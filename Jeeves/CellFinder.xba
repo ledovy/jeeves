@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CellFinder" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;CONSTANTS
+Public Const maxRows = 256
+
+&apos;ATTRIBUTES
+Private sheet As Object
+Public maxSearchRows as Integer
+Public searchColumn as Integer
+Public startRow as Integer
+
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	maxSearchRows = maxRows
+End Sub
+
+Public Sub Init(targetSheet as Object, column as Integer, row as Integer)
+	sheet = targetSheet
+	searchColumn = column
+	startRow = row
+End Sub
+
+Function FindRow(searchValue as String)
+	MsgBox &quot;FindRow(&quot;+startRow+&quot;, &quot;+searchColumn+&quot;, &quot;+searchValue+&quot;)&quot;
+End Function
+
+Function FindRowUntil(searchValue as String, abortValue as String)
+	MsgBox &quot;FindRow(&quot;+startRow+&quot;, &quot;+searchColumn+&quot;, &quot;+searchValue+&quot;, &quot;+abortValue+&quot;)&quot;
+End Function
+</script:module>

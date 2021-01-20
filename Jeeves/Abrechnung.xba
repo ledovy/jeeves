@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Abrechnung" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Abrechnung" script:language="StarBasic">REM  *****  BASIC  *****
 Const TimeFormat = &quot;HH:MM&quot;
 Const CurrencyFormat = &quot;[$SFr.-807] #&apos;##0.00;[$SFr.-807] -#&apos;##0.00&quot;
 &apos;Zeiterfassung
@@ -65,6 +65,10 @@ Sub Init
 	timeSheet = doc.Sheets(0)
 	typeSheet = doc.Sheets(1)
 	calcSheet = doc.Sheets(2)
+	
+	Dim finder as New CellFinder
+	finder.Init(timeSheet)
+	finder.FindRow(0, 0, &quot;Datum&quot;)
 	
 	config = New Configuration
 	config.Init(doc.Sheets(3))

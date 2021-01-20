@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ContactData" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ContactData" script:language="StarBasic">REM  *****  BASIC  *****
 Option Compatible
 Option ClassModule
 Option Explicit
@@ -37,10 +37,10 @@ Public Sub Init(sheet as Object)
 	bankIban = CheckValue(&quot;Bankverbindung &apos;IBAN&apos;&quot;, sheet.getCellByPosition(valueColumn, bankIbanRow).String)
 End Sub
 
-Sub CheckValue(title as String, value as String) as String
-	If value = &quot;&quot; Then
-		MsgBox &quot;&quot; + title + &quot; fehlt&quot;
-	End If
-	CheckValue = value
-End Sub
+&apos;Sub CheckValue(title as String, value as String) as String
+&apos;	If value = &quot;&quot; Then
+&apos;		MsgBox &quot;&quot; + title + &quot; fehlt&quot;
+&apos;	End If
+&apos;	CheckValue = value
+&apos;End Sub
 </script:module>

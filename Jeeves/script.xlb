@@ -7,4 +7,6 @@
  <library:element library:name="ContactData"/>
  <library:element library:name="MasterData"/>
  <library:element library:name="WorkTypes"/>
+ <library:element library:name="CellFinder"/>
+ <library:element library:name="Util"/>
 </library:library>

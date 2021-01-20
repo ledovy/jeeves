@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="MasterData" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="MasterData" script:language="StarBasic">REM  *****  BASIC  *****
 Option Compatible
 Option ClassModule
 Option Explicit
@@ -55,10 +55,10 @@ Public Sub Init(sheet as Object, doc as Object)
 	fileName = CheckValue(&quot;Dateiname&quot;, doc.getLocation())
 End Sub
 
-Sub CheckValue(title as String, value as String) as String
-	If value = &quot;&quot; Then
-		MsgBox &quot;Stammdaten &apos;&quot; + title + &quot;&apos; fehlt&quot;
-	End If
-	CheckValue = value
-End Sub
+&apos;Sub CheckValue(title as String, value as String) as String
+&apos;	If value = &quot;&quot; Then
+&apos;		MsgBox &quot;Stammdaten &apos;&quot; + title + &quot;&apos; fehlt&quot;
+&apos;	End If
+&apos;	CheckValue = value
+&apos;End Sub
 </script:module>
