@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Configuration" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;CONSTANTS
+Private Const valueColumn = 1
+Private Const showTimeSumRow = 1
+Private Const showCostSumRow = 2
+Private Const pathAccountingRow = 3
+
+&apos;ATTRIBUTES	
+Public ShowTimeSum As Boolean
+Public ShowCostSum As Boolean
+Public PathAccounting As String
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	ShowTimeSum = False
+	ShowCostSum = True
+	PathAccounting = &quot;&quot;
+End Sub
+
+Public Sub Init(sheet as Object)
+	ShowTimeSum = sheet.getCellByPosition(valueColumn, showTimeSumRow).Value
+	ShowCostSum = sheet.getCellByPosition(valueColumn, showCostSumRow).Value
+	PathAccounting = sheet.getCellByPosition(valueColumn, pathAccountingRow).String
+End Sub
+
+</script:module>

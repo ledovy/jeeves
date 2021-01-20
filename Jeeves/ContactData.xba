@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ContactData" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;CONSTANTS
+Public Const valueColumn = 1
+Private Const contactFirstNameRow = 1
+Private Const contactLastNameRow = 2
+Private Const contactAddressRow = 3
+Private Const bankPcRow = 5
+Private Const bankIbanRow = 6
+
+&apos;ATTRIBUTES
+Public contactFirstName As String
+Public contactLastName As String
+Public contactAddress As String
+Public bankPc As String
+Public bankIban As String
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	contactFirstName = &quot;&quot;
+	contactLastName = &quot;&quot;
+	contactAddress = &quot;&quot;
+	bankPc = &quot;&quot;
+	bankIban = &quot;&quot;
+End Sub
+
+Public Sub Init(sheet as Object)
+	contactFirstName = CheckValue(&quot;Kontaktdaten &apos;Vorname&apos;&quot;, sheet.getCellByPosition(valueColumn, contactFirstNameRow).String)
+	contactLastName = CheckValue(&quot;Kontaktdaten &apos;Nachname&apos;&quot;, sheet.getCellByPosition(valueColumn, contactLastNameRow).String)
+	contactAddress = CheckValue(&quot;Kontaktdaten &apos;Adresse&apos;&quot;, sheet.getCellByPosition(valueColumn, contactAddressRow).String)
+	bankPc = CheckValue(&quot;Bankverbindung &apos;PC&apos;&quot;, sheet.getCellByPosition(valueColumn, bankPcRow).String)
+	bankIban = CheckValue(&quot;Bankverbindung &apos;IBAN&apos;&quot;, sheet.getCellByPosition(valueColumn, bankIbanRow).String)
+End Sub
+
+Sub CheckValue(title as String, value as String) as String
+	If value = &quot;&quot; Then
+		MsgBox &quot;&quot; + title + &quot; fehlt&quot;
+	End If
+	CheckValue = value
+End Sub
+</script:module>

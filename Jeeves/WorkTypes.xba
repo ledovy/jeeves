@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="WorkTypes" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;CONSTANTS
+Private Const typeColumn = 0
+Const collapsedColumn = 1
+&apos;Const collapsedMinutesColumn = 2
+Private Const effortColumn = 3
+Const minutesRoundedColumn = 4
+&apos;Const typeMinutesFormattedColumn = 5
+Const costColumn = 6
+Const timeColumn = 7
+&apos;Const typeCostPerMinutesColumn = 8
+Const costsFormattedColumn = 9
+
+&apos;ATTRIBUTES	
+Private sheet As Object
+Private Const maxNumberOfTypes = 100
+Public Types(maxNumberOfTypes) As String
+Public TypesSize As Integer
+&apos;TypesSize = 0
+Private TypesCollapsed(maxNumberOfTypes) As Boolean
+Public CollapsedSize As Integer
+&apos;CollapsedTypesSize = 0
+&apos;Public SeparateTypes(maxNumberOfTypes) As String
+Public SeparateSize As Integer
+&apos;SeparateTypesSize = 0
+Private TypesRow(maxNumberOfTypes) As Integer
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+End Sub
+
+Public Sub Init(typeSheet as Object)
+	sheet = typeSheet
+	ReadTypes()
+	Reset()
+End Sub
+
+Private Sub Reset
+	Dim i As Integer
+	For i = 1 To TypesSize
+		Dim row As Integer
+		row = TypesRow(i-1)
+		sheet.getCellByPosition(effortColumn, row).String = 0
+	Next i
+End Sub
+
+Private Sub ReadTypes
+	TypesSize = 0
+	CollapsedSize = 0
+	SeparateSize = 0
+	Dim i As Integer
+	i = 1
+	Dim rowValue As String
+	rowValue = sheet.getCellByPosition(typeColumn, i).String
+	Do While &quot;&quot; &lt;&gt; rowValue
+		Dim collapsed As Boolean
+		collapsed = sheet.getCellByPosition(collapsedColumn, i).String = &quot;Ja&quot;
+		AddType(rowValue, collapsed, i)
+		i = i+1
+		rowValue = sheet.getCellByPosition(typeColumn, i).String
+	Loop
+End Sub
+
+Private Sub AddType(workType As String, collapsed As Boolean, row As Integer)
+	Types(TypesSize) = workType
+	TypesCollapsed(TypesSize) = collapsed
+	If collapsed Then
+		CollapsedSize = CollapsedSize + 1
+	Else
+		SeparateSize = SeparateSize + 1
+	End If
+	TypesRow(TypesSize) = row
+	TypesSize = TypesSize + 1
+End Sub
+
+Public Function IsCollapsed(workType As String)
+	Dim i As Integer
+	i = GetRow(workType)
+	If i&lt;0 Then
+		IsCollapsed = 0
+	ELse
+		IsCollapsed = TypesCollapsed(i)
+	End If
+End Function
+
+Private Function GetRow(workType As String) As Integer
+	Dim i As Integer 
+	For i = 0 To TypesSize
+		If Types(i) = workType Then
+			GetRow = i
+			Exit Function
+		End If
+	Next i
+	MsgBox &quot;Unbekannte Kategorie: &apos;&quot;+workType+&quot;&apos;&quot;
+	GetRow = -1
+End Function
+
+Public Sub AddEffort(effort As Integer, workType As String)
+	Dim i As Integer
+	Dim start As Integer
+	start = GetRow(workType)
+	If start &gt;= 0 Then
+		i = start+1
+		Dim v As Integer
+		v = sheet.getCellByPosition(effortColumn, i).String
+		v = v + effort
+		sheet.getCellByPosition(effortColumn, i).String = v
+	End If
+End Sub
+
+Public Function GetWorkEntry(workType As String)
+	Dim i As Integer
+	i = GetRow(workType)+1
+	Dim entry As Object
+	entry = New WorkEntry
+	entry.title = workType
+	entry.factor = sheet.getCellByPosition(costColumn, i).String + &quot; / &quot; + sheet.getCellByPosition(timeColumn, i).String + &quot; Min.&quot;
+	entry.time = sheet.getCellByPosition(minutesRoundedColumn, i).Value
+	entry.cost = sheet.getCellByPosition(costsFormattedColumn, i).Value
+	&apos;dateValue = GetRange(typeValue)
+	GetWorkEntry = entry
+End Function
+</script:module>

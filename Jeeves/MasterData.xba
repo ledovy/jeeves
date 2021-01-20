@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="MasterData" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;CONSTANTS
+Public Const valueColumn = 1
+Private Const customerNameRow = 1
+Private Const customerCompanyRow = 2
+Private Const customerEmailRow = 3
+Private Const calculationTitleRow = 4
+Private Const accountingTitleRow = 5
+Public Const startDateRow = 6
+Private Const calculationDateRow = 7
+Private Const calculationYearRow = 8
+
+&apos;ATTRIBUTES
+Public customerName As String
+Public customerCompany As String
+Public customerEmail As String
+Public calculationTitle As String
+Public accountingTitle As String
+Public startDate As String
+Public calculationDate As String
+Public calculationDateValue As Date
+Public calculationYear As String
+Public fileName as String
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	customerName = &quot;&quot;
+	customerCompany = &quot;&quot;
+	customerEmail = &quot;&quot;
+	calculationTitle = &quot;&quot;
+	accountingTitle = &quot;&quot;
+	startDate = &quot;&quot;
+	calculationDate = &quot;&quot;
+	calculationDateValue = 0
+	calculationYear = &quot;&quot;
+	fileName = &quot;&quot;
+End Sub
+
+Public Sub Init(sheet as Object, doc as Object)
+	customerName = CheckValue(&quot;Kunde Name&quot;, sheet.getCellByPosition(valueColumn, customerNameRow).String)
+	customerCompany = CheckValue(&quot;Kunde Firma&quot;, sheet.getCellByPosition(valueColumn, customerCompanyRow).String)
+	customerEmail = CheckValue(&quot;Kunde E-Mail&quot;, sheet.getCellByPosition(valueColumn, customerEmailRow).String)
+	calculationTitle = CheckValue(&quot;Rechnungstitel&quot;, sheet.getCellByPosition(valueColumn, calculationTitleRow).String)
+	accountingTitle = CheckValue(&quot;Buchh.-Eintrag&quot;, sheet.getCellByPosition(valueColumn, accountingTitleRow).String)
+	startDate = CheckValue(&quot;Startdatum&quot;, sheet.getCellByPosition(valueColumn, startDateRow).String)
+	calculationDate = CheckValue(&quot;Rechnungsdatum&quot;, sheet.getCellByPosition(valueColumn, calculationDateRow).String)
+	calculationDateValue = sheet.getCellByPosition(valueColumn, calculationDateRow).Value
+	calculationYear = CheckValue(&quot;Rechnungsjahr&quot;, sheet.getCellByPosition(valueColumn, calculationYearRow).String)
+	fileName = CheckValue(&quot;Dateiname&quot;, doc.getLocation())
+End Sub
+
+Sub CheckValue(title as String, value as String) as String
+	If value = &quot;&quot; Then
+		MsgBox &quot;Stammdaten &apos;&quot; + title + &quot;&apos; fehlt&quot;
+	End If
+	CheckValue = value
+End Sub
+</script:module>

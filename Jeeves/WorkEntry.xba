@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="WorkEntry" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;CONSTANTS
+Const timeDateColumn = 0
+Const timeTimeColumn = 1
+Const timeTypeColumn = 2
+Const timeNameColumn = 3
+Const timeMaxTimeColumn = 4
+Const timeMaxCostColumn = 5
+Const timeCollapsedColumn = 6
+Const timeCostColumn = 7
+Const timeTimeRoundedColumn = 8
+Const timeTimeFormattedColumn = 9
+Const timeCostRoundedColumn = 10
+Const timeFactorCostColumn = 11
+Const timeFactorTimeColumn  = 12
+
+&apos;ATTRIBUTES
+Public datum As String
+Public title As String
+Public factor As String
+Public time As Date
+Public cost As Currency
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	datum = &quot;&quot;
+	title = &quot;&quot;
+	factor = &quot;&quot;
+	time = 0
+	cost = 0
+End Sub
+
+Public Sub Init(sheet as Object, row As Integer)
+	datum = sheet.getCellByPosition(timeDateColumn, row).String
+	factor = sheet.getCellByPosition(timeFactorCostColumn, row).String + &quot; / &quot; + sheet.getCellByPosition(timeFactorTimeColumn, row).String + &quot; Min.&quot;
+	time = sheet.getCellByPosition(timeTimeRoundedColumn, row).Value
+	cost = sheet.getCellByPosition(timeCostRoundedColumn, row).Value
+	title = sheet.getCellByPosition(timeNameColumn, row).String
+End Sub
+</script:module>
