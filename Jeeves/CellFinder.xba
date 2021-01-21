@@ -11,8 +11,6 @@ Public Const maxRows = 256
 &apos;ATTRIBUTES
 Private sheet As Object
 Public maxSearchRows as Integer
-Public searchColumn as Integer
-Public startRow as Integer
 
 
 &apos;CONSTRUCTOR
@@ -20,17 +18,22 @@ Public Sub Class_Initialize
 	maxSearchRows = maxRows
 End Sub
 
-Public Sub Init(targetSheet as Object, column as Integer, row as Integer)
+Public Sub Init(targetSheet as Object)
 	sheet = targetSheet
-	searchColumn = column
-	startRow = row
 End Sub
 
-Function FindRow(searchValue as String)
-	MsgBox &quot;FindRow(&quot;+startRow+&quot;, &quot;+searchColumn+&quot;, &quot;+searchValue+&quot;)&quot;
+Function FindRow(column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
+	Dim toRow As Integer
+	toRow = row
+	Dim rowValue As String
+	Dim cell as Object
+	cell = sheet.getCellByPosition(column, toRow)
+	rowValue = cell.String
+	Do While searchValue &lt;&gt; rowValue AND (toRow-row) &lt; maxSearchRows AND (skipEmpty OR rowValue &lt;&gt; &quot;&quot;)
+		toRow = toRow + 1
+		rowValue = sheet.getCellByPosition(column, toRow).String
+	Loop
+	FindRow = toRow
 End Function
 
-Function FindRowUntil(searchValue as String, abortValue as String)
-	MsgBox &quot;FindRow(&quot;+startRow+&quot;, &quot;+searchColumn+&quot;, &quot;+searchValue+&quot;, &quot;+abortValue+&quot;)&quot;
-End Function
 </script:module>

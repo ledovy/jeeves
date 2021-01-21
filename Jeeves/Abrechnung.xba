@@ -66,10 +66,9 @@ Sub Init
 	typeSheet = doc.Sheets(1)
 	calcSheet = doc.Sheets(2)
 	
-	Dim finder as New CellFinder
-	finder.Init(timeSheet)
-	finder.FindRow(0, 0, &quot;Datum&quot;)
-	
+	Dim cell as Object
+	cell = timeSheet.getCellByPosition(0,0)
+		
 	config = New Configuration
 	config.Init(doc.Sheets(3))
 	masterData = New MasterData
