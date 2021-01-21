@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="WorkTypes" script:language="StarBasic">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ClassWorkTypes" script:language="StarBasic">REM  *****  BASIC  *****
 Option Compatible
 Option ClassModule
 Option Explicit
@@ -118,7 +118,7 @@ Public Function GetWorkEntry(workType As String)
 	Dim i As Integer
 	i = GetRow(workType)+1
 	Dim entry As Object
-	entry = New WorkEntry
+	entry = New ClassWorkEntry
 	entry.title = workType
 	entry.factor = sheet.getCellByPosition(costColumn, i).String + &quot; / &quot; + sheet.getCellByPosition(timeColumn, i).String + &quot; Min.&quot;
 	entry.time = sheet.getCellByPosition(minutesRoundedColumn, i).Value

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE library:library PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "library.dtd">
 <library:library xmlns:library="http://openoffice.org/2000/library" library:name="Jeeves" library:readonly="false" library:passwordprotected="false">
- <library:element library:name="WorkEntry"/>
+ <library:element library:name="ClassMasterData"/>
  <library:element library:name="Abrechnung"/>
- <library:element library:name="Configuration"/>
- <library:element library:name="ContactData"/>
- <library:element library:name="MasterData"/>
- <library:element library:name="WorkTypes"/>
- <library:element library:name="TestSuite"/>
  <library:element library:name="Util"/>
+ <library:element library:name="ClassWorkTypes"/>
+ <library:element library:name="ClassConfig"/>
+ <library:element library:name="ClassWorkEntry"/>
+ <library:element library:name="TestSuite"/>
+ <library:element library:name="ClassContact"/>
 </library:library>

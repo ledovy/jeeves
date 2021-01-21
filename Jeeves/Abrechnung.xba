@@ -45,8 +45,8 @@ Dim calcSheet As Object
 Dim currentTargetRow As Integer
 Dim localeSettings As New com.sun.star.lang.Locale
 
-Dim config As New Configuration
-Dim masterData As New MasterData
+Dim config As New ClassConfig
+Dim masterData As New ClassMasterData
 Dim contactData As Object
 Dim types As Object
 	
@@ -71,7 +71,7 @@ Sub Init
 	
 	config.Init(doc.Sheets(3))
 	masterData.Init(timeSheet, doc)
-	types = New WorkTypes
+	types = New ClassWorkTypes
 	types.Init(typeSheet)
 	ClearOldEntries(calcSheet)
 End Sub
@@ -114,7 +114,7 @@ Sub ProcessEntries
 End Sub
 
 Function GetWorkEntry(row As Integer)
-	Dim entry As New WorkEntry
+	Dim entry As New ClassWorkEntry
 	entry.Init(timeSheet, row)
 	GetWorkEntry = entry
 End Function
@@ -243,7 +243,7 @@ Sub UpdateAccounting
 	If FileExists(path) Then
 	    url = convertToURL(path)
 	    accDoc = StarDesktop.loadComponentFromURL(url, &quot;_blank&quot;, 0, Array())
-	    contactData = New ContactData
+	    contactData = New ClassContact
 		contactData.Init(accDoc.Sheets.getByName(&quot;Kontaktdaten&quot;))
 		If accDoc.Sheets.hasByName(masterData.calculationYear) Then
 		   accSheet = accDoc.Sheets.getByName(masterData.calculationYear)
