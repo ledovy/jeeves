@@ -38,12 +38,15 @@ Const accFileColumn = 4
 Const accStartRow = 4
 
 
-Dim doc, timeSheet, typeSheet, calcSheet As Object
+Dim doc As Object
+Dim timeSheet As Object
+Dim typeSheet As Object
+Dim calcSheet As Object
 Dim currentTargetRow As Integer
 Dim localeSettings As New com.sun.star.lang.Locale
 
-Dim config As Object
-Dim masterData As Object
+Dim config As New Configuration
+Dim masterData As New MasterData
 Dim contactData As Object
 Dim types As Object
 	
@@ -66,12 +69,7 @@ Sub Init
 	typeSheet = doc.Sheets(1)
 	calcSheet = doc.Sheets(2)
 	
-	Dim cell as Object
-	cell = timeSheet.getCellByPosition(0,0)
-		
-	config = New Configuration
 	config.Init(doc.Sheets(3))
-	masterData = New MasterData
 	masterData.Init(timeSheet, doc)
 	types = New WorkTypes
 	types.Init(typeSheet)
@@ -80,13 +78,7 @@ End Sub
 
 Sub ClearOldEntries(sheet as Object)
 	Dim toRow As Integer
-	toRow = calcStartRow
-	Dim rowValue As String
-	rowValue = calcSheet.getCellByPosition(calcFactorColumn, toRow).String
-	Do While &quot;Total: &quot; &lt;&gt; rowValue
-		toRow = toRow + 1
-		rowValue = calcSheet.getCellByPosition(calcFactorColumn, toRow).String
-	Loop
+	toRow = FindRow(calcSheet, calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
 	
 	Dim row As Integer
 	row = calcStartRow
@@ -292,13 +284,8 @@ Sub WriteCalculationToAccounting(sheet as Object)
 	customerRow = -1
 	currentRow = accStartRow
 	&apos;loop to find customer
-	Do While &quot;Total&quot; &lt;&gt; sheet.getCellByPosition(accCustomerColumn, currentRow).String
-		If company = sheet.getCellByPosition(accCustomerColumn, currentRow).String Then
-			customerRow = currentRow
-		End If
-		currentRow = currentRow+1
-	Loop
-	lastRow = currentRow
+	customerRow = FindRow(sheet, accCustomerColumn, accStartRow, company, True)
+	lastRow = FindRow(sheet, accCustomerColumn, accStartRow, &quot;Total&quot;, True)
 	&apos;if customer does not exist, create a new title
 	If customerRow &lt; 0 Then
 		Dim spacing As Integer
@@ -372,7 +359,7 @@ Sub ShowGreetings
 	Dim t as Date
 	t = Now()
 	If MONTH(t)=10 AND DAY(t)=29 Then
-		MsgBox &quot;Herzlichen Glückwunsch zum Geburtstag, Janine!&quot;
+		MsgBox &quot;Herzlichen Glückwunsch zum Geburtstag!&quot;
 	End If
 End Sub
 

@@ -8,4 +8,26 @@ Sub CheckValue(title as String, value as String) as String
 	End If
 	CheckValue = value
 End Sub
+
+Function FindRow(sheet as Object, column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
+	Dim found As Boolean
+	found = False
+	Dim toRow As Integer
+	toRow = row
+	Dim rowValue As String
+	rowValue = sheet.getCellByPosition(column, toRow).String
+	Do While (NOT found) AND ((toRow-row) &lt; 300) AND (skipEmpty OR rowValue &lt;&gt; &quot;&quot;)
+		If searchValue = rowValue Then
+			found = true
+		ENd If
+		toRow = toRow + 1
+		rowValue = sheet.getCellByPosition(column, toRow).String
+	Loop
+	If found Then
+		FindRow = toRow-1
+	Else
+		FindRow = -1
+	End If
+End Function
+
 </script:module>

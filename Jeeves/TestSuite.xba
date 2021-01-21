@@ -23,20 +23,20 @@ Dim sheet as Object
 Dim finder as New CellFinder
 
 Sub TestCellFinder
-	finder.Init(sheet)
-	
 	AssertFindRow(0, 0, 0, True)
 	AssertFindRow(0, 1, 3, True)
 	AssertFindRow(0, 4, 6, True)
-	AssertFindRow(1, 0, 3, False)
 	AssertFindRow(1, 0, 5, True)
+	AssertFindRow(1, 0, -1, False)
+	AssertFindRow(2, 0, -1, True)
+	AssertFindRow(2, 0, -1, True)
 End Sub
 
 Sub AssertFindRow(column, startRow, expectedResult as Integer, skipEmpty as Boolean)
 	Dim actualResult as Integer
-	actualResult = finder.FindRow(column, startRow, testValue, skipEmpty)
+	actualResult = FindRow(sheet, column, startRow, testValue, skipEmpty)
 	If expectedResult &lt;&gt; actualResult Then
-		Fail(&quot;FindRow (&quot;+column+&quot;/&quot;+startRow+&quot;) &quot;+actualResult+&quot; was not &quot;+expectedResult)
+		Fail(&quot;FindRow (&quot;+column+&quot; / &quot;+startRow+&quot; / &quot;+skipEmpty+&quot;) -&gt; &quot;+actualResult+&quot; was not &quot;+expectedResult)
 	End If
 End Sub
 
