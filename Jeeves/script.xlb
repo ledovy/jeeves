@@ -9,4 +9,5 @@
  <library:element library:name="WorkTypes"/>
  <library:element library:name="CellFinder"/>
  <library:element library:name="Util"/>
+ <library:element library:name="TestSuite"/>
 </library:library>

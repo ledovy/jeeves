@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestSuite" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+
+Public testResult as Boolean
+
+Sub Main
+	doc = ThisComponent
+	sheet = doc.Sheets(1)
+	testResult = True
+	
+	TestCellFinder()
+	
+	If testResult Then
+		MsgBox &quot;SUCCESSFUL&quot;
+	End If
+End Sub
+
+&apos; CellFinder
+Const testValue = &quot;Test&quot;
+
+Dim sheet as Object
+Dim finder as New CellFinder
+
+Sub TestCellFinder
+	finder.Init(sheet)
+	
+	AssertFindRow(0, 0, 0, True)
+	AssertFindRow(0, 1, 3, True)
+	AssertFindRow(0, 4, 6, True)
+	AssertFindRow(1, 0, 3, False)
+	AssertFindRow(1, 0, 5, True)
+End Sub
+
+Sub AssertFindRow(column, startRow, expectedResult as Integer, skipEmpty as Boolean)
+	Dim actualResult as Integer
+	actualResult = finder.FindRow(column, startRow, testValue, skipEmpty)
+	If expectedResult &lt;&gt; actualResult Then
+		Fail(&quot;FindRow (&quot;+column+&quot;/&quot;+startRow+&quot;) &quot;+actualResult+&quot; was not &quot;+expectedResult)
+	End If
+End Sub
+
+&apos; Commons
+Sub Fail(msg as String)
+	testResult = False
+	MsgBox &quot;FAIL: &quot;+msg
+End Sub
+</script:module>
