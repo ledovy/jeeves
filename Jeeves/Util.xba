@@ -3,11 +3,19 @@
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="Util" script:language="StarBasic">REM  *****  BASIC  *****
 
 Sub CheckValue(title as String, value as String) as String
-	If value = &quot;&quot; Then
+	If IsValueSet(value) Then
 		MsgBox &quot;&quot; + title + &quot; fehlt&quot;
 	End If
 	CheckValue = value
 End Sub
+
+Function IsValueSet(value as String) as String
+	If value = &quot;&quot; Then
+		IsValueSet = False
+	Else
+		IsValueSet = True
+	End If
+End Function
 
 Function FindRow(sheet as Object, column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
 	Dim found As Boolean
@@ -19,7 +27,7 @@ Function FindRow(sheet as Object, column as Integer, row as Integer, searchValue
 	Do While (NOT found) AND ((toRow-row) &lt; 300) AND (skipEmpty OR rowValue &lt;&gt; &quot;&quot;)
 		If searchValue = rowValue Then
 			found = true
-		ENd If
+		End If
 		toRow = toRow + 1
 		rowValue = sheet.getCellByPosition(column, toRow).String
 	Loop

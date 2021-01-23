@@ -5,10 +5,6 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
-Private Const testValue = &quot;Test&quot;
-Private Const matchColumn = 3
-Private Const noMatchColumn = 4
-
 Private sheet as Object
 Private targetRow as Integer
 Private testsSucceeded as Integer
@@ -39,6 +35,11 @@ Public Function HasFailed as Boolean
 End Function
 
 &apos;Implement RunTests, but drop everything below this line
+
+Private Const testValue = &quot;Test&quot;
+Private Const matchColumn = 3
+Private Const noMatchColumn = 4
+
 Sub RunTests
 	AssertFindRowMatch(1, 1, True)
 	AssertFindRowMatch(2, 4, True)

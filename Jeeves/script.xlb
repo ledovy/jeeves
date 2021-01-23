@@ -10,4 +10,5 @@
  <library:element library:name="TestSuite"/>
  <library:element library:name="ClassContact"/>
  <library:element library:name="TestFindRow"/>
+ <library:element library:name="TestIsValueSet"/>
 </library:library>

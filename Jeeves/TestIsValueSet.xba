@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestIsValueSet" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+Private sheet as Object
+Private targetRow as Integer
+Private testsSucceeded as Integer
+Private failMessage as String
+Private failInfo as String
+Public TestName as String
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	sheet = ThisComponent.Sheets(0)
+	testsSucceeded = 0
+	failInfo = &quot;&quot;
+	failMessage = &quot;&quot;
+End Sub
+
+Public Sub Init(row as Integer)
+	targetRow = row
+	TestName = ReadTestName(targetRow)
+End Sub
+
+Private Sub Fail(info, msg as String)
+	failInfo = info
+	failMessage = msg
+End Sub
+
+Public Function HasFailed as Boolean
+	HasFailed = failMessage &lt;&gt; &quot;&quot;
+End Function
+
+&apos;Implement RunTests, but drop everything below this line
+
+Sub RunTests
+	AssertIsValueSet(1)
+	AssertIsValueSet(1234)
+	AssertIsValueSet(&quot;Test&quot;)
+	
+	AssertIsValueNotSet(&quot;&quot;)
+	
+	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
+End Sub
+
+Sub AssertIsValueSet(value as String)
+	AssertValue(value, True)
+End Sub
+
+Sub AssertIsValueNotSet(value as String)
+	AssertValue(value, False)
+End Sub
+
+Sub AssertValue(value as String, expectedResult as Boolean)
+	If Not HasFailed Then
+		Dim actualResult as Boolean
+		actualResult = IsValueSet(value)
+
+		testsSucceeded = testsSucceeded + 1
+		If expectedResult &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded, &quot;&quot;+value+&quot; was not &quot;+expectedResult)
+		End If
+	End If
+End Sub
+
+</script:module>

@@ -6,21 +6,67 @@ Public Const resultColumnCaptions = 1
 Public Const resultColumnAllTests = 2
 Public Const resultRowAllTests = 2
 Public Const resultRowFindRowTests = 7
+Public Const resultRowIsValueSetTests = 12
+Public Const resultRowLastTests = resultRowIsValueSetTests
 
-Private testsSucceeded, testsFailed as Integer
+Private allTestsSucceeded, testsFailed as Integer
 Private failedInfo as String
 Private currentTest as Object
 
 &apos;TESTS: All
 Sub TestAll
-	testsSucceeded = 0
+	allTestsSucceeded = 0
 	testsFailed = 0
 	failedInfo = &quot;&quot;
-	
 	ClearAllTestResults()
-	TestFindRow()
 	
-	WriteTestResult(resultRowAllTests, testsSucceded, &quot;&quot;+testsFailed, failedInfo)
+	TestFindRow()
+	TestIsValueSet()
+	
+	WriteTestResult(resultRowAllTests, allTestsSucceeded, &quot;&quot;+testsFailed, failedInfo)
+End Sub
+
+Sub ClearAllResult
+	ClearTestResults(resultRowAllTests)
+End Sub
+
+Sub ClearAllTestResults
+	Dim I as Integer
+	For I = resultRowAllTests To resultRowLastTests Step 5
+		ClearTestResults(I)
+	Next I
+End Sub
+
+&apos;TESTS: FindRow
+Sub TestFindRow
+	currentTest = New TestFindRow
+	RunCurrentTest(resultRowFindRowTests)
+End Sub
+
+Sub ClearFindRowResults
+	ClearTestResults(resultRowFindRowTests)
+End Sub
+
+&apos;TESTS: IsValueSet
+Sub TestIsValueSet
+	currentTest = New TestIsValueSet
+	RunCurrentTest(resultRowIsValueSetTests)
+End Sub
+
+Sub ClearIsValueSetResults
+	ClearTestResults(resultRowIsValueSetTests)
+End Sub
+
+&apos;METHODS
+
+Sub RunCurrentTest(targetRow)
+	ClearTestResults(resultRowAllTests)
+	ClearTestResults(targetRow)
+	
+	currentTest.Init(targetRow)
+	currentTest.RunTests()
+	
+	UpdateResultInfo()
 End Sub
 
 Sub UpdateResultInfo
@@ -34,39 +80,6 @@ Sub UpdateResultInfo
 	End If
 End Sub
 
-Sub ClearAllResult
-	ClearTestResults(resultRowAllTests)
-End Sub
-
-Sub ClearAllTestResults
-	Dim I as Integer
-	For I = resultRowAllTests To resultRowFindRowTests Step 5
-		ClearTestResults(I)
-	Next I
-End Sub
-
-Sub RunCurrentTest(targetRow)
-	ClearTestResults(resultRowAllTests)
-	ClearTestResults(targetRow)
-	
-	currentTest.Init(targetRow)
-	currentTest.RunTests()
-	
-	UpdateResultInfo()
-End Sub
-
-&apos;TESTS: FindRow
-Sub TestFindRow
-	currentTest = New TestFindRow
-	RunCurrentTest(resultRowFindRowTests)
-End Sub
-
-Sub ClearFindRowResults
-	ClearTestResults(resultRowFindRowTests)
-End Sub
-
-&apos;METHODS
-
 Sub WriteTestResult(row as Integer, nrSucceeded as Integer, info, message as String)
 	Dim result as String
 	If message &lt;&gt; &quot;&quot; Then
@@ -74,12 +87,12 @@ Sub WriteTestResult(row as Integer, nrSucceeded as Integer, info, message as Str
 	Else
 		result = &quot;SUCCESS&quot;
 	End If
-	testsSucceeded = testsSucceeded + nrSucceeded
+	allTestsSucceeded = allTestsSucceeded + nrSucceeded
 	
 	Dim sheet
 	sheet = ThisComponent.Sheets(0)
 	sheet.getCellByPosition(resultColumnAllTests, row).String = result
-	sheet.getCellByPosition(resultColumnAllTests, row+1).Value = testsSucceeded
+	sheet.getCellByPosition(resultColumnAllTests, row+1).Value = nrSucceeded
 	sheet.getCellByPosition(resultColumnAllTests, row+2).String = info
 	sheet.getCellByPosition(resultColumnAllTests, row+3).String = message
 End Sub
