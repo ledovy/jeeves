@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestFindRow" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+Private Const testValue = &quot;Test&quot;
+Private Const matchColumn = 3
+Private Const noMatchColumn = 4
+
+Private sheet as Object
+Private targetRow as Integer
+Private testsSucceeded as Integer
+Private failMessage as String
+Private failInfo as String
+Public TestName as String
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	sheet = ThisComponent.Sheets(0)
+	testsSucceeded = 0
+	failInfo = &quot;&quot;
+	failMessage = &quot;&quot;
+End Sub
+
+Public Sub Init(row as Integer)
+	targetRow = row
+	TestName = ReadTestName(targetRow)
+End Sub
+
+Private Sub Fail(info, msg as String)
+	failInfo = info
+	failMessage = msg
+End Sub
+
+Public Function HasFailed as Boolean
+	HasFailed = failMessage &lt;&gt; &quot;&quot;
+End Function
+
+&apos;Implement RunTests, but drop everything below this line
+Sub RunTests
+	AssertFindRowMatch(1, 1, True)
+	AssertFindRowMatch(2, 4, True)
+	AssertFindRowMatch(5, 7, True)
+	AssertFindRowMatch(8, 13, True)
+	AssertFindRowMatch(8, -1, False)
+	AssertFindRowNoMatch(1, True)
+	AssertFindRowNoMatch(1, False)
+	
+	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
+End Sub
+
+Sub AssertFindRowMatch(startRow, expectedResult as Integer, skipEmpty as Boolean)
+	AssertFindRow(matchColumn, startRow, expectedResult, skipEmpty)
+End Sub
+
+Sub AssertFindRowNoMatch(startRow as Integer, skipEmpty as Boolean)
+	AssertFindRow(noMatchColumn, startRow, -1, skipEmpty)
+End Sub
+
+Sub AssertFindRow(column, startRow, expectedResult as Integer, skipEmpty as Boolean)
+	If Not HasFailed Then
+		Dim actualResult as Integer
+		actualResult = FindRow(sheet, column, startRow, testValue, skipEmpty)
+
+		testsSucceeded = testsSucceeded + 1
+		If expectedResult &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+column+&quot; / &quot;+startRow+&quot; / &quot;+skipEmpty+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+expectedResult)
+		End If
+	End If
+End Sub
+
+</script:module>

@@ -1,48 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestSuite" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestSuite" script:language="StarBasic">REM  *****  BASIC  *****
 
-Public testResult as Boolean
+Public Const resultColumnCaptions = 1
+Public Const resultColumnAllTests = 2
+Public Const resultRowAllTests = 2
+Public Const resultRowFindRowTests = 7
 
-Sub Main
-	doc = ThisComponent
-	sheet = doc.Sheets(1)
-	testResult = True
+Private testsSucceeded, testsFailed as Integer
+Private failedInfo as String
+Private currentTest as Object
+
+&apos;TESTS: All
+Sub TestAll
+	testsSucceeded = 0
+	testsFailed = 0
+	failedInfo = &quot;&quot;
 	
-	TestCellFinder()
+	ClearAllTestResults()
+	TestFindRow()
 	
-	If testResult Then
-		MsgBox &quot;SUCCESSFUL&quot;
+	WriteTestResult(resultRowAllTests, testsSucceded, &quot;&quot;+testsFailed, failedInfo)
+End Sub
+
+Sub UpdateResultInfo
+	If currentTest.HasFailed Then
+		testsFailed = testsFailed + 1
+		If failedInfo &lt;&gt; &quot;&quot; Then
+			failedInfo = failedInfo + &quot;, &quot;+currentTest.TestName
+		Else
+			failedInfo = currentTest.TestName
+		End If
 	End If
 End Sub
 
-&apos; CellFinder
-Const testValue = &quot;Test&quot;
-
-Dim sheet as Object
-Dim finder as New CellFinder
-
-Sub TestCellFinder
-	AssertFindRow(0, 0, 0, True)
-	AssertFindRow(0, 1, 3, True)
-	AssertFindRow(0, 4, 6, True)
-	AssertFindRow(1, 0, 5, True)
-	AssertFindRow(1, 0, -1, False)
-	AssertFindRow(2, 0, -1, True)
-	AssertFindRow(2, 0, -1, True)
+Sub ClearAllResult
+	ClearTestResults(resultRowAllTests)
 End Sub
 
-Sub AssertFindRow(column, startRow, expectedResult as Integer, skipEmpty as Boolean)
-	Dim actualResult as Integer
-	actualResult = FindRow(sheet, column, startRow, testValue, skipEmpty)
-	If expectedResult &lt;&gt; actualResult Then
-		Fail(&quot;FindRow (&quot;+column+&quot; / &quot;+startRow+&quot; / &quot;+skipEmpty+&quot;) -&gt; &quot;+actualResult+&quot; was not &quot;+expectedResult)
+Sub ClearAllTestResults
+	Dim I as Integer
+	For I = resultRowAllTests To resultRowFindRowTests Step 5
+		ClearTestResults(I)
+	Next I
+End Sub
+
+Sub RunCurrentTest(targetRow)
+	ClearTestResults(resultRowAllTests)
+	ClearTestResults(targetRow)
+	
+	currentTest.Init(targetRow)
+	currentTest.RunTests()
+	
+	UpdateResultInfo()
+End Sub
+
+&apos;TESTS: FindRow
+Sub TestFindRow
+	currentTest = New TestFindRow
+	RunCurrentTest(resultRowFindRowTests)
+End Sub
+
+Sub ClearFindRowResults
+	ClearTestResults(resultRowFindRowTests)
+End Sub
+
+&apos;METHODS
+
+Sub WriteTestResult(row as Integer, nrSucceeded as Integer, info, message as String)
+	Dim result as String
+	If message &lt;&gt; &quot;&quot; Then
+		result = &quot;FAILURE&quot;
+	Else
+		result = &quot;SUCCESS&quot;
 	End If
+	testsSucceeded = testsSucceeded + nrSucceeded
+	
+	Dim sheet
+	sheet = ThisComponent.Sheets(0)
+	sheet.getCellByPosition(resultColumnAllTests, row).String = result
+	sheet.getCellByPosition(resultColumnAllTests, row+1).Value = testsSucceeded
+	sheet.getCellByPosition(resultColumnAllTests, row+2).String = info
+	sheet.getCellByPosition(resultColumnAllTests, row+3).String = message
 End Sub
 
-&apos; Commons
-Sub Fail(msg as String)
-	testResult = False
-	MsgBox &quot;FAIL: &quot;+msg
+Sub ClearTestResults(row as Integer)
+	Dim sheet
+	sheet = ThisComponent.Sheets(0)
+	Dim I 
+	For I = 0 To 3
+  		sheet.getCellByPosition(resultColumnAllTests, row+I).String = &quot;&quot;
+	Next I
 End Sub
+
+Function ReadTestName(row as Integer) as String
+	ReadTestName = ThisComponent.Sheets(0).getCellByPosition(resultColumnCaptions, row).String
+End Function
+
 </script:module>
