@@ -3,7 +3,9 @@
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="Util" script:language="StarBasic">REM  *****  BASIC  *****
 
 Sub CheckValue(title as String, value as String) as String
-	If IsValueSet(value) Then
+	Dim valid as Boolean
+	valid = IsValueSet(value)
+	If Not valid Then
 		MsgBox &quot;&quot; + title + &quot; fehlt&quot;
 	End If
 	CheckValue = value

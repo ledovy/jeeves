@@ -73,19 +73,18 @@ Sub Init
 	masterData.Init(timeSheet, doc)
 	types = New ClassWorkTypes
 	types.Init(typeSheet)
+	
 	ClearOldEntries(calcSheet)
 End Sub
 
 Sub ClearOldEntries(sheet as Object)
-	Dim toRow As Integer
-	toRow = FindRow(calcSheet, calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
+	Dim endRow, rows As Integer
 	
-	Dim row As Integer
-	row = calcStartRow
-	Do While row &lt; toRow
-		calcSheet.Rows.removeByIndex(calcStartRow, 1)
-		row = row + 1
-	Loop
+	endRow = FindRow(calcSheet, calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
+	rows = endRow-calcStartRow
+	If rows &gt; 0 Then
+		calcSheet.Rows.removeByIndex(calcStartRow, rows)
+	End If
 End Sub
 
 Sub ProcessEntries
