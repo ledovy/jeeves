@@ -6,12 +6,15 @@ Option ClassModule
 Option Explicit
 
 &apos;CONSTANTS
+Public Const captionColumn = 0
 Public Const valueColumn = 1
-Private Const contactFirstNameRow = 1
-Private Const contactLastNameRow = 2
-Private Const contactAddressRow = 3
-Private Const bankPcRow = 5
-Private Const bankIbanRow = 6
+Public Const contactTitleRow = 0
+Public Const contactFirstNameRow = 1
+Public Const contactLastNameRow = 2
+Public Const contactAddressRow = 3
+Public Const bankTitleRow = 4
+Public Const bankPcRow = 5
+Public Const bankIbanRow = 6
 
 &apos;ATTRIBUTES
 Public contactFirstName As String
@@ -28,19 +31,23 @@ Public Sub Class_Initialize
 	bankPc = &quot;&quot;
 	bankIban = &quot;&quot;
 End Sub
-
-Public Sub Init(sheet as Object)
-	contactFirstName = CheckValue(&quot;Kontaktdaten &apos;Vorname&apos;&quot;, sheet.getCellByPosition(valueColumn, contactFirstNameRow).String)
-	contactLastName = CheckValue(&quot;Kontaktdaten &apos;Nachname&apos;&quot;, sheet.getCellByPosition(valueColumn, contactLastNameRow).String)
-	contactAddress = CheckValue(&quot;Kontaktdaten &apos;Adresse&apos;&quot;, sheet.getCellByPosition(valueColumn, contactAddressRow).String)
-	bankPc = CheckValue(&quot;Bankverbindung &apos;PC&apos;&quot;, sheet.getCellByPosition(valueColumn, bankPcRow).String)
-	bankIban = CheckValue(&quot;Bankverbindung &apos;IBAN&apos;&quot;, sheet.getCellByPosition(valueColumn, bankIbanRow).String)
+&apos;
+Public Sub Init&apos;(sheet as Object)
+	contactFirstName = ReadValue(contactTitleRow, contactFirstNameRow)
+	contactLastName = ReadValue(contactTitleRow, contactLastNameRow)
+	contactAddress = ReadValue(contactTitleRow, contactAddressRow)
+	bankPc = ReadValue(bankTitleRow, bankPcRow)
+	bankIban = ReadValue(bankTitleRow, bankIbanRow)
 End Sub
 
-&apos;Sub CheckValue(title as String, value as String) as String
-&apos;	If value = &quot;&quot; Then
-&apos;		MsgBox &quot;&quot; + title + &quot; fehlt&quot;
-&apos;	End If
-&apos;	CheckValue = value
-&apos;End Sub
+Private Function ReadValue(titleRow, valueRow as Integer) as String
+	Dim info, value as String
+	info = GetTitle(titleRow, valueRow)
+	value = GetText(accSheetTitle, valueColumn, valueRow)
+	ReadValue = CheckValue(info, value)
+End Function
+
+Private Function GetTitle(titleRow, valueRow as Integer) as String
+	GetTitle = getText(accSheetTitle, captionColumn, titleRow)+&quot; &apos;&quot;+getText(accSheetTitle, captionColumn, valueRow)+&quot;&apos;&quot;
+End Function
 </script:module>

@@ -5,7 +5,6 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
-Private sheet as Object
 Private targetRow as Integer
 Private testsSucceeded as Integer
 Private failMessage as String
@@ -14,7 +13,6 @@ Public TestName as String
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
-	sheet = ThisComponent.Sheets(0)
 	testsSucceeded = 0
 	failInfo = &quot;&quot;
 	failMessage = &quot;&quot;
@@ -57,6 +55,7 @@ End Sub
 Sub AssertValue(value as String, expectedResult as Boolean)
 	If Not HasFailed Then
 		Dim actualResult as Boolean
+
 		actualResult = IsValueSet(value)
 
 		testsSucceeded = testsSucceeded + 1

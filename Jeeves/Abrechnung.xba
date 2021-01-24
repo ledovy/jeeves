@@ -1,54 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="Abrechnung" script:language="StarBasic">REM  *****  BASIC  *****
-Const TimeFormat = &quot;HH:MM&quot;
-Const CurrencyFormat = &quot;[$SFr.-807] #&apos;##0.00;[$SFr.-807] -#&apos;##0.00&quot;
-&apos;Zeiterfassung
-Const timeDateColumn = 0
-Const timeTimeColumn = 1
-Const timeTypeColumn = 2
-Const timeNameColumn = 3
-Const timeMaxTimeColumn = 4
-Const timeMaxCostColumn = 5
-Const timeCollapsedColumn = 6
-Const timeCostColumn = 7
-Const timeTimeRoundedColumn = 8
-Const timeTimeFormattedColumn = 9
-Const timeCostRoundedColumn = 10
-Const timeFactorCostColumn = 11
-Const timeFactorTimeColumn  = 12
 
-Const timeFirstEntryRow = 11
-Const timeMaxEntries = 300
+Public Const timeSheetTitle = &quot;Zeiterfassung&quot;
+Public Const timeDateColumn = 0
+Public Const timeTimeColumn = 1
+Public Const timeTypeColumn = 2
+Public Const timeNameColumn = 3
+Public Const timeMaxTimeColumn = 4
+Public Const timeMaxCostColumn = 5
+Public Const timeCollapsedColumn = 6
+Public Const timeCostColumn = 7
+Public Const timeTimeRoundedColumn = 8
+Public Const timeTimeFormattedColumn = 9
+Public Const timeCostRoundedColumn = 10
+Public Const timeFactorCostColumn = 11
+Public Const timeFactorTimeColumn  = 12
+Public Const timeFirstEntryRow = 11
 
-Const calcDateColumn = 0
-Const calcNameColumn = 1
-Const calcFactorColumn = 2
-Const calcTimeColumn = 3
-Const calcCostColumn = 4
+Public Const timeMaxEntries = 300
 
-Const calcStartRow = 8
+Public Const typeSheetTitle = &quot;Arbeitstypen&quot;
 
-Const accCustomerColumn = 0
-Const accTitleColumn = 1
-Const accTimeColumn = 2
-Const accCostColumn = 3
-Const accFileColumn = 4
+Public Const calcSheetTitle = &quot;Abrechnung&quot;
+Public Const calcDateColumn = 0
+Public Const calcNameColumn = 1
+Public Const calcFactorColumn = 2
+Public Const calcTimeColumn = 3
+Public Const calcCostColumn = 4
+Public Const calcStartRow = 8
 
-Const accStartRow = 4
+Public Const configSheetTitle = &quot;Konfiguration&quot;
 
+Public Const accSheetTitle = &quot;Kontaktdaten&quot;
+Public Const accCustomerColumn = 0
+Public Const accTitleColumn = 1
+Public Const accTimeColumn = 2
+Public Const accCostColumn = 3
+Public Const accFileColumn = 4
+Public Const accStartRow = 3
 
-Dim doc As Object
-Dim timeSheet As Object
-Dim typeSheet As Object
-Dim calcSheet As Object
+Dim calcDoc, accDoc As Object
 Dim currentTargetRow As Integer
-Dim localeSettings As New com.sun.star.lang.Locale
 
 Dim config As New ClassConfig
 Dim masterData As New ClassMasterData
 Dim contactData As Object
-Dim types As Object
+Dim types As New ClassWorkTypes
 	
 Sub Main
 	Init()
@@ -60,30 +58,20 @@ Sub Main
 End Sub
 
 Sub Init
-	localeSettings.Language = &quot;de&quot;
-	localeSettings.Country = &quot;ch&quot;
+	calcDoc = ThisComponent
+	SetDocument(calcDoc)
 	ShowGreetings()
-
-	doc = ThisComponent
-	timeSheet = doc.Sheets(0)
-	typeSheet = doc.Sheets(1)
-	calcSheet = doc.Sheets(2)
 	
-	config.Init(doc.Sheets(3))
-	masterData.Init(timeSheet, doc)
-	types = New ClassWorkTypes
-	types.Init(typeSheet)
-	
-	ClearOldEntries(calcSheet)
+	ClearOldEntries()
 End Sub
 
-Sub ClearOldEntries(sheet as Object)
+Sub ClearOldEntries
 	Dim endRow, rows As Integer
 	
-	endRow = FindRow(calcSheet, calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
+	endRow = FindRow(calcSheetTitle, calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
 	rows = endRow-calcStartRow
 	If rows &gt; 0 Then
-		calcSheet.Rows.removeByIndex(calcStartRow, rows)
+		RemoveRows(calcSheetTitle, calcStartRow, rows)
 	End If
 End Sub
 
@@ -92,20 +80,20 @@ Sub ProcessEntries
 	Dim i As Integer
 	i = timeFirstEntryRow
 	Dim rowValue As String
-	rowValue = timeSheet.getCellByPosition(timeDateColumn, i).String
+	rowValue = GetText(timeSheetTitle, timeDateColumn, i)
 	Do While (&quot;&quot; &lt;&gt; rowValue) OR (i &lt; (timeFirstEntryRow+timeMaxEntries))
 		Dim typeValue, collapsedValue, sumValue As String
-		typeValue = timeSheet.getCellByPosition(timeTypeColumn, i).String
+		typeValue = GetText(timeSheetTitle, timeTypeColumn, i)
 		If types.IsCollapsed(typeValue) Then
-			sumValue = timeSheet.getCellByPosition(timeTimeColumn, i).String
+			sumValue = GetText(timeSheetTitle, timeTimeColumn, i)
 		Else
-			sumValue = timeSheet.getCellByPosition(timeTimeRoundedColumn, i).String
+			sumValue = GetText(timeSheetTitle, timeTimeRoundedColumn, i)
 			AddRow(GetWorkEntry(i))
 		End If
 		types.AddEffort(sumValue, typeValue)
 		&apos; increment
 		i = i+1
-		rowValue = timeSheet.getCellByPosition(timeDateColumn, i).String
+		rowValue = GetText(timeSheetTitle, timeDateColumn, i)
 	Loop
 	If (i &gt; (timeFirstEntryRow+timeMaxEntries)) Then
 		MsgBox &quot;Maximale Anzahl von &quot;+timeMaxEntries+&quot; Zeilen überschritten: &quot;+(i-timeFirstEntryRow)
@@ -114,37 +102,28 @@ End Sub
 
 Function GetWorkEntry(row As Integer)
 	Dim entry As New ClassWorkEntry
-	entry.Init(timeSheet, row)
+	entry.Init(row)
 	GetWorkEntry = entry
 End Function
 
 Sub AddRow(entry As Object)
 	If (entry.datum &lt;&gt; &quot;&quot;) OR (entry.title &lt;&gt; &quot;&quot;) OR (entry.time &lt;&gt; 0) OR (entry.cost &lt;&gt; 0) Then
-		calcSheet.Rows.insertByIndex(currentTargetRow, 1)
-		calcSheet.Rows(currentTargetRow).clearContents(32)
+		&apos;TODO Util.InsertRow
+		GetSheet(calcSheetTitle).Rows.insertByIndex(currentTargetRow, 1)
+		GetSheet(calcSheetTitle).Rows(currentTargetRow).clearContents(32)
 		WriteRow(currentTargetRow, entry.datum, entry.title, entry.factor, entry.time, entry.cost)
 		currentTargetRow = currentTargetRow + 1
 	End If
 End Sub
 
 Sub WriteRow (rowIndex As Integer, dateValue As String, nameValue As String, factorValue As String, timeValue As Integer, costValue As Currency)
-		calcSheet.getCellByPosition(calcDateColumn, rowIndex).String = dateValue
-		calcSheet.getCellByPosition(calcNameColumn, rowIndex).String = nameValue
-		calcSheet.getCellByPosition(calcFactorColumn, rowIndex).String = factorValue
-		calcSheet.getCellByPosition(calcTimeColumn, rowIndex).Formula = &quot;=&quot;+timeValue+&quot;/(60*24)&quot;
-		SetFormat(calcTimeColumn, rowIndex, TimeFormat)
-		calcSheet.getCellByPosition(calcCostColumn, rowIndex).Value = costValue
-		SetFormat(calcCostColumn, rowIndex, CurrencyFormat)
-End Sub
-
-Sub SetFormat(x As Integer, y As Integer, format As String)
-	Dim cell As Object
-	cell = calcSheet.getCellByPosition(x, y)
-	formatId = doc.NumberFormats.queryKey(format, localeSettings, True)
-	If formatId = -1 Then
-		formatId = doc.NumberFormats.addNew(format, localeSettings)
-	End If
-	cell.NumberFormat = formatId
+		SetText(calcSheetTitle, calcDateColumn, rowIndex, dateValue)
+		SetText(calcSheetTitle, calcNameColumn, rowIndex, nameValue)
+		SetText(calcSheetTitle, calcFactorColumn, rowIndex, factorValue)
+		SetFormula(calcSheetTitle, calcTimeColumn, rowIndex, &quot;=&quot;+timeValue+&quot;/(60*24)&quot;)
+		SetFormat(calcSheetTitle, calcTimeColumn, rowIndex, TimeFormat)
+		SetMoney(calcSheetTitle, calcCostColumn, rowIndex, costValue)
+		SetFormat(calcSheetTitle, calcCostColumn, rowIndex, CurrencyFormat)
 End Sub
 
 Sub AddCollapsedEntries
@@ -165,94 +144,89 @@ End Sub
 
 Sub SortWrittenEntries
 	Dim range As Object
-	range = calcSheet.getCellRangeByPosition(calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
+	range = GetRangeByIndex(calcSheetTitle, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
     SortRange(0, range)
 End Sub
 
 Sub WriteSummary
-	calcSheet.getCellByPosition(0, 0).String = masterData.customerName
-	calcSheet.getCellByPosition(0, 1).String = masterData.customerCompany
-	calcSheet.getCellByPosition(0, 2).String = masterData.customerEmail
+	SetText(calcSheetTitle, 0, 0, masterData.customerName)
+	SetText(calcSheetTitle, 0, 1, masterData.customerCompany)
+	SetText(calcSheetTitle, 0, 2, masterData.customerEmail)
 	&apos;header
-	calcSheet.getCellRangeByName(&quot;A6&quot;).String = masterData.customerCompany + &quot; | Abrechnung &quot; + masterData.calculationTitle
-	calcSheet.getCellRangeByName(&quot;A7&quot;).String = &quot;Datum: &quot; + masterData.calculationDate
+	SetRangeText(calcSheetTitle, &quot;A6&quot;, masterData.customerCompany + &quot; | Abrechnung &quot; + masterData.calculationTitle)
+	SetRangeText(calcSheetTitle, &quot;A7&quot;, &quot;Datum: &quot; + masterData.calculationDate)
 	&apos;time sum
 	If config.ShowTimeSum Then
-		calcSheet.getCellByPosition(calcTimeColumn, currentTargetRow).Formula = &quot;=SUM(D&quot;+(calcStartRow+1)+&quot;:D&quot;+(currentTargetRow)+&quot;)&quot;
-		SetFormat(calcTimeColumn, currentTargetRow, TimeFormat)
+		SetFormula(calcSheetTitle, calcTimeColumn, currentTargetRow, &quot;=SUM(D&quot;+(calcStartRow+1)+&quot;:D&quot;+(currentTargetRow)+&quot;)&quot;)
+		SetFormat(calcSheetTitle, calcTimeColumn, currentTargetRow, TimeFormat)
 	End If
 	&apos;cost sum
 	If config.ShowCostSum Then
-		calcSheet.getCellByPosition(calcCostColumn, currentTargetRow).Formula = &quot;=SUM(E&quot;+(calcStartRow+1)+&quot;:E&quot;+(currentTargetRow)+&quot;)&quot;
-		SetFormat(calcCostColumn, currentTargetRow, CurrencyFormat)
+		SetFormula(calcSheetTitle, calcCostColumn, currentTargetRow, &quot;=SUM(E&quot;+(calcStartRow+1)+&quot;:E&quot;+(currentTargetRow)+&quot;)&quot;)
+		SetFormat(calcSheetTitle, calcCostColumn, currentTargetRow, CurrencyFormat)
 	End If
 End Sub
 
 Function GetRange(Optional category As String) As String
-	Dim currentPos(1) As Integer, firstPos(1) As Integer, lastPos(1) As Integer
-	currentPos(0) = timeDateColumn
-	currentPos(1) = timeFirstEntryRow
-	firstPos(0) = masterData.valueColumn
-	firstPos(1) = masterData.startDateRow
-	lastPos(0) = masterData.valueColumn
-	lastPos(1) = masterData.startDateRow
+	Dim currentX, currentY, firstX, firstY, lastX, lastY As Integer
+	currentX = timeDateColumn
+	currentY = timeFirstEntryRow
+	firstX = masterData.valueColumn
+	firstY = masterData.startDateRow
+	lastX = masterData.valueColumn
+	lastY = masterData.startDateRow
 	
 	Dim current As Date,first As Date, last As Date
-	current = GetCell(timeSheet, currentPos).Value
-	Do While &quot;&quot; &lt;&gt; GetCell(timeSheet, currentPos).String
-		If (IsMissing(category)) OR (category = timeSheet.getCellByPosition(timeTypeColumn, currentPos(1)).String) Then
+	current = GetDate(timeSheetTitle, currentX, currentY)
+	Do While &quot;&quot; &lt;&gt; GetText(timeSheetTitle, currentX, currentY)
+		If (IsMissing(category)) OR (category = GetText(timeSheetTitle, timeTypeColumn, currentY)) Then
 			If (first = 0) OR (first &gt; current) Then
 				first = current
-				firstPos(0) = currentPos(0)
-				firstPos(1) = currentPos(1)
+				firstX = currentX
+				firstY = currentY
 			End If
 			If (last = 0) OR (last &lt; current) Then
 				last = current
-				lastPos(0) = currentPos(0)
-				lastPos(1) = currentPos(1)
+				lastX = currentX
+				lastY = currentY
 			End If
 		End If
-		currentPos(1) = currentPos(1) + 1
-		current = GetCell(timeSheet, currentPos).Value
+		currentY = currentY + 1
+		current = GetDate(timeSheetTitle, currentX, currentY)
 	Loop
 	If first = last Then
-		GetRange = GetCell(timeSheet, lastPos).String
+		GetRange = GetText(timeSheetTitle, lastX, lastY)
 	Else
-		GetRange = GetCell(timeSheet, firstPos).String + &quot; - &quot; + GetCell(timeSheet, lastPos).String
+		GetRange = GetText(timeSheetTitle, firstX, firstY) + &quot; - &quot; + GetText(timeSheetTitle, lastX, lastY)
 	End If
 End Function
 
-Function GetCell(sheet As Object, position() As Integer)
-	GetCell = sheet.getCellByPosition(position(0),position(1))
-End Function
-
-Function GetPosition(x As Integer, y As Integer)
-	Dim position(1) As Integer
-	position(0) = x
-	position(1) = y
-	GetPosition = position
-End Function
-
-
 Sub UpdateAccounting
 	Dim path, year As String
-	Dim url, accDoc, accSheet As Object
+	Dim url, accSheet As Object
 	path = config.PathAccounting
 		
 	If FileExists(path) Then
 	    url = convertToURL(path)
 	    accDoc = StarDesktop.loadComponentFromURL(url, &quot;_blank&quot;, 0, Array())
+
+	    SetDocument(accDoc)
 	    contactData = New ClassContact
-		contactData.Init(accDoc.Sheets.getByName(&quot;Kontaktdaten&quot;))
+		contactData.Init()&apos;accDoc.Sheets.getByName(accSheetTitle))
 		If accDoc.Sheets.hasByName(masterData.calculationYear) Then
 		   accSheet = accDoc.Sheets.getByName(masterData.calculationYear)
 		Else
 		   accSheet = CreateAccountingSheet(accDoc)
 		End If
+
+		SetDocument(calcDoc)
 		WriteCalculationContact
-		WriteCalculationToAccounting(accSheet)
+
+		SetDocument(accDoc)
+		WriteCalculationToAccounting(masterData.calculationYear)
 		accDoc.store()
 	    accDoc.Close(True)
+	    SetDocument(calcDoc)
 	Else
 		MsgBox &quot;Konfiguration -&gt; &apos;Pfad Buchhaltung&apos; nicht gefunden:&quot;+ chr(13) + path
 	End If
@@ -269,19 +243,17 @@ Function CreateAccountingSheet(doc as Object) as Object
 End Function
 
 Sub WriteCalculationContact
-	calcSheet.getCellRangeByName(&quot;A5&quot;).String = contactData.contactFirstName+&quot; &quot;+contactData.contactLastName
-	calcSheet.getCellByPosition(0, currentTargetRow+3).String = &quot;PC: &quot;+contactData.bankPc
-	calcSheet.getCellByPosition(0, currentTargetRow+4).String = &quot;IBAN: &quot;+contactData.bankIban
-	calcSheet.getCellByPosition(0, currentTargetRow+5).String = &quot;Kontoinhaberin: &quot;+contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot;; &quot;+contactData.contactAddress
-	calcSheet.getCellByPosition(0, currentTargetRow+8).String = contactData.contactFirstName
+	SetRangeText(calcSheetTitle, &quot;A5&quot;,  contactData.contactFirstName+&quot; &quot;+contactData.contactLastName)
+	SetText(calcSheetTitle, 0, currentTargetRow+3, &quot;PC: &quot;+contactData.bankPc)
+	SetText(calcSheetTitle, 0, currentTargetRow+4, &quot;IBAN: &quot;+contactData.bankIban)
+	SetText(calcSheetTitle, 0, currentTargetRow+5, &quot;Kontoinhaberin: &quot;+contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot;; &quot;+contactData.contactAddress)
+	SetText(calcSheetTitle, 0, currentTargetRow+8, contactData.contactFirstName)
 End Sub
 
-Sub WriteCalculationToAccounting(sheet as Object)
+Sub WriteCalculationToAccounting(sheet as String)
 	Dim company As String
 	company = masterData.customerCompany
 	Dim currentRow, customerRow, entryRow, lastRow As Integer
-	customerRow = -1
-	currentRow = accStartRow
 	&apos;loop to find customer
 	customerRow = FindRow(sheet, accCustomerColumn, accStartRow, company, True)
 	lastRow = FindRow(sheet, accCustomerColumn, accStartRow, &quot;Total&quot;, True)
@@ -289,9 +261,9 @@ Sub WriteCalculationToAccounting(sheet as Object)
 	If customerRow &lt; 0 Then
 		Dim spacing As Integer
 		spacing = 2
-		customerRow = currentRow-1
-		sheet.Rows.insertByIndex(customerRow-1, spacing)
-		sheet.getCellByPosition(accCustomerColumn, customerRow).String = company
+		customerRow = lastRow-1
+		GetSheet(sheet).Rows.insertByIndex(customerRow-1, spacing)
+		GetSheet(sheet).getCellByPosition(accCustomerColumn, customerRow).String = company
 		lastRow = lastRow+spacing
 	End If
 	&apos;load entry-data
@@ -300,20 +272,20 @@ Sub WriteCalculationToAccounting(sheet as Object)
 	Dim time As Date
 	time = masterData.calculationDateValue
 	Dim cost As Currency
-	cost = calcSheet.getCellByPosition(calcCostColumn, currentTargetRow).Value
+	cost = calcDoc.Sheets.getByName(calcSheetTitle).getCellByPosition(calcCostColumn, currentTargetRow).Value
 	&apos;find entry-row (update existing or insert new line)
 	Dim msg as String
 	entryRow = -1
 	currentRow = customerRow+1
-	Do While &quot;&quot; &lt;&gt; sheet.getCellByPosition(accTitleColumn, currentRow).String
-		If masterData.fileName=sheet.getCellByPosition(accFileColumn, currentRow).String Then
+	Do While &quot;&quot; &lt;&gt; GetSheet(sheet).getCellByPosition(accTitleColumn, currentRow).String
+		If masterData.fileName = GetSheet(sheet).getCellByPosition(accFileColumn, currentRow).String Then
 			entryRow = currentRow
 		End If
 		currentRow = currentRow+1
 	Loop
 	If entryRow &lt; 0 Then
 		entryRow = currentRow
-		sheet.Rows.insertByIndex(currentRow, 1)
+		GetSheet(sheet).Rows.insertByIndex(currentRow, 1)
 		currentRow = currentRow+1
 		lastRow = lastRow+1
 		msg = &quot;Eintrag zur Buchhaltung hinzugefügt&quot;
@@ -321,37 +293,18 @@ Sub WriteCalculationToAccounting(sheet as Object)
 		msg = &quot;Eintrag in Buchhaltung aktualisiert&quot;
 	End If
 	&apos;write entry for calculation
-	sheet.getCellByPosition(accTitleColumn, entryRow).String = title
-	sheet.getCellByPosition(accTimeColumn, entryRow).Value = time
-	sheet.getCellByPosition(accCostColumn, entryRow).Value = cost
-	sheet.getCellByPosition(accFileColumn, entryRow).String = masterData.fileName
+	GetSheet(sheet).getCellByPosition(accTitleColumn, entryRow).String = title
+	GetSheet(sheet).getCellByPosition(accTimeColumn, entryRow).Value = time
+	GetSheet(sheet).getCellByPosition(accCostColumn, entryRow).Value = cost
+	GetSheet(sheet).getCellByPosition(accFileColumn, entryRow).String = masterData.fileName
 	&apos;sort entries
 	Dim range As Object
-	range = sheet.getCellRangeByPosition(accCustomerColumn, customerRow+1, accCostColumn, currentRow-1)
+	range = GetSheet(sheet).getCellRangeByPosition(accCustomerColumn, customerRow+1, accCostColumn, currentRow-1)
     SortRange(accTimeColumn, range)
 	&apos;rewrite total
-	sheet.getCellByPosition(accCostColumn, lastRow).Formula = &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;
+	GetSheet(sheet).getCellByPosition(accCostColumn, lastRow).Formula = &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;
 	MsgBox msg
 End Sub
-
-Sub SortRange(column As Integer, range As Object)
-	&apos;fields
-	Dim sortFields(0) as New com.sun.star.table.TableSortField
-	sortFields(0).Field = column
-    sortFields(0).FieldType = com.sun.star.util.SortFieldType.ALPHANUMERIC
-    sortFields(0).IsAscending = True
-    &apos;options
-    Dim sortOptions(2) As New com.sun.star.beans.PropertyValue
-    sortOptions(0).Name = &quot;SortFields&quot;
-    sortOptions(0).Value = sortFields()
-    sortOptions(1).Name = &quot;IsSortColumns&quot; &apos; False=Sort by Row; True=Sort by Column.
-    sortOptions(1).Value = False
-    sortOptions(2).Name = &quot;ContainsHeader&quot;
-    sortOptions(2).Value = False
-	&apos;sorting
-    range.Sort(sortOptions)
-End Sub
-
 
 Sub ShowGreetings
 	&apos;EasterEgg

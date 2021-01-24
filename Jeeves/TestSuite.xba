@@ -2,12 +2,13 @@
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestSuite" script:language="StarBasic">REM  *****  BASIC  *****
 
+Public Const titleSheetTestSuite = &quot;TestSuite&quot;
 Public Const resultColumnCaptions = 1
 Public Const resultColumnAllTests = 2
 Public Const resultRowAllTests = 2
 Public Const resultRowFindRowTests = 7
-Public Const resultRowIsValueSetTests = 12
-Public Const resultRowLastTests = resultRowIsValueSetTests
+Public Const resultRowGetSetValueTests = 12
+Public Const resultRowLastTests = resultRowGetSetValueTests
 
 Private allTestsSucceeded, testsFailed as Integer
 Private failedInfo as String
@@ -15,13 +16,14 @@ Private currentTest as Object
 
 &apos;TESTS: All
 Sub TestAll
+	SetDocument(ThisComponent)
 	allTestsSucceeded = 0
 	testsFailed = 0
 	failedInfo = &quot;&quot;
 	ClearAllTestResults()
 	
 	TestFindRow()
-	TestIsValueSet()
+	TestGetSetValue()
 	
 	WriteTestResult(resultRowAllTests, allTestsSucceeded, &quot;&quot;+testsFailed, failedInfo)
 End Sub
@@ -31,6 +33,7 @@ Sub ClearAllResult
 End Sub
 
 Sub ClearAllTestResults
+	SetDocument(ThisComponent)
 	Dim I as Integer
 	For I = resultRowAllTests To resultRowLastTests Step 5
 		ClearTestResults(I)
@@ -39,22 +42,26 @@ End Sub
 
 &apos;TESTS: FindRow
 Sub TestFindRow
+	SetDocument(ThisComponent)
 	currentTest = New TestFindRow
 	RunCurrentTest(resultRowFindRowTests)
 End Sub
 
 Sub ClearFindRowResults
+	SetDocument(ThisComponent)
 	ClearTestResults(resultRowFindRowTests)
 End Sub
 
-&apos;TESTS: IsValueSet
-Sub TestIsValueSet
-	currentTest = New TestIsValueSet
-	RunCurrentTest(resultRowIsValueSetTests)
+&apos;TESTS: GetSetValue
+Sub TestGetSetValue
+	SetDocument(ThisComponent)
+	currentTest = New TestGetSetValue
+	RunCurrentTest(resultRowGetSetValueTests)
 End Sub
 
-Sub ClearIsValueSetResults
-	ClearTestResults(resultRowIsValueSetTests)
+Sub ClearGetSetValueResults
+	SetDocument(ThisComponent)
+	ClearTestResults(resultRowGetSetValueTests)
 End Sub
 
 &apos;METHODS
@@ -89,25 +96,21 @@ Sub WriteTestResult(row as Integer, nrSucceeded as Integer, info, message as Str
 	End If
 	allTestsSucceeded = allTestsSucceeded + nrSucceeded
 	
-	Dim sheet
-	sheet = ThisComponent.Sheets(0)
-	sheet.getCellByPosition(resultColumnAllTests, row).String = result
-	sheet.getCellByPosition(resultColumnAllTests, row+1).Value = nrSucceeded
-	sheet.getCellByPosition(resultColumnAllTests, row+2).String = info
-	sheet.getCellByPosition(resultColumnAllTests, row+3).String = message
+	SetText(titleSheetTestSuite, resultColumnAllTests, row, result)
+	SetNumber(titleSheetTestSuite, resultColumnAllTests, row+1, nrSucceeded)
+	SetText(titleSheetTestSuite, resultColumnAllTests, row+2, info)
+	SetText(titleSheetTestSuite, resultColumnAllTests, row+3, message)
 End Sub
 
 Sub ClearTestResults(row as Integer)
-	Dim sheet
-	sheet = ThisComponent.Sheets(0)
 	Dim I 
 	For I = 0 To 3
-  		sheet.getCellByPosition(resultColumnAllTests, row+I).String = &quot;&quot;
+  		ClearCell(titleSheetTestSuite, resultColumnAllTests, row+I)
 	Next I
 End Sub
 
 Function ReadTestName(row as Integer) as String
-	ReadTestName = ThisComponent.Sheets(0).getCellByPosition(resultColumnCaptions, row).String
+	ReadTestName = ThisComponent.Sheets.getByName(titleSheetTestSuite).getCellByPosition(resultColumnCaptions, row).String
 End Function
 
 </script:module>

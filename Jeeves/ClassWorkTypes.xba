@@ -6,7 +6,7 @@ Option ClassModule
 Option Explicit
 
 &apos;CONSTANTS
-Private Const typeColumn = 0
+Public Const typeColumn = 0
 Const collapsedColumn = 1
 &apos;Const collapsedMinutesColumn = 2
 Private Const effortColumn = 3
@@ -18,25 +18,16 @@ Const timeColumn = 7
 Const costsFormattedColumn = 9
 
 &apos;ATTRIBUTES	
-Private sheet As Object
 Private Const maxNumberOfTypes = 100
 Public Types(maxNumberOfTypes) As String
 Public TypesSize As Integer
-&apos;TypesSize = 0
 Private TypesCollapsed(maxNumberOfTypes) As Boolean
 Public CollapsedSize As Integer
-&apos;CollapsedTypesSize = 0
-&apos;Public SeparateTypes(maxNumberOfTypes) As String
 Public SeparateSize As Integer
-&apos;SeparateTypesSize = 0
 Private TypesRow(maxNumberOfTypes) As Integer
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
-End Sub
-
-Public Sub Init(typeSheet as Object)
-	sheet = typeSheet
 	ReadTypes()
 	Reset()
 End Sub
@@ -46,7 +37,7 @@ Private Sub Reset
 	For i = 1 To TypesSize
 		Dim row As Integer
 		row = TypesRow(i-1)
-		sheet.getCellByPosition(effortColumn, row).String = 0
+		SetText(typeSheetTitle, effortColumn, row, 0)
 	Next i
 End Sub
 
@@ -57,13 +48,13 @@ Private Sub ReadTypes
 	Dim i As Integer
 	i = 1
 	Dim rowValue As String
-	rowValue = sheet.getCellByPosition(typeColumn, i).String
+	rowValue = GetText(typeSheetTitle, typeColumn, i)
 	Do While &quot;&quot; &lt;&gt; rowValue
 		Dim collapsed As Boolean
-		collapsed = sheet.getCellByPosition(collapsedColumn, i).String = &quot;Ja&quot;
+		collapsed = GetText(typeSheetTitle, collapsedColumn, i) = &quot;Ja&quot;
 		AddType(rowValue, collapsed, i)
 		i = i+1
-		rowValue = sheet.getCellByPosition(typeColumn, i).String
+		rowValue = GetText(typeSheetTitle, typeColumn, i)
 	Loop
 End Sub
 
@@ -108,9 +99,9 @@ Public Sub AddEffort(effort As Integer, workType As String)
 	If start &gt;= 0 Then
 		i = start+1
 		Dim v As Integer
-		v = sheet.getCellByPosition(effortColumn, i).String
+		v = GetText(typeSheetTitle, effortColumn, i)
 		v = v + effort
-		sheet.getCellByPosition(effortColumn, i).String = v
+		SetText(typeSheetTitle, effortColumn, i, v)
 	End If
 End Sub
 
@@ -120,10 +111,9 @@ Public Function GetWorkEntry(workType As String)
 	Dim entry As Object
 	entry = New ClassWorkEntry
 	entry.title = workType
-	entry.factor = sheet.getCellByPosition(costColumn, i).String + &quot; / &quot; + sheet.getCellByPosition(timeColumn, i).String + &quot; Min.&quot;
-	entry.time = sheet.getCellByPosition(minutesRoundedColumn, i).Value
-	entry.cost = sheet.getCellByPosition(costsFormattedColumn, i).Value
-	&apos;dateValue = GetRange(typeValue)
+	entry.factor = GetText(typeSheetTitle, costColumn, i) + &quot; / &quot; + GetText(typeSheetTitle, timeColumn, i) + &quot; Min.&quot;
+	entry.time = GetDate(typeSheetTitle, minutesRoundedColumn, i)
+	entry.cost = GetMoney(typeSheetTitle, costsFormattedColumn, i)
 	GetWorkEntry = entry
 End Function
 </script:module>

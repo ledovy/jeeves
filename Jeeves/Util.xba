@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="Util" script:language="StarBasic">REM  *****  BASIC  *****
-
-Sub CheckValue(title as String, value as String) as String
+Public Const TimeFormat = &quot;HH:MM&quot;
+Public Const CurrencyFormat = &quot;[$SFr.-807] #&apos;##0.00;[$SFr.-807] -#&apos;##0.00&quot;
+	
+Public Sub CheckValue(title as String, value as String) as String
 	Dim valid as Boolean
 	valid = IsValueSet(value)
 	If Not valid Then
@@ -11,7 +13,7 @@ Sub CheckValue(title as String, value as String) as String
 	CheckValue = value
 End Sub
 
-Function IsValueSet(value as String) as String
+Public Function IsValueSet(value as String) as String
 	If value = &quot;&quot; Then
 		IsValueSet = False
 	Else
@@ -19,19 +21,19 @@ Function IsValueSet(value as String) as String
 	End If
 End Function
 
-Function FindRow(sheet as Object, column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
+Public Function FindRow(sheet as String, column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
 	Dim found As Boolean
 	found = False
 	Dim toRow As Integer
 	toRow = row
 	Dim rowValue As String
-	rowValue = sheet.getCellByPosition(column, toRow).String
+	rowValue = GetText(sheet, column, toRow)
 	Do While (NOT found) AND ((toRow-row) &lt; 300) AND (skipEmpty OR rowValue &lt;&gt; &quot;&quot;)
 		If searchValue = rowValue Then
 			found = true
 		End If
 		toRow = toRow + 1
-		rowValue = sheet.getCellByPosition(column, toRow).String
+		rowValue = GetText(sheet, column, toRow)
 	Loop
 	If found Then
 		FindRow = toRow-1
@@ -39,5 +41,114 @@ Function FindRow(sheet as Object, column as Integer, row as Integer, searchValue
 		FindRow = -1
 	End If
 End Function
+
+Public Function GetText(sheet as String, column, row as Integer) as String
+	GetText = GetCell(sheet, column, row).String
+End Function
+
+Public Function SetText(sheet as String, column, row as Integer, value as String)
+	GetCell(sheet, column, row).String = value
+End Function
+
+Public Function GetNumber(sheet as String, column, row as Integer) as Integer
+	GetNumber = GetCell(sheet, column, row).value
+End Function
+
+Public Function SetNumber(sheet as String, column, row as Integer, value as Integer)
+	GetCell(sheet, column, row).value = value
+End Function
+
+Public Function GetDate(sheet as String, column, row as Integer) as Date
+	GetDate = GetCell(sheet, column, row).Value
+End Function
+
+Public Function SetDate(sheet as String, column, row as Integer, value as Date)
+	GetCell(sheet, column, row).value = Value
+End Function
+
+Public Function GetMoney(sheet as String, column, row as Integer) as Currency
+	GetMoney = GetCell(sheet, column, row).Value
+End Function
+
+Public Function SetMoney(sheet as String, column, row as Integer, value as Currency)
+	GetCell(sheet, column, row).value = Value
+End Function
+
+Public Function GetBool(sheet as String, column, row as Integer) as Boolean
+	GetBool = GetCell(sheet, column, row).Value
+End Function
+
+Public Function SetBool(sheet as String, column, row as Integer, value as Boolean)
+	GetCell(sheet, column, row).value = Value
+End Function
+
+Public Function SetFormula(sheet as String, column, row as Integer, value as String)
+	GetCell(sheet, column, row).Formula = value
+End Function
+
+Public Function ClearCell(sheet as String, column, row as Integer)
+	SetText(sheet, column, row, &quot;&quot;)
+End Function
+
+Public Function GetCell(sheet as String, column, row as Integer) as Object
+	GetCell = GetSheet(sheet).getCellByPosition(column, row)
+End Function
+
+Public Function GetRangeByIndex(sheet as String, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow as Integer) as Object
+	GetRangeByIndex = getSheet(sheet).getCellRangeByPosition(calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
+End Function
+
+Public Function GetRangeByName(sheet, rangeName as String) as Object
+	GetRangeByName = getSheet(sheet).getCellRangeByName(rangeName)
+End Function
+
+Public Function SetRangeText(sheet, rangeName, value as String)
+	GetRangeByName(sheet, rangeName).String = value
+End Function
+
+Dim currentDocument as Object
+
+Public Function GetSheet(sheet as String) as Object
+	GetSheet = currentDocument.Sheets.getByName(sheet)
+End Function
+
+Public Function RemoveRows(sheet as String, index, count as Integer)
+	GetSheet(sheet).Rows.removeByIndex(index, count)
+End Function
+
+Public Sub SetFormat(sheet as String, x As Integer, y As Integer, format As String)
+	Dim localeSettings As New com.sun.star.lang.Locale
+	localeSettings.Language = &quot;de&quot;
+	localeSettings.Country = &quot;ch&quot;
+	Dim cell As Object
+	cell = GetCell(sheet, x, y)
+	formatId = currentDocument.NumberFormats.queryKey(format, localeSettings, True)
+	If formatId = -1 Then
+		formatId = currentDocument.NumberFormats.addNew(format, localeSettings)
+	End If
+	cell.NumberFormat = formatId
+End Sub
+
+Public Sub SetDocument(doc as Object)
+	currentDocument = doc
+End Sub
+
+Public Sub SortRange(column As Integer, range As Object)
+	&apos;fields
+	Dim sortFields(0) as New com.sun.star.table.TableSortField
+	sortFields(0).Field = column
+    sortFields(0).FieldType = com.sun.star.util.SortFieldType.ALPHANUMERIC
+    sortFields(0).IsAscending = True
+    &apos;options
+    Dim sortOptions(2) As New com.sun.star.beans.PropertyValue
+    sortOptions(0).Name = &quot;SortFields&quot;
+    sortOptions(0).Value = sortFields()
+    sortOptions(1).Name = &quot;IsSortColumns&quot; &apos; False=Sort by Row; True=Sort by Column.
+    sortOptions(1).Value = False
+    sortOptions(2).Name = &quot;ContainsHeader&quot;
+    sortOptions(2).Value = False
+	&apos;sorting
+    range.Sort(sortOptions)
+End Sub
 
 </script:module>

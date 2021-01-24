@@ -5,7 +5,6 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
-Private sheet as Object
 Private targetRow as Integer
 Private testsSucceeded as Integer
 Private failMessage as String
@@ -14,7 +13,6 @@ Public TestName as String
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
-	sheet = ThisComponent.Sheets(0)
 	testsSucceeded = 0
 	failInfo = &quot;&quot;
 	failMessage = &quot;&quot;
@@ -63,7 +61,8 @@ End Sub
 Sub AssertFindRow(column, startRow, expectedResult as Integer, skipEmpty as Boolean)
 	If Not HasFailed Then
 		Dim actualResult as Integer
-		actualResult = FindRow(sheet, column, startRow, testValue, skipEmpty)
+
+		actualResult = FindRow(titleSheetTestSuite, column, startRow, testValue, skipEmpty)
 
 		testsSucceeded = testsSucceeded + 1
 		If expectedResult &lt;&gt; actualResult Then

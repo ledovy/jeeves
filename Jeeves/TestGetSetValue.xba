@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestGetSetValue" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+Private targetRow as Integer
+Private testsSucceeded as Integer
+Private failMessage as String
+Private failInfo as String
+Public TestName as String
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	testsSucceeded = 0
+	failInfo = &quot;&quot;
+	failMessage = &quot;&quot;
+End Sub
+
+Public Sub Init(row as Integer)
+	targetRow = row
+	TestName = ReadTestName(targetRow)
+End Sub
+
+Private Sub Fail(info, msg as String)
+	failInfo = info
+	failMessage = msg
+End Sub
+
+Public Function HasFailed as Boolean
+	HasFailed = failMessage &lt;&gt; &quot;&quot;
+End Function
+
+&apos;Implement RunTests, but drop everything below this line
+
+Private Const testValue = &quot;Test&quot;
+Private Const valuesColumn = 5
+Private Const nrOfValues = 6
+
+Sub RunTests
+	AssertIsValueSet(1)
+	AssertIsValueSet(1234)
+	AssertIsValueSet(&quot;Test&quot;)
+	
+	AssertIsValueNotSet(&quot;&quot;)
+	
+	AssertText(1, &quot;Test&quot;)
+	AssertNumber(2, 42)
+	AssertDate(3, &quot;29.10.1983&quot;)
+	AssertMoney(4, 66.6)
+	AssertBool(5, True)
+	AssertBool(6, False)
+	
+	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
+End Sub
+
+Sub AssertIsValueSet(value as String)
+	AssertValueSet(value, True)
+End Sub
+
+Sub AssertIsValueNotSet(value as String)
+	AssertValueSet(value, False)
+End Sub
+
+Sub AssertValueSet(value as String, expectedResult as Boolean)
+	If Not HasFailed Then
+		Dim actualResult as Boolean
+
+		actualResult = IsValueSet(value)
+
+		testsSucceeded = testsSucceeded + 1
+		If expectedResult &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded, &quot;&quot;+value+&quot; was not &quot;+expectedResult)
+		End If
+	End If
+End Sub
+
+
+Sub AssertText(row as Integer, value as String)
+	If Not HasFailed Then
+		Dim actualResult as String
+
+		actualResult = GetText(titleSheetTestSuite, valuesColumn, row)
+
+		testsSucceeded = testsSucceeded + 1
+		If value &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
+		End If
+		
+		row = row + nrOfValues
+		SetText(titleSheetTestSuite, valuesColumn, row, value)
+		actualResult = GetText(titleSheetTestSuite, valuesColumn, row)
+
+		testsSucceeded = testsSucceeded + 1
+		If value &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
+		Else
+			ClearCell(titleSheetTestSuite, valuesColumn, row)
+			AssertIsValueNotSet(GetText(titleSheetTestSuite, valuesColumn, row))
+		End If
+	End If
+End Sub
+
+Sub AssertNumber(row as Integer, value as Integer)
+	If Not HasFailed Then
+		Dim actualResult as Integer
+
+		actualResult = GetNumber(titleSheetTestSuite, valuesColumn, row)
+
+		testsSucceeded = testsSucceeded + 1
+		If value &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
+		End If
+		
+		row = row + nrOfValues
+		SetNumber(titleSheetTestSuite, valuesColumn, row, value)
+		actualResult = GetNumber(titleSheetTestSuite, valuesColumn, row)
+
+		testsSucceeded = testsSucceeded + 1
+		If value &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
+		Else
+			ClearCell(titleSheetTestSuite, valuesColumn, row)
+			AssertIsValueNotSet(GetText(titleSheetTestSuite, valuesColumn, row))
+		End If
+	End If
+End Sub
+
+Sub AssertDate(row as Integer, value as Date)
+	If Not HasFailed Then
+		Dim actualResult as Date
+
+		actualResult = GetDate(titleSheetTestSuite, valuesColumn, row)
+
+		testsSucceeded = testsSucceeded + 1
+		If value &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
+		End If
+		
+		row = row + nrOfValues
+		SetDate(titleSheetTestSuite, valuesColumn, row, value)
+		actualResult = GetDate(titleSheetTestSuite, valuesColumn, row)
+
+		testsSucceeded = testsSucceeded + 1
+		If value &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
+		Else
+			ClearCell(titleSheetTestSuite, valuesColumn, row)
+			AssertIsValueNotSet(GetText(titleSheetTestSuite, valuesColumn, row))
+		End If
+	End If
+End Sub
+
+Sub AssertMoney(row as Integer, value as Currency)
+	If Not HasFailed Then
+		Dim actualResult as Currency
+
+		actualResult = GetMoney(titleSheetTestSuite, valuesColumn, row)
+
+		testsSucceeded = testsSucceeded + 1
+		If value &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
+		End If
+		
+		row = row + nrOfValues
+		SetMoney(titleSheetTestSuite, valuesColumn, row, value)
+		actualResult = GetMoney(titleSheetTestSuite, valuesColumn, row)
+
+		testsSucceeded = testsSucceeded + 1
+		If value &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
+		Else
+			ClearCell(titleSheetTestSuite, valuesColumn, row)
+			AssertIsValueNotSet(GetText(titleSheetTestSuite, valuesColumn, row))
+		End If
+	End If
+End Sub
+
+Sub AssertBool(row as Integer, value as Boolean)
+	If Not HasFailed Then
+		Dim actualResult as Boolean
+
+		actualResult = GetBool(titleSheetTestSuite, valuesColumn, row)
+
+		testsSucceeded = testsSucceeded + 1
+		If value &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
+		End If
+		
+		row = row + nrOfValues
+		SetBool(titleSheetTestSuite, valuesColumn, row, value)
+		actualResult = GetBool(titleSheetTestSuite, valuesColumn, row)
+
+		testsSucceeded = testsSucceeded + 1
+		If value &lt;&gt; actualResult Then
+			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
+		Else
+			ClearCell(titleSheetTestSuite, valuesColumn, row)
+			AssertIsValueNotSet(GetText(titleSheetTestSuite, valuesColumn, row))
+		End If
+	End If
+End Sub
+
+</script:module>

@@ -36,11 +36,11 @@ Public Sub Class_Initialize
 	cost = 0
 End Sub
 
-Public Sub Init(sheet as Object, row As Integer)
-	datum = sheet.getCellByPosition(timeDateColumn, row).String
-	factor = sheet.getCellByPosition(timeFactorCostColumn, row).String + &quot; / &quot; + sheet.getCellByPosition(timeFactorTimeColumn, row).String + &quot; Min.&quot;
-	time = sheet.getCellByPosition(timeTimeRoundedColumn, row).Value
-	cost = sheet.getCellByPosition(timeCostRoundedColumn, row).Value
-	title = sheet.getCellByPosition(timeNameColumn, row).String
+Public Sub Init(row As Integer)
+	datum = GetText(timeSheetTitle, timeDateColumn, row)
+	factor = GetText(timeSheetTitle, timeFactorCostColumn, row) + &quot; / &quot; + GetText(timeSheetTitle, timeFactorTimeColumn, row) + &quot; Min.&quot;
+	time = GetDate(timeSheetTitle, timeTimeRoundedColumn, row)
+	cost = GetMoney(timeSheetTitle, timeCostRoundedColumn, row)
+	title = GetText(timeSheetTitle, timeNameColumn, row)
 End Sub
 </script:module>

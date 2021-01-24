@@ -11,4 +11,5 @@
  <library:element library:name="ClassContact"/>
  <library:element library:name="TestFindRow"/>
  <library:element library:name="TestIsValueSet"/>
+ <library:element library:name="TestGetSetValue"/>
 </library:library>

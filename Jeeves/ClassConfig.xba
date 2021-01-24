@@ -6,6 +6,7 @@ Option ClassModule
 Option Explicit
 
 &apos;CONSTANTS
+Private Const captionColumn = 0
 Private Const valueColumn = 1
 Private Const showTimeSumRow = 1
 Private Const showCostSumRow = 2
@@ -18,15 +19,16 @@ Public PathAccounting As String
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
-	ShowTimeSum = False
-	ShowCostSum = True
-	PathAccounting = &quot;&quot;
+	ShowTimeSum = GetBool(configSheetTitle, valueColumn, showTimeSumRow)
+	ShowCostSum = GetBool(configSheetTitle, valueColumn, showCostSumRow)
+	PathAccounting = ReadValue(pathAccountingRow)
 End Sub
 
-Public Sub Init(sheet as Object)
-	ShowTimeSum = sheet.getCellByPosition(valueColumn, showTimeSumRow).Value
-	ShowCostSum = sheet.getCellByPosition(valueColumn, showCostSumRow).Value
-	PathAccounting = sheet.getCellByPosition(valueColumn, pathAccountingRow).String
-End Sub
+Private Function ReadValue(valueRow as Integer) as String
+	ReadValue = CheckValue(GetTitle(valueRow), GetText(configSheetTitle, valueColumn, valueRow))
+End Function
 
+Private Function GetTitle(valueRow as Integer) as String
+	GetTitle = configSheetTitle+&quot; &apos;&quot;+getText(configSheetTitle, captionColumn, valueRow)+&quot;&apos;&quot;
+End Function
 </script:module>
