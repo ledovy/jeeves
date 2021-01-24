@@ -59,7 +59,6 @@ End Sub
 
 Sub Init
 	calcDoc = ThisComponent
-	SetDocument(calcDoc)
 	ShowGreetings()
 	
 	ClearOldEntries()
@@ -210,23 +209,17 @@ Sub UpdateAccounting
 	    url = convertToURL(path)
 	    accDoc = StarDesktop.loadComponentFromURL(url, &quot;_blank&quot;, 0, Array())
 
-	    SetDocument(accDoc)
 	    contactData = New ClassContact
-		contactData.Init()&apos;accDoc.Sheets.getByName(accSheetTitle))
-		If accDoc.Sheets.hasByName(masterData.calculationYear) Then
-		   accSheet = accDoc.Sheets.getByName(masterData.calculationYear)
-		Else
-		   accSheet = CreateAccountingSheet(accDoc)
+		contactData.Init(accDoc)
+		If Not accDoc.Sheets.hasByName(masterData.calculationYear) Then
+		   CreateAccountingSheet(accDoc)
 		End If
 
-		SetDocument(calcDoc)
 		WriteCalculationContact
 
-		SetDocument(accDoc)
 		WriteCalculationToAccounting(masterData.calculationYear)
 		accDoc.store()
 	    accDoc.Close(True)
-	    SetDocument(calcDoc)
 	Else
 		MsgBox &quot;Konfiguration -&gt; &apos;Pfad Buchhaltung&apos; nicht gefunden:&quot;+ chr(13) + path
 	End If
@@ -237,17 +230,15 @@ Function CreateAccountingSheet(doc as Object) as Object
 	Dim sheetYear As String
 	sheetYear = masterData.calculationYear
 	doc.Sheets.copyByName(&quot;Vorlage&quot;, sheetYear, 0)
-	sheet = doc.Sheets.getByName(sheetYear)
-	sheet.getCellRangeByName(&quot;A1&quot;).String = contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetYear
-	CreateAccountingSheet = sheet
+	SetRangeTextDoc(doc, sheetYear, &quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetYear)
 End Function
 
 Sub WriteCalculationContact
-	SetRangeText(calcSheetTitle, &quot;A5&quot;,  contactData.contactFirstName+&quot; &quot;+contactData.contactLastName)
-	SetText(calcSheetTitle, 0, currentTargetRow+3, &quot;PC: &quot;+contactData.bankPc)
-	SetText(calcSheetTitle, 0, currentTargetRow+4, &quot;IBAN: &quot;+contactData.bankIban)
-	SetText(calcSheetTitle, 0, currentTargetRow+5, &quot;Kontoinhaberin: &quot;+contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot;; &quot;+contactData.contactAddress)
-	SetText(calcSheetTitle, 0, currentTargetRow+8, contactData.contactFirstName)
+	SetRangeTextDoc(calcDoc, calcSheetTitle, &quot;A5&quot;,  contactData.contactFirstName+&quot; &quot;+contactData.contactLastName)
+	SetTextDoc(calcDoc, calcSheetTitle, 0, currentTargetRow+3, &quot;PC: &quot;+contactData.bankPc)
+	SetTextDoc(calcDoc, calcSheetTitle, 0, currentTargetRow+4, &quot;IBAN: &quot;+contactData.bankIban)
+	SetTextDoc(calcDoc, calcSheetTitle, 0, currentTargetRow+5, &quot;Kontoinhaberin: &quot;+contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot;; &quot;+contactData.contactAddress)
+	SetTextDoc(calcDoc, calcSheetTitle, 0, currentTargetRow+8, contactData.contactFirstName)
 End Sub
 
 Sub WriteCalculationToAccounting(sheet as String)
@@ -255,15 +246,15 @@ Sub WriteCalculationToAccounting(sheet as String)
 	company = masterData.customerCompany
 	Dim currentRow, customerRow, entryRow, lastRow As Integer
 	&apos;loop to find customer
-	customerRow = FindRow(sheet, accCustomerColumn, accStartRow, company, True)
-	lastRow = FindRow(sheet, accCustomerColumn, accStartRow, &quot;Total&quot;, True)
+	customerRow = FindRowDoc(accDoc, sheet, accCustomerColumn, accStartRow, company, True)
+	lastRow = FindRowDoc(accDoc, sheet, accCustomerColumn, accStartRow, &quot;Total&quot;, True)
 	&apos;if customer does not exist, create a new title
 	If customerRow &lt; 0 Then
 		Dim spacing As Integer
 		spacing = 2
 		customerRow = lastRow-1
-		GetSheet(sheet).Rows.insertByIndex(customerRow-1, spacing)
-		GetSheet(sheet).getCellByPosition(accCustomerColumn, customerRow).String = company
+		GetSheetDoc(accDoc, sheet).Rows.insertByIndex(customerRow-1, spacing)
+		GetSheetDoc(accDoc, sheet).getCellByPosition(accCustomerColumn, customerRow).String = company
 		lastRow = lastRow+spacing
 	End If
 	&apos;load entry-data
@@ -272,20 +263,21 @@ Sub WriteCalculationToAccounting(sheet as String)
 	Dim time As Date
 	time = masterData.calculationDateValue
 	Dim cost As Currency
-	cost = calcDoc.Sheets.getByName(calcSheetTitle).getCellByPosition(calcCostColumn, currentTargetRow).Value
+	cost = GetMoneyDoc(calcDoc, calcSheetTitle, calcCostColumn, currentTargetRow)
 	&apos;find entry-row (update existing or insert new line)
 	Dim msg as String
 	entryRow = -1
 	currentRow = customerRow+1
-	Do While &quot;&quot; &lt;&gt; GetSheet(sheet).getCellByPosition(accTitleColumn, currentRow).String
-		If masterData.fileName = GetSheet(sheet).getCellByPosition(accFileColumn, currentRow).String Then
+	&apos;TODO HasValue(cell, value)
+	Do While &quot;&quot; &lt;&gt; GetTextDoc(accDoc, sheet, accTitleColumn, currentRow)
+		If masterData.fileName = GetTextDoc(accDoc, sheet, accFileColumn, currentRow) Then
 			entryRow = currentRow
 		End If
 		currentRow = currentRow+1
 	Loop
 	If entryRow &lt; 0 Then
 		entryRow = currentRow
-		GetSheet(sheet).Rows.insertByIndex(currentRow, 1)
+		GetSheetDoc(accDoc, sheet).Rows.insertByIndex(currentRow, 1)
 		currentRow = currentRow+1
 		lastRow = lastRow+1
 		msg = &quot;Eintrag zur Buchhaltung hinzugefügt&quot;
@@ -293,16 +285,16 @@ Sub WriteCalculationToAccounting(sheet as String)
 		msg = &quot;Eintrag in Buchhaltung aktualisiert&quot;
 	End If
 	&apos;write entry for calculation
-	GetSheet(sheet).getCellByPosition(accTitleColumn, entryRow).String = title
-	GetSheet(sheet).getCellByPosition(accTimeColumn, entryRow).Value = time
-	GetSheet(sheet).getCellByPosition(accCostColumn, entryRow).Value = cost
-	GetSheet(sheet).getCellByPosition(accFileColumn, entryRow).String = masterData.fileName
+	SetTextDoc(accDoc, sheet, accTitleColumn, entryRow, title)
+	SetDateDoc(accDoc, sheet, accTimeColumn, entryRow, time)
+	SetMoneyDoc(accDoc, sheet, accCostColumn, entryRow, cost)
+	SetTextDoc(accDoc, sheet, accFileColumn, entryRow, masterData.fileName)
 	&apos;sort entries
 	Dim range As Object
-	range = GetSheet(sheet).getCellRangeByPosition(accCustomerColumn, customerRow+1, accCostColumn, currentRow-1)
+	range = GetRangeByIndexDoc(accDoc, sheet, accCustomerColumn, customerRow+1, accCostColumn, currentRow-1)
     SortRange(accTimeColumn, range)
 	&apos;rewrite total
-	GetSheet(sheet).getCellByPosition(accCostColumn, lastRow).Formula = &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;
+	SetFormulaDoc(accDoc, sheet, accCostColumn, lastRow, &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;)
 	MsgBox msg
 End Sub
 

@@ -22,23 +22,27 @@ Public Function IsValueSet(value as String) as String
 End Function
 
 Public Function FindRow(sheet as String, column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
+	FindRow = FindRowDoc(ThisComponent, sheet, column, row, searchValue, skipEmpty)
+End Function
+
+Public Function FindRowDoc(doc as Object, sheet as String, column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
 	Dim found As Boolean
 	found = False
 	Dim toRow As Integer
 	toRow = row
 	Dim rowValue As String
-	rowValue = GetText(sheet, column, toRow)
+	rowValue = GetTextDoc(doc, sheet, column, toRow)
 	Do While (NOT found) AND ((toRow-row) &lt; 300) AND (skipEmpty OR rowValue &lt;&gt; &quot;&quot;)
 		If searchValue = rowValue Then
 			found = true
 		End If
 		toRow = toRow + 1
-		rowValue = GetText(sheet, column, toRow)
+		rowValue = GetTextDoc(doc, sheet, column, toRow)
 	Loop
 	If found Then
-		FindRow = toRow-1
+		FindRowDoc = toRow-1
 	Else
-		FindRow = -1
+		FindRowDoc = -1
 	End If
 End Function
 
@@ -46,8 +50,16 @@ Public Function GetText(sheet as String, column, row as Integer) as String
 	GetText = GetCell(sheet, column, row).String
 End Function
 
+Public Function GetTextDoc(doc as Object, sheet as String, column, row as Integer) as String
+	GetTextDoc = GetCellDoc(doc, sheet, column, row).String
+End Function
+
 Public Function SetText(sheet as String, column, row as Integer, value as String)
 	GetCell(sheet, column, row).String = value
+End Function
+
+Public Function SetTextDoc(doc as Doc, sheet as String, column, row as Integer, value as String)
+	GetCellDoc(doc, sheet, column, row).String = value
 End Function
 
 Public Function GetNumber(sheet as String, column, row as Integer) as Integer
@@ -66,12 +78,24 @@ Public Function SetDate(sheet as String, column, row as Integer, value as Date)
 	GetCell(sheet, column, row).value = Value
 End Function
 
+Public Function SetDateDoc(doc as Doc, sheet as String, column, row as Integer, value as Date)
+	GetCellDoc(doc, sheet, column, row).value = Value
+End Function
+
 Public Function GetMoney(sheet as String, column, row as Integer) as Currency
 	GetMoney = GetCell(sheet, column, row).Value
 End Function
 
+Public Function GetMoneyDoc(doc as Object, sheet as String, column, row as Integer) as Currency
+	GetMoneyDoc = GetCellDoc(doc, sheet, column, row).Value
+End Function
+
 Public Function SetMoney(sheet as String, column, row as Integer, value as Currency)
 	GetCell(sheet, column, row).value = Value
+End Function
+
+Public Function SetMoneyDoc(doc as Doc, sheet as String, column, row as Integer, value as Currency)
+	GetCellDoc(doc, sheet, column, row).value = Value
 End Function
 
 Public Function GetBool(sheet as String, column, row as Integer) as Boolean
@@ -86,6 +110,10 @@ Public Function SetFormula(sheet as String, column, row as Integer, value as Str
 	GetCell(sheet, column, row).Formula = value
 End Function
 
+Public Function SetFormulaDoc(doc as Doc, sheet as String, column, row as Integer, value as String)
+	GetCellDoc(doc, sheet, column, row).Formula = value
+End Function
+
 Public Function ClearCell(sheet as String, column, row as Integer)
 	SetText(sheet, column, row, &quot;&quot;)
 End Function
@@ -94,22 +122,42 @@ Public Function GetCell(sheet as String, column, row as Integer) as Object
 	GetCell = GetSheet(sheet).getCellByPosition(column, row)
 End Function
 
+Public Function GetCellDoc(doc as Object, sheet as String, column, row as Integer) as Object
+	GetCellDoc = GetSheetDoc(doc, sheet).getCellByPosition(column, row)
+End Function
+
 Public Function GetRangeByIndex(sheet as String, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow as Integer) as Object
 	GetRangeByIndex = getSheet(sheet).getCellRangeByPosition(calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
+End Function
+
+Public Function GetRangeByIndexDoc(doc as Object, sheet as String, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow as Integer) as Object
+	GetRangeByIndexDoc = getSheetDoc(doc, sheet).getCellRangeByPosition(calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
 End Function
 
 Public Function GetRangeByName(sheet, rangeName as String) as Object
 	GetRangeByName = getSheet(sheet).getCellRangeByName(rangeName)
 End Function
 
+Public Function GetRangeByNameDoc(doc as Object, sheet, rangeName as String) as Object
+	GetRangeByNameDoc = getSheetDoc(doc, sheet).getCellRangeByName(rangeName)
+End Function
+
 Public Function SetRangeText(sheet, rangeName, value as String)
 	GetRangeByName(sheet, rangeName).String = value
 End Function
 
-Dim currentDocument as Object
+Public Function SetRangeTextDoc(doc as Object, sheet, rangeName, value as String)
+	GetRangeByNameDoc(doc, sheet, rangeName).String = value
+End Function
 
 Public Function GetSheet(sheet as String) as Object
-	GetSheet = currentDocument.Sheets.getByName(sheet)
+	Dim doc as Object
+	doc = ThisComponent
+	GetSheet = GetSheetDoc(doc, sheet)
+End Function
+
+Public Function GetSheetDoc(doc as Object, sheet as String) as Object
+	GetSheetDoc = doc.Sheets.getByName(sheet)
 End Function
 
 Public Function RemoveRows(sheet as String, index, count as Integer)
@@ -117,20 +165,20 @@ Public Function RemoveRows(sheet as String, index, count as Integer)
 End Function
 
 Public Sub SetFormat(sheet as String, x As Integer, y As Integer, format As String)
+	SetFormatDoc(ThisComponent, sheet, x, y, format)
+End Sub
+
+Public Sub SetFormatDoc(doc as Object, sheet as String, x As Integer, y As Integer, format As String)
 	Dim localeSettings As New com.sun.star.lang.Locale
 	localeSettings.Language = &quot;de&quot;
 	localeSettings.Country = &quot;ch&quot;
 	Dim cell As Object
 	cell = GetCell(sheet, x, y)
-	formatId = currentDocument.NumberFormats.queryKey(format, localeSettings, True)
+	formatId = doc.NumberFormats.queryKey(format, localeSettings, True)
 	If formatId = -1 Then
-		formatId = currentDocument.NumberFormats.addNew(format, localeSettings)
+		formatId = doc.NumberFormats.addNew(format, localeSettings)
 	End If
 	cell.NumberFormat = formatId
-End Sub
-
-Public Sub SetDocument(doc as Object)
-	currentDocument = doc
 End Sub
 
 Public Sub SortRange(column As Integer, range As Object)

@@ -22,6 +22,7 @@ Public contactLastName As String
 Public contactAddress As String
 Public bankPc As String
 Public bankIban As String
+Private doc as Object
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
@@ -32,7 +33,8 @@ Public Sub Class_Initialize
 	bankIban = &quot;&quot;
 End Sub
 &apos;
-Public Sub Init&apos;(sheet as Object)
+Public Sub Init(document as Object)
+	doc = document
 	contactFirstName = ReadValue(contactTitleRow, contactFirstNameRow)
 	contactLastName = ReadValue(contactTitleRow, contactLastNameRow)
 	contactAddress = ReadValue(contactTitleRow, contactAddressRow)
@@ -43,11 +45,11 @@ End Sub
 Private Function ReadValue(titleRow, valueRow as Integer) as String
 	Dim info, value as String
 	info = GetTitle(titleRow, valueRow)
-	value = GetText(accSheetTitle, valueColumn, valueRow)
+	value = GetTextDoc(doc, accSheetTitle, valueColumn, valueRow)
 	ReadValue = CheckValue(info, value)
 End Function
 
 Private Function GetTitle(titleRow, valueRow as Integer) as String
-	GetTitle = getText(accSheetTitle, captionColumn, titleRow)+&quot; &apos;&quot;+getText(accSheetTitle, captionColumn, valueRow)+&quot;&apos;&quot;
+	GetTitle = getTextDoc(doc, accSheetTitle, captionColumn, titleRow)+&quot; &apos;&quot;+getTextDoc(doc, accSheetTitle, captionColumn, valueRow)+&quot;&apos;&quot;
 End Function
 </script:module>

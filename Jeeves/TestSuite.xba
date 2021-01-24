@@ -16,7 +16,7 @@ Private currentTest as Object
 
 &apos;TESTS: All
 Sub TestAll
-	SetDocument(ThisComponent)
+	&apos;SetDocument(ThisComponent)
 	allTestsSucceeded = 0
 	testsFailed = 0
 	failedInfo = &quot;&quot;
@@ -33,7 +33,7 @@ Sub ClearAllResult
 End Sub
 
 Sub ClearAllTestResults
-	SetDocument(ThisComponent)
+	&apos;SetDocument(ThisComponent)
 	Dim I as Integer
 	For I = resultRowAllTests To resultRowLastTests Step 5
 		ClearTestResults(I)
@@ -42,25 +42,25 @@ End Sub
 
 &apos;TESTS: FindRow
 Sub TestFindRow
-	SetDocument(ThisComponent)
+	&apos;SetDocument(ThisComponent)
 	currentTest = New TestFindRow
 	RunCurrentTest(resultRowFindRowTests)
 End Sub
 
 Sub ClearFindRowResults
-	SetDocument(ThisComponent)
+	&apos;SetDocument(ThisComponent)
 	ClearTestResults(resultRowFindRowTests)
 End Sub
 
 &apos;TESTS: GetSetValue
 Sub TestGetSetValue
-	SetDocument(ThisComponent)
+	&apos;SetDocument(ThisComponent)
 	currentTest = New TestGetSetValue
 	RunCurrentTest(resultRowGetSetValueTests)
 End Sub
 
 Sub ClearGetSetValueResults
-	SetDocument(ThisComponent)
+	&apos;SetDocument(ThisComponent)
 	ClearTestResults(resultRowGetSetValueTests)
 End Sub
 
