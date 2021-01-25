@@ -90,7 +90,7 @@ Sub RunCurrentTest(targetRow)
 	ClearTestResults(targetRow)
 	
 	currentTest.Init(targetRow)
-	currentTest.RunTests()
+	currentTest.RunTests(helper)
 	
 	UpdateResultInfo()
 End Sub

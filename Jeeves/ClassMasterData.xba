@@ -6,19 +6,9 @@ Option ClassModule
 Option Explicit
 
 &apos;CONSTANTS
-Public Const captionColumn = 0
-Public Const valueColumn = 1
-Private Const customerTitleRow = 0
-Private Const customerNameRow = 1
-Private Const customerCompanyRow = 2
-Private Const customerEmailRow = 3
-Private Const calculationTitleRow = 4
-Private Const accountingTitleRow = 5
-Public Const startDateRow = 6
-Private Const calculationDateRow = 7
-Private Const calculationYearRow = 8
 
 &apos;ATTRIBUTES
+Private helper as Object
 Public customerName As String
 Public customerCompany As String
 Public customerEmail As String
@@ -32,23 +22,33 @@ Public fileName as String
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
-	customerName = ReadValue(customerNameRow)
-	customerCompany = ReadValue(customerCompanyRow)
-	customerEmail = ReadValue(customerEmailRow)
-	calculationTitle = ReadValue(calculationTitleRow)
-	accountingTitle = ReadValue(accountingTitleRow)
-	startDate = ReadValue(startDateRow)
-	calculationDate = ReadValue(calculationDateRow)
-	calculationDateValue = GetDate(timeSheetTitle, valueColumn, calculationDateRow)
-	calculationYear = ReadValue(calculationYearRow)
-	fileName = CheckValue(&quot;Dateiname&quot;, ThisComponent.getLocation())
+	customerName = &quot;&quot;
+	customerCompany = &quot;&quot;
+	customerEmail = &quot;&quot;
+	calculationTitle = &quot;&quot;
+	accountingTitle = &quot;&quot;
+	startDate = &quot;&quot;
+	calculationDate = &quot;&quot;
+	calculationDateValue = 0
+	calculationYear = &quot;&quot;
+	fileName = &quot;&quot;
 End Sub
 
-Private Function ReadValue(valueRow as Integer) as String
-	ReadValue = CheckValue(GetTitle(valueRow), GetText(timeSheetTitle, valueColumn, valueRow))
-End Function
+Public Sub Init(sheetHelper as Object, file as String)
+	helper = sheetHelper
+	customerName = helper.getTextChecked(GetTitle(masterCustomerNameRow), masterValueColumn, masterCustomerNameRow)
+	customerCompany = helper.getTextChecked(GetTitle(masterCustomerCompanyRow), masterValueColumn, masterCustomerCompanyRow)
+	customerEmail = helper.getTextChecked(GetTitle(masterCustomerEmailRow), masterValueColumn, masterCustomerEmailRow)
+	calculationTitle = helper.getTextChecked(GetTitle(masterCalculationTitleRow), masterValueColumn, masterCalculationTitleRow)
+	accountingTitle = helper.getTextChecked(GetTitle(masterAccountingTitleRow), masterValueColumn, masterAccountingTitleRow)
+	startDate = helper.getTextChecked(GetTitle(masterStartDateRow), masterValueColumn, masterStartDateRow)
+	calculationDate = helper.getTextChecked(GetTitle(masterCalculationDateRow), masterValueColumn, masterCalculationDateRow)
+	calculationDateValue = helper.GetDate(masterValueColumn, masterCalculationDateRow)
+	calculationYear = helper.getTextChecked(GetTitle(masterCalculationYearRow), masterValueColumn, masterCalculationYearRow)
+	fileName = CheckValue(&quot;Dateiname&quot;, file)
+End Sub
 
 Private Function GetTitle(valueRow as Integer) as String
-	GetTitle = GetText(timeSheetTitle, captionColumn, customerTitleRow)+&quot; &apos;&quot;+GetText(timeSheetTitle, captionColumn, valueRow)+&quot;&apos;&quot;
+	GetTitle = helper.GetText(masterCaptionColumn, valueRow)+&quot; &apos;&quot;+helper.GetText(masterValueColumn, valueRow)+&quot;&apos;&quot;
 End Function
 </script:module>

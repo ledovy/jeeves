@@ -6,19 +6,6 @@ Option ClassModule
 Option Explicit
 
 &apos;CONSTANTS
-Const timeDateColumn = 0
-Const timeTimeColumn = 1
-Const timeTypeColumn = 2
-Const timeNameColumn = 3
-Const timeMaxTimeColumn = 4
-Const timeMaxCostColumn = 5
-Const timeCollapsedColumn = 6
-Const timeCostColumn = 7
-Const timeTimeRoundedColumn = 8
-Const timeTimeFormattedColumn = 9
-Const timeCostRoundedColumn = 10
-Const timeFactorCostColumn = 11
-Const timeFactorTimeColumn  = 12
 
 &apos;ATTRIBUTES
 Public datum As String
@@ -34,13 +21,5 @@ Public Sub Class_Initialize
 	factor = &quot;&quot;
 	time = 0
 	cost = 0
-End Sub
-
-Public Sub Init(row As Integer)
-	datum = GetText(timeSheetTitle, timeDateColumn, row)
-	factor = GetText(timeSheetTitle, timeFactorCostColumn, row) + &quot; / &quot; + GetText(timeSheetTitle, timeFactorTimeColumn, row) + &quot; Min.&quot;
-	time = GetDate(timeSheetTitle, timeTimeRoundedColumn, row)
-	cost = GetMoney(timeSheetTitle, timeCostRoundedColumn, row)
-	title = GetText(timeSheetTitle, timeNameColumn, row)
 End Sub
 </script:module>

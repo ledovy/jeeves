@@ -2,26 +2,33 @@
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="Abrechnung" script:language="StarBasic">REM  *****  BASIC  *****
 
-Dim calcDoc, accDoc As Object
+&apos;Dim calcDoc, accDoc As Object
+Dim timeHelper, typeHelper, calcHelper, configHelper, accHelper as Object
 Dim currentTargetRow As Integer
 
-Dim config As New ClassConfig
-Dim masterData As New ClassMasterData
-Dim contactData As Object
-Dim types As New ClassWorkTypes
+Dim config, masterData, contactData, types As Object
 	
 Sub Main
 	Init()
 	ProcessEntries()
 	AddCollapsedEntries()
-	SortWrittenEntries()
 	WriteSummary()
 	UpdateAccounting()
 End Sub
 
 Sub Init
-	calcDoc = ThisComponent
+	timeHelper = SheetHelper(timeSheetTitle)
+	typeHelper = SheetHelper(typeSheetTitle)
+	calcHelper = SheetHelper(calcSheetTitle)
+	configHelper = SheetHelper(configSheetTitle)
 	ShowGreetings()
+	
+	config = New ClassConfig
+	config.Init(configHelper)
+	masterData = New ClassMasterData
+	masterData.Init(timeHelper, ThisComponent.getLocation())
+	types = New ClassWorkTypes
+	types.Init(typeHelper)
 	
 	ClearOldEntries()
 End Sub
@@ -29,10 +36,10 @@ End Sub
 Sub ClearOldEntries
 	Dim endRow, rows As Integer
 	
-	endRow = FindRow(calcSheetTitle, calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
+	endRow = calcHelper.FindRow(calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
 	rows = endRow-calcStartRow
 	If rows &gt; 0 Then
-		RemoveRows(calcSheetTitle, calcStartRow, rows)
+		calcHelper.RemoveRows(calcStartRow, rows)
 	End If
 End Sub
 
@@ -41,20 +48,20 @@ Sub ProcessEntries
 	Dim i As Integer
 	i = timeFirstEntryRow
 	Dim rowValue As String
-	rowValue = GetText(timeSheetTitle, timeDateColumn, i)
+	rowValue = timeHelper.GetText(timeDateColumn, i)
 	Do While (&quot;&quot; &lt;&gt; rowValue) OR (i &lt; (timeFirstEntryRow+timeMaxEntries))
 		Dim typeValue, collapsedValue, sumValue As String
-		typeValue = GetText(timeSheetTitle, timeTypeColumn, i)
+		typeValue = timeHelper.GetText(timeTypeColumn, i)
 		If types.IsCollapsed(typeValue) Then
-			sumValue = GetText(timeSheetTitle, timeTimeColumn, i)
+			sumValue = timeHelper.GetText(timeTimeColumn, i)
 		Else
-			sumValue = GetText(timeSheetTitle, timeTimeRoundedColumn, i)
+			sumValue = timeHelper.GetText(timeTimeRoundedColumn, i)
 			AddRow(GetWorkEntry(i))
 		End If
 		types.AddEffort(sumValue, typeValue)
 		&apos; increment
 		i = i+1
-		rowValue = GetText(timeSheetTitle, timeDateColumn, i)
+		rowValue = timeHelper.GetText(timeDateColumn, i)
 	Loop
 	If (i &gt; (timeFirstEntryRow+timeMaxEntries)) Then
 		MsgBox &quot;Maximale Anzahl von &quot;+timeMaxEntries+&quot; Zeilen überschritten: &quot;+(i-timeFirstEntryRow)
@@ -63,28 +70,33 @@ End Sub
 
 Function GetWorkEntry(row As Integer)
 	Dim entry As New ClassWorkEntry
-	entry.Init(row)
+	&apos;entry.Init(row)
+	entry.datum = timeHelper.GetText(timeDateColumn, row)
+	entry.factor = timeHelper.GetText(timeFactorCostColumn, row) + &quot; / &quot; + timeHelper.GetText(timeFactorTimeColumn, row) + &quot; Min.&quot;
+	entry.time = timeHelper.GetDate(timeTimeRoundedColumn, row)
+	entry.cost = timeHelper.GetMoney(timeCostRoundedColumn, row)
+	entry.title = timeHelper.GetText(timeNameColumn, row)
 	GetWorkEntry = entry
 End Function
 
 Sub AddRow(entry As Object)
 	If (entry.datum &lt;&gt; &quot;&quot;) OR (entry.title &lt;&gt; &quot;&quot;) OR (entry.time &lt;&gt; 0) OR (entry.cost &lt;&gt; 0) Then
-		&apos;TODO Util.InsertRow
-		GetSheet(calcSheetTitle).Rows.insertByIndex(currentTargetRow, 1)
-		GetSheet(calcSheetTitle).Rows(currentTargetRow).clearContents(32)
-		WriteRow(currentTargetRow, entry.datum, entry.title, entry.factor, entry.time, entry.cost)
+		calcHelper.InsertRows(currentTargetRow, 1)
+		WriteRow(currentTargetRow, entry)
 		currentTargetRow = currentTargetRow + 1
 	End If
 End Sub
 
-Sub WriteRow (rowIndex As Integer, dateValue As String, nameValue As String, factorValue As String, timeValue As Integer, costValue As Currency)
-		SetText(calcSheetTitle, calcDateColumn, rowIndex, dateValue)
-		SetText(calcSheetTitle, calcNameColumn, rowIndex, nameValue)
-		SetText(calcSheetTitle, calcFactorColumn, rowIndex, factorValue)
-		SetFormula(calcSheetTitle, calcTimeColumn, rowIndex, &quot;=&quot;+timeValue+&quot;/(60*24)&quot;)
-		SetFormat(calcSheetTitle, calcTimeColumn, rowIndex, TimeFormat)
-		SetMoney(calcSheetTitle, calcCostColumn, rowIndex, costValue)
-		SetFormat(calcSheetTitle, calcCostColumn, rowIndex, CurrencyFormat)
+Sub WriteRow (rowIndex As Integer, entry as Object)
+		calcHelper.SetText(calcDateColumn, rowIndex, entry.datum)
+		calcHelper.SetText(calcNameColumn, rowIndex, entry.title)
+		calcHelper.SetText(calcFactorColumn, rowIndex, entry.factor)
+		Dim timeValue as Integer
+		timeValue = entry.time
+		calcHelper.SetFormula(calcTimeColumn, rowIndex, &quot;=&quot;+timeValue+&quot;/(60*24)&quot;)
+		calcHelper.SetFormatTime(calcTimeColumn, rowIndex)
+		calcHelper.SetMoney(calcCostColumn, rowIndex, entry.cost)
+		calcHelper.SetFormatMoney(calcCostColumn, rowIndex)
 End Sub
 
 Sub AddCollapsedEntries
@@ -101,30 +113,25 @@ Sub AddCollapsedEntries
 			End If
 		End If
 	Next i
-End Sub
-
-Sub SortWrittenEntries
-	Dim range As Object
-	range = GetRangeByIndex(calcSheetTitle, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
-    SortRange(0, range)
+	calcHelper.SortRange(calcDateColumn, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
 End Sub
 
 Sub WriteSummary
-	SetText(calcSheetTitle, 0, 0, masterData.customerName)
-	SetText(calcSheetTitle, 0, 1, masterData.customerCompany)
-	SetText(calcSheetTitle, 0, 2, masterData.customerEmail)
+	calcHelper.SetText(0, 0, masterData.customerName)
+	calcHelper.SetText(0, 1, masterData.customerCompany)
+	calcHelper.SetText(0, 2, masterData.customerEmail)
 	&apos;header
-	SetRangeText(calcSheetTitle, &quot;A6&quot;, masterData.customerCompany + &quot; | Abrechnung &quot; + masterData.calculationTitle)
-	SetRangeText(calcSheetTitle, &quot;A7&quot;, &quot;Datum: &quot; + masterData.calculationDate)
+	calcHelper.SetRangeText(&quot;A6&quot;, masterData.customerCompany + &quot; | Abrechnung &quot; + masterData.calculationTitle)
+	calcHelper.SetRangeText(&quot;A7&quot;, &quot;Datum: &quot; + masterData.calculationDate)
 	&apos;time sum
 	If config.ShowTimeSum Then
-		SetFormula(calcSheetTitle, calcTimeColumn, currentTargetRow, &quot;=SUM(D&quot;+(calcStartRow+1)+&quot;:D&quot;+(currentTargetRow)+&quot;)&quot;)
-		SetFormat(calcSheetTitle, calcTimeColumn, currentTargetRow, TimeFormat)
+		calcHelper.SetFormula(calcTimeColumn, currentTargetRow, &quot;=SUM(D&quot;+(calcStartRow+1)+&quot;:D&quot;+(currentTargetRow)+&quot;)&quot;)
+		calcHelper.SetFormatTime(calcTimeColumn, currentTargetRow)
 	End If
 	&apos;cost sum
 	If config.ShowCostSum Then
-		SetFormula(calcSheetTitle, calcCostColumn, currentTargetRow, &quot;=SUM(E&quot;+(calcStartRow+1)+&quot;:E&quot;+(currentTargetRow)+&quot;)&quot;)
-		SetFormat(calcSheetTitle, calcCostColumn, currentTargetRow, CurrencyFormat)
+		calcHelper.SetFormula(calcCostColumn, currentTargetRow, &quot;=SUM(E&quot;+(calcStartRow+1)+&quot;:E&quot;+(currentTargetRow)+&quot;)&quot;)
+		calcHelper.SetFormatMoney(calcCostColumn, currentTargetRow)
 	End If
 End Sub
 
@@ -132,15 +139,15 @@ Function GetRange(Optional category As String) As String
 	Dim currentX, currentY, firstX, firstY, lastX, lastY As Integer
 	currentX = timeDateColumn
 	currentY = timeFirstEntryRow
-	firstX = masterData.valueColumn
-	firstY = masterData.startDateRow
-	lastX = masterData.valueColumn
-	lastY = masterData.startDateRow
+	firstX = masterValueColumn
+	firstY = masterStartDateRow
+	lastX = masterValueColumn
+	lastY = masterStartDateRow
 	
 	Dim current As Date,first As Date, last As Date
-	current = GetDate(timeSheetTitle, currentX, currentY)
-	Do While &quot;&quot; &lt;&gt; GetText(timeSheetTitle, currentX, currentY)
-		If (IsMissing(category)) OR (category = GetText(timeSheetTitle, timeTypeColumn, currentY)) Then
+	current = timeHelper.GetDate(currentX, currentY)
+	Do While &quot;&quot; &lt;&gt; timeHelper.GetText(currentX, currentY)
+		If (IsMissing(category)) OR (category = timeHelper.GetText(timeTypeColumn, currentY)) Then
 			If (first = 0) OR (first &gt; current) Then
 				first = current
 				firstX = currentX
@@ -153,54 +160,53 @@ Function GetRange(Optional category As String) As String
 			End If
 		End If
 		currentY = currentY + 1
-		current = GetDate(timeSheetTitle, currentX, currentY)
+		current = timeHelper.GetDate(currentX, currentY)
 	Loop
 	If first = last Then
-		GetRange = GetText(timeSheetTitle, lastX, lastY)
+		GetRange = timeHelper.GetText(lastX, lastY)
 	Else
-		GetRange = GetText(timeSheetTitle, firstX, firstY) + &quot; - &quot; + GetText(timeSheetTitle, lastX, lastY)
+		GetRange = timeHelper.GetText(firstX, firstY) + &quot; - &quot; + timeHelper.GetText(lastX, lastY)
 	End If
 End Function
 
 Sub UpdateAccounting
-	Dim path, year As String
-	Dim url, accSheet As Object
+	Dim path, sheetName As String
+	Dim url, doc, contactHelper As Object
 	path = config.PathAccounting
+	sheetName = masterData.calculationYear
 		
 	If FileExists(path) Then
 	    url = convertToURL(path)
-	    accDoc = StarDesktop.loadComponentFromURL(url, &quot;_blank&quot;, 0, Array())
+	    doc = StarDesktop.loadComponentFromURL(url, &quot;_blank&quot;, 0, Array())
 
+		contactHelper = DocHelper(doc, accSheetTitle)
 	    contactData = New ClassContact
-		contactData.Init(accDoc)
-		If Not accDoc.Sheets.hasByName(masterData.calculationYear) Then
-		   CreateAccountingSheet(accDoc)
+	    contactData.Init(contactHelper)
+	    
+		If doc.Sheets.hasByName(sheetName) Then
+			accHelper = DocHelper(doc, sheetName)
+		Else
+			doc.Sheets.copyByName(&quot;Vorlage&quot;, sheetName, 0)
+			accHelper = DocHelper(doc, sheetName)
+			accHelper.SetRangeText(&quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
 		End If
 
 		WriteCalculationContact
 
-		WriteCalculationToAccounting(masterData.calculationYear)
-		accDoc.store()
-	    accDoc.Close(True)
+		WriteCalculationToAccounting(sheetName)
+		doc.store()
+	    doc.Close(True)
 	Else
 		MsgBox &quot;Konfiguration -&gt; &apos;Pfad Buchhaltung&apos; nicht gefunden:&quot;+ chr(13) + path
 	End If
 End Sub
 
-Function CreateAccountingSheet(doc as Object) as Object
-	Dim sheet As Object
-	Dim sheetYear As String
-	sheetYear = masterData.calculationYear
-	doc.Sheets.copyByName(&quot;Vorlage&quot;, sheetYear, 0)
-	SetRangeTextDoc(doc, sheetYear, &quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetYear)
-End Function
-
 Sub WriteCalculationContact
-	SetRangeTextDoc(calcDoc, calcSheetTitle, &quot;A5&quot;,  contactData.contactFirstName+&quot; &quot;+contactData.contactLastName)
-	SetTextDoc(calcDoc, calcSheetTitle, 0, currentTargetRow+3, &quot;PC: &quot;+contactData.bankPc)
-	SetTextDoc(calcDoc, calcSheetTitle, 0, currentTargetRow+4, &quot;IBAN: &quot;+contactData.bankIban)
-	SetTextDoc(calcDoc, calcSheetTitle, 0, currentTargetRow+5, &quot;Kontoinhaberin: &quot;+contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot;; &quot;+contactData.contactAddress)
-	SetTextDoc(calcDoc, calcSheetTitle, 0, currentTargetRow+8, contactData.contactFirstName)
+	calcHelper.SetRangeText(&quot;A5&quot;,  contactData.contactFirstName+&quot; &quot;+contactData.contactLastName)
+	calcHelper.SetText(0, currentTargetRow+3, &quot;PC: &quot;+contactData.bankPc)
+	calcHelper.SetText(0, currentTargetRow+4, &quot;IBAN: &quot;+contactData.bankIban)
+	calcHelper.SetText(0, currentTargetRow+5, &quot;Kontoinhaberin: &quot;+contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot;; &quot;+contactData.contactAddress)
+	calcHelper.SetText(0, currentTargetRow+8, contactData.contactFirstName)
 End Sub
 
 Sub WriteCalculationToAccounting(sheet as String)
@@ -208,15 +214,15 @@ Sub WriteCalculationToAccounting(sheet as String)
 	company = masterData.customerCompany
 	Dim currentRow, customerRow, entryRow, lastRow As Integer
 	&apos;loop to find customer
-	customerRow = FindRowDoc(accDoc, sheet, accCustomerColumn, accStartRow, company, True)
-	lastRow = FindRowDoc(accDoc, sheet, accCustomerColumn, accStartRow, &quot;Total&quot;, True)
+	customerRow = accHelper.FindRow(accCustomerColumn, accStartRow, company, True)
+	lastRow = accHelper.FindRow(accCustomerColumn, accStartRow, &quot;Total&quot;, True)
 	&apos;if customer does not exist, create a new title
 	If customerRow &lt; 0 Then
 		Dim spacing As Integer
 		spacing = 2
 		customerRow = lastRow-1
-		GetSheetDoc(accDoc, sheet).Rows.insertByIndex(customerRow-1, spacing)
-		GetSheetDoc(accDoc, sheet).getCellByPosition(accCustomerColumn, customerRow).String = company
+		accHelper.InsertRows(customerRow-1, spacing)
+		accHelper.SetText(accCustomerColumn, customerRow, company)
 		lastRow = lastRow+spacing
 	End If
 	&apos;load entry-data
@@ -225,21 +231,21 @@ Sub WriteCalculationToAccounting(sheet as String)
 	Dim time As Date
 	time = masterData.calculationDateValue
 	Dim cost As Currency
-	cost = GetMoneyDoc(calcDoc, calcSheetTitle, calcCostColumn, currentTargetRow)
+	cost = calcHelper.GetMoney(calcCostColumn, currentTargetRow)
 	&apos;find entry-row (update existing or insert new line)
 	Dim msg as String
 	entryRow = -1
 	currentRow = customerRow+1
 	&apos;TODO HasValue(cell, value)
-	Do While &quot;&quot; &lt;&gt; GetTextDoc(accDoc, sheet, accTitleColumn, currentRow)
-		If masterData.fileName = GetTextDoc(accDoc, sheet, accFileColumn, currentRow) Then
+	Do While &quot;&quot; &lt;&gt; accHelper.GetText(accTitleColumn, currentRow)
+		If masterData.fileName = accHelper.GetText(accFileColumn, currentRow) Then
 			entryRow = currentRow
 		End If
 		currentRow = currentRow+1
 	Loop
 	If entryRow &lt; 0 Then
 		entryRow = currentRow
-		GetSheetDoc(accDoc, sheet).Rows.insertByIndex(currentRow, 1)
+		accHelper.InsertRows(currentRow, 1)
 		currentRow = currentRow+1
 		lastRow = lastRow+1
 		msg = &quot;Eintrag zur Buchhaltung hinzugefügt&quot;
@@ -247,16 +253,14 @@ Sub WriteCalculationToAccounting(sheet as String)
 		msg = &quot;Eintrag in Buchhaltung aktualisiert&quot;
 	End If
 	&apos;write entry for calculation
-	SetTextDoc(accDoc, sheet, accTitleColumn, entryRow, title)
-	SetDateDoc(accDoc, sheet, accTimeColumn, entryRow, time)
-	SetMoneyDoc(accDoc, sheet, accCostColumn, entryRow, cost)
-	SetTextDoc(accDoc, sheet, accFileColumn, entryRow, masterData.fileName)
+	accHelper.SetText(accTitleColumn, entryRow, title)
+	accHelper.SetDate(accTimeColumn, entryRow, time)
+	accHelper.SetMoney(accCostColumn, entryRow, cost)
+	accHelper.SetText(accFileColumn, entryRow, masterData.fileName)
 	&apos;sort entries
-	Dim range As Object
-	range = GetRangeByIndexDoc(accDoc, sheet, accCustomerColumn, customerRow+1, accCostColumn, currentRow-1)
-    SortRange(accTimeColumn, range)
+    accHelper.SortRange(accTimeColumn, accCustomerColumn, customerRow+1, accCostColumn, currentRow-1)
 	&apos;rewrite total
-	SetFormulaDoc(accDoc, sheet, accCostColumn, lastRow, &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;)
+	accHelper.SetFormula(accCostColumn, lastRow, &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;)
 	MsgBox msg
 End Sub
 

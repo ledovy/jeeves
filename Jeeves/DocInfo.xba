@@ -2,9 +2,8 @@
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="DocInfo" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
 
-
-
 Public Const timeSheetTitle = &quot;Zeiterfassung&quot;
+
 Public Const timeDateColumn = 0
 Public Const timeTimeColumn = 1
 Public Const timeTypeColumn = 2
@@ -19,12 +18,36 @@ Public Const timeCostRoundedColumn = 10
 Public Const timeFactorCostColumn = 11
 Public Const timeFactorTimeColumn  = 12
 Public Const timeFirstEntryRow = 11
-
 Public Const timeMaxEntries = 300
+
+Public Const masterCaptionColumn = 0
+Public Const masterValueColumn = 1
+Public Const masterCustomerTitleRow = 0
+Public Const masterCustomerNameRow = 1
+Public Const masterCustomerCompanyRow = 2
+Public Const masterCustomerEmailRow = 3
+Public Const masterCalculationTitleRow = 4
+Public Const masterAccountingTitleRow = 5
+Public Const masterStartDateRow = 6
+Public Const masterCalculationDateRow = 7
+Public Const masterCalculationYearRow = 8
 
 Public Const typeSheetTitle = &quot;Arbeitstypen&quot;
 
+Public Const typeTypeColumn = 0
+Public Const typeCollapsedColumn = 1
+Public Const typeCollapsedMinutesColumn = 2
+Public Const typeEffortColumn = 3
+Public Const typeMinutesRoundedColumn = 4
+Public Const typeMinutesFormattedColumn = 5
+Public Const typeCostColumn = 6
+Public Const typeTimeColumn = 7
+Public Const typeCostPerMinutesColumn = 8
+Public Const typeCostsFormattedColumn = 9
+Public Const typeMaxEntries = 100
+
 Public Const calcSheetTitle = &quot;Abrechnung&quot;
+
 Public Const calcDateColumn = 0
 Public Const calcNameColumn = 1
 Public Const calcFactorColumn = 2
@@ -35,6 +58,7 @@ Public Const calcStartRow = 8
 Public Const configSheetTitle = &quot;Konfiguration&quot;
 
 Public Const accSheetTitle = &quot;Kontaktdaten&quot;
+
 Public Const accCustomerColumn = 0
 Public Const accTitleColumn = 1
 Public Const accTimeColumn = 2

@@ -23,7 +23,7 @@ Public Sub Init(targetDocument as Object, sheetName as String)
 	sheet = document.Sheets.getByName(sheetName)
 End Sub
 	
-Public Function FindRowDoc(column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
+Public Function FindRow(column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
 	Dim found As Boolean
 	found = False
 	Dim toRow As Integer
@@ -49,6 +49,10 @@ End Function
 
 Public Function GetText(column, row as Integer) as String
 	GetText = GetCell(column, row).String
+End Function
+
+Public Function GetTextChecked(info as String, column, row as Integer) as String
+	GetTextChecked = CheckValue(info, GetText(column, row))
 End Function
 
 Public Function SetText(column, row as Integer, value as String)
@@ -100,7 +104,7 @@ Public Function GetCell(column, row as Integer) as Object
 End Function
 
 Public Function GetRange(startColumn, startRow, endColumn, endRow as Integer) as Object
-	GetRangeByIndex = sheet.getCellRangeByPosition(startColumn, startRow, endColumn, endRow)
+	GetRange = sheet.getCellRangeByPosition(startColumn, startRow, endColumn, endRow)
 End Function
 
 Public Function GetRangeByName(rangeName as String) as Object
@@ -111,21 +115,37 @@ Public Function SetRangeText(rangeName, value as String)
 	GetRangeByName(rangeName).String = value
 End Function
 
+Public Function InsertRows(index, count as Integer)
+		sheet.Rows.insertByIndex(index, count)
+		Dim i As Integer
+		For i = index To index+count
+			sheet.Rows(index).clearContents(32)
+		Next i
+End Function
+
 Public Function RemoveRows(index, count as Integer)
 	sheet.Rows.removeByIndex(index, count)
 End Function
+
+Public Sub SetFormatTime(column, row As Integer)
+	SetFormat(column, row, TimeFormat)
+End Sub
+
+Public Sub SetFormatMoney(column, row As Integer)
+	SetFormat(column, row, CurrencyFormat)
+End Sub
 
 Public Sub SetFormat(column, row As Integer, format As String)
 	Dim localeSettings As New com.sun.star.lang.Locale
 	localeSettings.Language = &quot;de&quot;
 	localeSettings.Country = &quot;ch&quot;
-	Dim cell As Object
-	cell = GetCell(column, row)
+	Dim formatId As Integer
 	formatId = document.NumberFormats.queryKey(format, localeSettings, True)
 	If formatId = -1 Then
 		formatId = document.NumberFormats.addNew(format, localeSettings)
 	End If
-	cell.NumberFormat = formatId
+	&apos;cell.NumberFormat = formatId
+	GetCell(column, row).NumberFormat = formatId
 End Sub
 
 Public Sub SortRange(sortColumn, startColumn, startRow, endColumn, endRow as Integer)

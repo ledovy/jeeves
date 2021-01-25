@@ -9,6 +9,8 @@ Private targetRow as Integer
 Private testsSucceeded as Integer
 Private failMessage as String
 Private failInfo as String
+Private helper as Object
+
 Public TestName as String
 
 &apos;CONSTRUCTOR
@@ -38,7 +40,9 @@ Private Const testValue = &quot;Test&quot;
 Private Const valuesColumn = 5
 Private Const nrOfValues = 6
 
-Sub RunTests
+Sub RunTests(cellHelper as Object)
+	helper = cellHelper
+	
 	AssertIsValueSet(1)
 	AssertIsValueSet(1234)
 	AssertIsValueSet(&quot;Test&quot;)
@@ -81,7 +85,7 @@ Sub AssertText(row as Integer, value as String)
 	If Not HasFailed Then
 		Dim actualResult as String
 
-		actualResult = GetText(titleSheetTestSuite, valuesColumn, row)
+		actualResult = helper.GetText(valuesColumn, row)
 
 		testsSucceeded = testsSucceeded + 1
 		If value &lt;&gt; actualResult Then
@@ -89,15 +93,15 @@ Sub AssertText(row as Integer, value as String)
 		End If
 		
 		row = row + nrOfValues
-		SetText(titleSheetTestSuite, valuesColumn, row, value)
-		actualResult = GetText(titleSheetTestSuite, valuesColumn, row)
+		helper.SetText(valuesColumn, row, value)
+		actualResult = helper.GetText(valuesColumn, row)
 
 		testsSucceeded = testsSucceeded + 1
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		Else
-			ClearCell(titleSheetTestSuite, valuesColumn, row)
-			AssertIsValueNotSet(GetText(titleSheetTestSuite, valuesColumn, row))
+			helper.ClearCell(valuesColumn, row)
+			AssertIsValueNotSet(helper.GetText(valuesColumn, row))
 		End If
 	End If
 End Sub
@@ -106,7 +110,7 @@ Sub AssertNumber(row as Integer, value as Integer)
 	If Not HasFailed Then
 		Dim actualResult as Integer
 
-		actualResult = GetNumber(titleSheetTestSuite, valuesColumn, row)
+		actualResult = helper.GetNumber(valuesColumn, row)
 
 		testsSucceeded = testsSucceeded + 1
 		If value &lt;&gt; actualResult Then
@@ -114,15 +118,15 @@ Sub AssertNumber(row as Integer, value as Integer)
 		End If
 		
 		row = row + nrOfValues
-		SetNumber(titleSheetTestSuite, valuesColumn, row, value)
-		actualResult = GetNumber(titleSheetTestSuite, valuesColumn, row)
+		helper.SetNumber(valuesColumn, row, value)
+		actualResult = helper.GetNumber(valuesColumn, row)
 
 		testsSucceeded = testsSucceeded + 1
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		Else
-			ClearCell(titleSheetTestSuite, valuesColumn, row)
-			AssertIsValueNotSet(GetText(titleSheetTestSuite, valuesColumn, row))
+			helper.ClearCell(valuesColumn, row)
+			AssertIsValueNotSet(helper.GetText(valuesColumn, row))
 		End If
 	End If
 End Sub
@@ -131,7 +135,7 @@ Sub AssertDate(row as Integer, value as Date)
 	If Not HasFailed Then
 		Dim actualResult as Date
 
-		actualResult = GetDate(titleSheetTestSuite, valuesColumn, row)
+		actualResult = helper.GetDate(valuesColumn, row)
 
 		testsSucceeded = testsSucceeded + 1
 		If value &lt;&gt; actualResult Then
@@ -139,15 +143,15 @@ Sub AssertDate(row as Integer, value as Date)
 		End If
 		
 		row = row + nrOfValues
-		SetDate(titleSheetTestSuite, valuesColumn, row, value)
-		actualResult = GetDate(titleSheetTestSuite, valuesColumn, row)
+		helper.SetDate(valuesColumn, row, value)
+		actualResult = helper.GetDate(valuesColumn, row)
 
 		testsSucceeded = testsSucceeded + 1
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		Else
-			ClearCell(titleSheetTestSuite, valuesColumn, row)
-			AssertIsValueNotSet(GetText(titleSheetTestSuite, valuesColumn, row))
+			helper.ClearCell(valuesColumn, row)
+			AssertIsValueNotSet(helper.GetText(valuesColumn, row))
 		End If
 	End If
 End Sub
@@ -156,7 +160,7 @@ Sub AssertMoney(row as Integer, value as Currency)
 	If Not HasFailed Then
 		Dim actualResult as Currency
 
-		actualResult = GetMoney(titleSheetTestSuite, valuesColumn, row)
+		actualResult = helper.GetMoney(valuesColumn, row)
 
 		testsSucceeded = testsSucceeded + 1
 		If value &lt;&gt; actualResult Then
@@ -164,15 +168,15 @@ Sub AssertMoney(row as Integer, value as Currency)
 		End If
 		
 		row = row + nrOfValues
-		SetMoney(titleSheetTestSuite, valuesColumn, row, value)
-		actualResult = GetMoney(titleSheetTestSuite, valuesColumn, row)
+		helper.SetMoney(valuesColumn, row, value)
+		actualResult = helper.GetMoney(valuesColumn, row)
 
 		testsSucceeded = testsSucceeded + 1
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		Else
-			ClearCell(titleSheetTestSuite, valuesColumn, row)
-			AssertIsValueNotSet(GetText(titleSheetTestSuite, valuesColumn, row))
+			helper.ClearCell(valuesColumn, row)
+			AssertIsValueNotSet(helper.GetText(valuesColumn, row))
 		End If
 	End If
 End Sub
@@ -181,7 +185,7 @@ Sub AssertBool(row as Integer, value as Boolean)
 	If Not HasFailed Then
 		Dim actualResult as Boolean
 
-		actualResult = GetBool(titleSheetTestSuite, valuesColumn, row)
+		actualResult = helper.GetBool(valuesColumn, row)
 
 		testsSucceeded = testsSucceeded + 1
 		If value &lt;&gt; actualResult Then
@@ -189,15 +193,15 @@ Sub AssertBool(row as Integer, value as Boolean)
 		End If
 		
 		row = row + nrOfValues
-		SetBool(titleSheetTestSuite, valuesColumn, row, value)
-		actualResult = GetBool(titleSheetTestSuite, valuesColumn, row)
+		helper.SetBool(valuesColumn, row, value)
+		actualResult = helper.GetBool(valuesColumn, row)
 
 		testsSucceeded = testsSucceeded + 1
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		Else
-			ClearCell(titleSheetTestSuite, valuesColumn, row)
-			AssertIsValueNotSet(GetText(titleSheetTestSuite, valuesColumn, row))
+			helper.ClearCell(valuesColumn, row)
+			AssertIsValueNotSet(helper.GetText(valuesColumn, row))
 		End If
 	End If
 End Sub

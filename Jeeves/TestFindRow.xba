@@ -9,6 +9,8 @@ Private targetRow as Integer
 Private testsSucceeded as Integer
 Private failMessage as String
 Private failInfo as String
+Private helper as Object
+
 Public TestName as String
 
 &apos;CONSTRUCTOR
@@ -38,7 +40,9 @@ Private Const testValue = &quot;Test&quot;
 Private Const matchColumn = 3
 Private Const noMatchColumn = 4
 
-Sub RunTests
+Sub RunTests(cellHelper as Object)
+	helper = cellHelper
+	
 	AssertFindRowMatch(1, 1, True)
 	AssertFindRowMatch(2, 4, True)
 	AssertFindRowMatch(5, 7, True)
@@ -62,7 +66,7 @@ Sub AssertFindRow(column, startRow, expectedResult as Integer, skipEmpty as Bool
 	If Not HasFailed Then
 		Dim actualResult as Integer
 
-		actualResult = FindRow(titleSheetTestSuite, column, startRow, testValue, skipEmpty)
+		actualResult = helper.FindRow(column, startRow, testValue, skipEmpty)
 
 		testsSucceeded = testsSucceeded + 1
 		If expectedResult &lt;&gt; actualResult Then

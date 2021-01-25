@@ -6,55 +6,54 @@ Option ClassModule
 Option Explicit
 
 &apos;CONSTANTS
-Public Const typeColumn = 0
-Const collapsedColumn = 1
-&apos;Const collapsedMinutesColumn = 2
-Private Const effortColumn = 3
-Const minutesRoundedColumn = 4
-&apos;Const typeMinutesFormattedColumn = 5
-Const costColumn = 6
-Const timeColumn = 7
-&apos;Const typeCostPerMinutesColumn = 8
-Const costsFormattedColumn = 9
 
 &apos;ATTRIBUTES	
-Private Const maxNumberOfTypes = 100
-Public Types(maxNumberOfTypes) As String
+
+Public Types(typeMaxEntries) As String
 Public TypesSize As Integer
-Private TypesCollapsed(maxNumberOfTypes) As Boolean
+Public TypesCollapsed(typeMaxEntries) As Boolean
 Public CollapsedSize As Integer
 Public SeparateSize As Integer
-Private TypesRow(maxNumberOfTypes) As Integer
+Public TypesRow(typeMaxEntries) As Integer
+
+Public helper as Object
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
+&apos;	TypesSize = 0
+&apos;	CollapsedSize = 0
+&apos;	SeparateSize = 0
+End Sub
+
+Public Sub Init(sheetHelper as Object)
+	helper = sheetHelper
 	ReadTypes()
 	Reset()
 End Sub
 
-Private Sub Reset
+Sub Reset
 	Dim i As Integer
 	For i = 1 To TypesSize
 		Dim row As Integer
 		row = TypesRow(i-1)
-		SetText(typeSheetTitle, effortColumn, row, 0)
+		helper.SetText(typeEffortColumn, row, 0)
 	Next i
 End Sub
 
-Private Sub ReadTypes
-	TypesSize = 0
-	CollapsedSize = 0
-	SeparateSize = 0
+Sub ReadTypes
+	&apos;TypesSize = 0
+	&apos;CollapsedSize = 0
+	&apos;SeparateSize = 0
 	Dim i As Integer
 	i = 1
 	Dim rowValue As String
-	rowValue = GetText(typeSheetTitle, typeColumn, i)
+	rowValue = helper.GetText(typeTypeColumn, i)
 	Do While &quot;&quot; &lt;&gt; rowValue
 		Dim collapsed As Boolean
-		collapsed = GetText(typeSheetTitle, collapsedColumn, i) = &quot;Ja&quot;
+		collapsed = helper.GetText(typeCollapsedColumn, i) = &quot;Ja&quot;
 		AddType(rowValue, collapsed, i)
 		i = i+1
-		rowValue = GetText(typeSheetTitle, typeColumn, i)
+		rowValue = helper.GetText(typeTypeColumn, i)
 	Loop
 End Sub
 
@@ -99,9 +98,9 @@ Public Sub AddEffort(effort As Integer, workType As String)
 	If start &gt;= 0 Then
 		i = start+1
 		Dim v As Integer
-		v = GetText(typeSheetTitle, effortColumn, i)
+		v = helper.GetText(typeEffortColumn, i)
 		v = v + effort
-		SetText(typeSheetTitle, effortColumn, i, v)
+		helper.SetText(typeEffortColumn, i, v)
 	End If
 End Sub
 
@@ -111,9 +110,9 @@ Public Function GetWorkEntry(workType As String)
 	Dim entry As Object
 	entry = New ClassWorkEntry
 	entry.title = workType
-	entry.factor = GetText(typeSheetTitle, costColumn, i) + &quot; / &quot; + GetText(typeSheetTitle, timeColumn, i) + &quot; Min.&quot;
-	entry.time = GetDate(typeSheetTitle, minutesRoundedColumn, i)
-	entry.cost = GetMoney(typeSheetTitle, costsFormattedColumn, i)
+	entry.factor = helper.GetText(typeCostColumn, i) + &quot; / &quot; + helper.GetText(typeTimeColumn, i) + &quot; Min.&quot;
+	entry.time = helper.GetDate(typeMinutesRoundedColumn, i)
+	entry.cost = helper.GetMoney(typeCostsFormattedColumn, i)
 	GetWorkEntry = entry
 End Function
 </script:module>
