@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="Util" script:language="StarBasic">REM  *****  BASIC  *****
-Public Const TimeFormat = &quot;HH:MM&quot;
-Public Const CurrencyFormat = &quot;[$SFr.-807] #&apos;##0.00;[$SFr.-807] -#&apos;##0.00&quot;
-	
 Public Sub CheckValue(title as String, value as String) as String
 	Dim valid as Boolean
 	valid = IsValueSet(value)
@@ -21,6 +18,20 @@ Public Function IsValueSet(value as String) as String
 	End If
 End Function
 
+Public Function SheetHelper(sheet as String) as Object
+	SheetHelper = DocHelper(ThisComponent, sheet)
+End Function
+
+Public Function DocHelper(doc as Object, sheet as String) as Object
+	Dim h as new ClassCellHelper
+	h.Init(doc, sheet)
+	DocHelper = h
+End Function
+
+&apos;CellHelper
+Public Const TimeFormat = &quot;HH:MM&quot;
+Public Const CurrencyFormat = &quot;[$SFr.-807] #&apos;##0.00;[$SFr.-807] -#&apos;##0.00&quot;
+	
 Public Function FindRow(sheet as String, column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
 	FindRow = FindRowDoc(ThisComponent, sheet, column, row, searchValue, skipEmpty)
 End Function

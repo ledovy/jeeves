@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ClassCellHelper" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;CONSTANTS
+Public Const TimeFormat = &quot;HH:MM&quot;
+Public Const CurrencyFormat = &quot;[$SFr.-807] #&apos;##0.00;[$SFr.-807] -#&apos;##0.00&quot;
+
+&apos;ATTRIBUTES
+Public document as Object
+Public sheet as Object
+
+&apos;CONSTRUCTOR
+&apos;Public Sub Class_Initialize
+&apos;
+&apos;End Sub
+
+Public Sub Init(targetDocument as Object, sheetName as String)
+	document = targetDocument
+	sheet = document.Sheets.getByName(sheetName)
+End Sub
+	
+Public Function FindRowDoc(column as Integer, row as Integer, searchValue as String, skipEmpty as Boolean)
+	Dim found As Boolean
+	found = False
+	Dim toRow As Integer
+	toRow = row
+	Dim rowValue As String
+	
+	rowValue = GetText(column, toRow)
+	Do While (NOT found) AND ((toRow-row) &lt; 300) AND (skipEmpty OR rowValue &lt;&gt; &quot;&quot;)
+		If searchValue = rowValue Then
+			found = true
+		End If
+		
+		toRow = toRow + 1
+		rowValue = GetText(column, toRow)
+		
+	Loop
+	If found Then
+		FindRow = toRow-1
+	Else
+		FindRow = -1
+	End If
+End Function
+
+Public Function GetText(column, row as Integer) as String
+	GetText = GetCell(column, row).String
+End Function
+
+Public Function SetText(column, row as Integer, value as String)
+	GetCell(column, row).String = value
+End Function
+
+Public Function GetNumber(column, row as Integer) as Integer
+	GetNumber = GetCell(column, row).value
+End Function
+
+Public Function SetNumber(column, row as Integer, value as Integer)
+	GetCell(column, row).value = value
+End Function
+
+Public Function GetDate(column, row as Integer) as Date
+	GetDate = GetCell(column, row).Value
+End Function
+
+Public Function SetDate(column, row as Integer, value as Date)
+	GetCell(column, row).value = Value
+End Function
+
+Public Function GetMoney(column, row as Integer) as Currency
+	GetMoney = GetCell(column, row).Value
+End Function
+
+Public Function SetMoney(column, row as Integer, value as Currency)
+	GetCell(column, row).value = Value
+End Function
+
+Public Function GetBool(column, row as Integer) as Boolean
+	GetBool = GetCell(column, row).Value
+End Function
+
+Public Function SetBool(column, row as Integer, value as Boolean)
+	GetCell(column, row).value = Value
+End Function
+
+Public Function SetFormula(column, row as Integer, value as String)
+	GetCell(column, row).Formula = value
+End Function
+
+Public Function ClearCell(column, row as Integer)
+	SetText(column, row, &quot;&quot;)
+End Function
+
+Public Function GetCell(column, row as Integer) as Object
+	GetCell = sheet.getCellByPosition(column, row)
+End Function
+
+Public Function GetRange(startColumn, startRow, endColumn, endRow as Integer) as Object
+	GetRangeByIndex = sheet.getCellRangeByPosition(startColumn, startRow, endColumn, endRow)
+End Function
+
+Public Function GetRangeByName(rangeName as String) as Object
+	GetRangeByName = sheet.getCellRangeByName(rangeName)
+End Function
+
+Public Function SetRangeText(rangeName, value as String)
+	GetRangeByName(rangeName).String = value
+End Function
+
+Public Function RemoveRows(index, count as Integer)
+	sheet.Rows.removeByIndex(index, count)
+End Function
+
+Public Sub SetFormat(column, row As Integer, format As String)
+	Dim localeSettings As New com.sun.star.lang.Locale
+	localeSettings.Language = &quot;de&quot;
+	localeSettings.Country = &quot;ch&quot;
+	Dim cell As Object
+	cell = GetCell(column, row)
+	formatId = document.NumberFormats.queryKey(format, localeSettings, True)
+	If formatId = -1 Then
+		formatId = document.NumberFormats.addNew(format, localeSettings)
+	End If
+	cell.NumberFormat = formatId
+End Sub
+
+Public Sub SortRange(sortColumn, startColumn, startRow, endColumn, endRow as Integer)
+	Dim range As Object
+	range = GetRange(startColumn, startRow, endColumn, endRow)
+	&apos;fields
+	Dim sortFields(0) as New com.sun.star.table.TableSortField
+	sortFields(0).Field = sortColumn
+    sortFields(0).FieldType = com.sun.star.util.SortFieldType.ALPHANUMERIC
+    sortFields(0).IsAscending = True
+    &apos;options
+    Dim sortOptions(2) As New com.sun.star.beans.PropertyValue
+    sortOptions(0).Name = &quot;SortFields&quot;
+    sortOptions(0).Value = sortFields()
+    sortOptions(1).Name = &quot;IsSortColumns&quot; &apos; False=Sort by Row; True=Sort by Column.
+    sortOptions(1).Value = False
+    sortOptions(2).Name = &quot;ContainsHeader&quot;
+    sortOptions(2).Value = False
+	&apos;sorting
+    range.Sort(sortOptions)
+End Sub
+
+</script:module>

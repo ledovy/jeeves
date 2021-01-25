@@ -5,21 +5,21 @@
 Public Const titleSheetTestSuite = &quot;TestSuite&quot;
 Public Const resultColumnCaptions = 1
 Public Const resultColumnAllTests = 2
+Public Const resultRowHeight = 5
 Public Const resultRowAllTests = 2
-Public Const resultRowFindRowTests = 7
-Public Const resultRowGetSetValueTests = 12
+Public Const resultRowFindRowTests = resultRowAllTests + resultRowHeight
+Public Const resultRowGetSetValueTests = resultRowFindRowTests+ resultRowHeight
 Public Const resultRowLastTests = resultRowGetSetValueTests
 
 Private allTestsSucceeded, testsFailed as Integer
 Private failedInfo as String
 Private currentTest as Object
+Private helper as Object
 
 &apos;TESTS: All
 Sub TestAll
-	&apos;SetDocument(ThisComponent)
-	allTestsSucceeded = 0
-	testsFailed = 0
-	failedInfo = &quot;&quot;
+	&apos;All Tests -&gt; Run
+	Init()
 	ClearAllTestResults()
 	
 	TestFindRow()
@@ -28,39 +28,58 @@ Sub TestAll
 	WriteTestResult(resultRowAllTests, allTestsSucceeded, &quot;&quot;+testsFailed, failedInfo)
 End Sub
 
+Sub Init
+	helper = SheetHelper(titleSheetTestSuite)	
+End Sub
+
+Sub Reset
+	allTestsSucceeded = 0
+	testsFailed = 0
+	failedInfo = &quot;&quot;
+End Sub
+
 Sub ClearAllResult
 	ClearTestResults(resultRowAllTests)
 End Sub
 
 Sub ClearAllTestResults
-	&apos;SetDocument(ThisComponent)
+	&apos;All Tests -&gt; Clear
+	Init()
+	Reset()
 	Dim I as Integer
-	For I = resultRowAllTests To resultRowLastTests Step 5
+	For I = resultRowAllTests To resultRowLastTests Step resultRowHeight
 		ClearTestResults(I)
 	Next I
 End Sub
 
 &apos;TESTS: FindRow
 Sub TestFindRow
-	&apos;SetDocument(ThisComponent)
+	&apos;FindRow -&gt; Run
+	Init()
+	
 	currentTest = New TestFindRow
 	RunCurrentTest(resultRowFindRowTests)
 End Sub
 
 Sub ClearFindRowResults
-	&apos;SetDocument(ThisComponent)
+	&apos;FindRow -&gt; Clear
+	Init()
+	Reset()
 	ClearTestResults(resultRowFindRowTests)
 End Sub
 
 &apos;TESTS: GetSetValue
 Sub TestGetSetValue
-	&apos;SetDocument(ThisComponent)
+	&apos;GetSetValue -&gt; Run
+	Init()
 	currentTest = New TestGetSetValue
 	RunCurrentTest(resultRowGetSetValueTests)
 End Sub
 
 Sub ClearGetSetValueResults
-	&apos;SetDocument(ThisComponent)
+	&apos;GetSetValue -&gt; Clear
+	Init()
+	Reset()
 	ClearTestResults(resultRowGetSetValueTests)
 End Sub
 
@@ -96,21 +115,21 @@ Sub WriteTestResult(row as Integer, nrSucceeded as Integer, info, message as Str
 	End If
 	allTestsSucceeded = allTestsSucceeded + nrSucceeded
 	
-	SetText(titleSheetTestSuite, resultColumnAllTests, row, result)
-	SetNumber(titleSheetTestSuite, resultColumnAllTests, row+1, nrSucceeded)
-	SetText(titleSheetTestSuite, resultColumnAllTests, row+2, info)
-	SetText(titleSheetTestSuite, resultColumnAllTests, row+3, message)
+	helper.SetText(resultColumnAllTests, row, result)
+	helper.SetNumber(resultColumnAllTests, row+1, nrSucceeded)
+	helper.SetText(resultColumnAllTests, row+2, info)
+	helper.SetText(resultColumnAllTests, row+3, message)
 End Sub
 
 Sub ClearTestResults(row as Integer)
 	Dim I 
 	For I = 0 To 3
-  		ClearCell(titleSheetTestSuite, resultColumnAllTests, row+I)
+  		helper.ClearCell(resultColumnAllTests, row+I)
 	Next I
 End Sub
 
 Function ReadTestName(row as Integer) as String
-	ReadTestName = ThisComponent.Sheets.getByName(titleSheetTestSuite).getCellByPosition(resultColumnCaptions, row).String
+	ReadTestName = helper.GetText(resultColumnCaptions, row)
 End Function
 
 </script:module>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="DocInfo" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+
+
+
+Public Const timeSheetTitle = &quot;Zeiterfassung&quot;
+Public Const timeDateColumn = 0
+Public Const timeTimeColumn = 1
+Public Const timeTypeColumn = 2
+Public Const timeNameColumn = 3
+Public Const timeMaxTimeColumn = 4
+Public Const timeMaxCostColumn = 5
+Public Const timeCollapsedColumn = 6
+Public Const timeCostColumn = 7
+Public Const timeTimeRoundedColumn = 8
+Public Const timeTimeFormattedColumn = 9
+Public Const timeCostRoundedColumn = 10
+Public Const timeFactorCostColumn = 11
+Public Const timeFactorTimeColumn  = 12
+Public Const timeFirstEntryRow = 11
+
+Public Const timeMaxEntries = 300
+
+Public Const typeSheetTitle = &quot;Arbeitstypen&quot;
+
+Public Const calcSheetTitle = &quot;Abrechnung&quot;
+Public Const calcDateColumn = 0
+Public Const calcNameColumn = 1
+Public Const calcFactorColumn = 2
+Public Const calcTimeColumn = 3
+Public Const calcCostColumn = 4
+Public Const calcStartRow = 8
+
+Public Const configSheetTitle = &quot;Konfiguration&quot;
+
+Public Const accSheetTitle = &quot;Kontaktdaten&quot;
+Public Const accCustomerColumn = 0
+Public Const accTitleColumn = 1
+Public Const accTimeColumn = 2
+Public Const accCostColumn = 3
+Public Const accFileColumn = 4
+Public Const accStartRow = 3
+
+
+</script:module>
