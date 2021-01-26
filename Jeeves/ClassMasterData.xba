@@ -5,8 +5,6 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
-&apos;CONSTANTS
-
 &apos;ATTRIBUTES
 Private helper as Object
 Public customerName As String

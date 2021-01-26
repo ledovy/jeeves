@@ -168,4 +168,12 @@ Public Sub SortRange(sortColumn, startColumn, startRow, endColumn, endRow as Int
     range.Sort(sortOptions)
 End Sub
 
+Public Sub Save
+	document.store()
+    document.Close(True)
+End Sub
+
+Public Function IsReady as Boolean
+	IsReady = NOT (IsEmpty(document) OR IsEmpty(sheet))
+End Function
 </script:module>

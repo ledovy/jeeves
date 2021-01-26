@@ -5,8 +5,6 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
-&apos;CONSTANTS
-
 &apos;ATTRIBUTES
 Public datum As String
 Public title As String
@@ -21,5 +19,13 @@ Public Sub Class_Initialize
 	factor = &quot;&quot;
 	time = 0
 	cost = 0
+End Sub
+
+Public Sub Init(helper as Object, row as Integer)
+	datum = helper.GetText(timeDateColumn, row)
+	factor = helper.GetText(timeFactorCostColumn, row) + &quot; / &quot; + helper.GetText(timeFactorTimeColumn, row) + &quot; Min.&quot;
+	time = helper.GetDate(timeTimeRoundedColumn, row)
+	cost = helper.GetMoney(timeCostRoundedColumn, row)
+	title = helper.GetText(timeNameColumn, row)
 End Sub
 </script:module>

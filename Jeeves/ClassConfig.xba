@@ -5,13 +5,6 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
-&apos;CONSTANTS
-Private Const captionColumn = 0
-Private Const valueColumn = 1
-Private Const showTimeSumRow = 1
-Private Const showCostSumRow = 2
-Private Const pathAccountingRow = 3
-
 &apos;ATTRIBUTES	
 Private helper as Object
 Public ShowTimeSum As Boolean
@@ -27,16 +20,10 @@ End Sub
 
 Public Sub Init(sheetHelper as Object)
 	helper = sheetHelper
-	ShowTimeSum = helper.GetBool(valueColumn, showTimeSumRow)
-	ShowCostSum = helper.GetBool(valueColumn, showCostSumRow)
-	PathAccounting = helper.GetTextChecked(GetTitle(pathAccountingRow), valueColumn, pathAccountingRow)
+	ShowTimeSum = helper.GetBool(configValueColumn, configShowTimeSumRow)
+	ShowCostSum = helper.GetBool(configValueColumn, configShowCostSumRow)
+	Dim title as String
+	title = configSheetTitle+&quot; &apos;&quot;+helper.getText(configCaptionColumn, configPathAccountingRow)+&quot;&apos;&quot;
+	PathAccounting = helper.GetTextChecked(title, configValueColumn, configPathAccountingRow)
 End Sub
-
-&apos;Private Function ReadValue(valueRow as Integer) as String
-&apos;	ReadValue = CheckValue(GetTitle(valueRow), GetText(configSheetTitle, valueColumn, valueRow))
-&apos;End Function
-
-Private Function GetTitle(valueRow as Integer) as String
-	GetTitle = configSheetTitle+&quot; &apos;&quot;+helper.getText(captionColumn, valueRow)+&quot;&apos;&quot;
-End Function
 </script:module>

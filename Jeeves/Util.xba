@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="Util" script:language="StarBasic">REM  *****  BASIC  *****
+
+Public Sub Main
+	MsgBox &quot;Jeeves v2.1.1-SNAPSHOT&quot;
+End Sub
+
 Public Sub CheckValue(title as String, value as String) as String
 	Dim valid as Boolean
 	valid = IsValueSet(value)
@@ -27,4 +32,39 @@ Public Function DocHelper(doc as Object, sheet as String) as Object
 	h.Init(doc, sheet)
 	DocHelper = h
 End Function
+
+Public Function WorkRowEntry(helper as Object, row As Integer)
+	Dim entry As New ClassWorkEntry
+	entry.Init(helper, row)
+	WorkRowEntry = entry
+End Function
+
+Public Function WorkTypeEntry(helper as Object, row As Integer)
+	Dim entry As Object
+	entry = New ClassWorkEntry
+	entry.title = helper.GetText(typeTypeColumn, row)
+	entry.factor = helper.GetText(typeCostColumn, row) + &quot; / &quot; + helper.GetText(typeTimeColumn, row) + &quot; Min.&quot;
+	entry.time = helper.GetDate(typeMinutesRoundedColumn, row)
+	entry.cost = helper.GetMoney(typeCostsFormattedColumn, row)
+	WorkTypeEntry = entry
+End Function
+
+Public Function LoadDocument(path, errorMsg as String)
+	If FileExists(path) Then
+		Dim properties(0) As New com.sun.star.beans.PropertyValue
+		properties(0).Name = &quot;Hidden&quot;
+		properties(0).Value = True
+	    LoadDocument = StarDesktop.loadComponentFromURL(ConvertToURL(path), &quot;_blank&quot;, 0, properties())
+	Else
+		MsgBox errorMsg+&quot;:&quot;+ chr(13) + path
+	End If
+End Function
+
+Public Sub ShowGreetings
+	Dim t as Date
+	t = Now()
+	If MONTH(t)=10 AND DAY(t)=29 Then
+		MsgBox &quot;Herzlichen Glückwunsch zum Geburtstag!&quot;
+	End If
+End Sub
 </script:module>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="JeevesApp" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+
+Public calculation as Object
+Public accounting as Object
+Public timeHelper as Object
+Public calcHelper as Object
+Public configHelper as Object
+
+Sub InitHelper
+	If IsNull(timeHelper) Then
+		timeHelper = SheetHelper(timeSheetTitle)
+	End If
+	If IsNull(calcHelper) Then
+		calcHelper = SheetHelper(calcSheetTitle)
+	End If
+	If IsNull(configHelper) Then
+		configHelper = SheetHelper(configSheetTitle)
+	End If
+End Sub
+
+
+Sub RunCalculationAndAccounting
+	&apos;Rechnung neu erstellen und Buchhaltung aktualisieren
+	RunCalculation()
+	RunAccounting()
+End Sub
+
+Sub RunCalculation
+	&apos;Rechnung aktualisieren
+	InitCalculation()
+	
+	calculation.CreateCalculation()
+End Sub
+
+Sub ClearCalculation
+	&apos;Rechnung leeren
+	InitCalculation()
+	
+	calculation.ClearOldEntries()
+End Sub
+
+Sub InitCalculation
+	InitHelper()
+	
+	Dim config, masterData, types as Object
+	config = New ClassConfig
+	config.Init(configHelper)
+	masterData = New ClassMasterData
+	masterData.Init(timeHelper, ThisComponent.getLocation())
+	types = New ClassWorkTypes
+	types.Init(SheetHelper(typeSheetTitle))
+	
+	calculation = new ClassCalculation
+	calculation.Init(timeHelper, calcHelper, config, masterData, types)
+End Sub
+
+Sub RunAccounting
+	&apos;Buchhaltung aktualisieren
+	InitAccounting()
+	
+	accounting.UpdateAccounting()
+End Sub
+
+Sub InitAccounting
+	InitHelper()
+			
+	Dim doc, config, masterData, contactData As Object
+	config = New ClassConfig
+	config.Init(configHelper)
+    doc = LoadDocument(config.PathAccounting, &quot;Konfiguration -&gt; &apos;Pfad Buchhaltung&apos; nicht gefunden&quot;)
+	
+	If Not IsEmpty(doc) Then
+	    contactData = New ClassContact
+	    contactData.Init(DocHelper(doc, accSheetTitle))
+	
+		masterData = New ClassMasterData
+		masterData.Init(timeHelper, ThisComponent.getLocation())
+	    accHelper = AccountingHelper(doc, masterData.calculationYear, contactData)
+		
+		accounting = new ClassAccounting
+		accounting.Init(calcHelper, accHelper, config, masterData, contactData)
+	Else
+		MsgBox &quot;Konnte Buchhaltung nicht aktualisieren&quot;
+	End If
+End Sub
+
+Function AccountingHelper(document as Object, sheetName as String, contactData as Object)
+	Dim helper As Object
+    If document.Sheets.hasByName(sheetName) Then
+		helper = DocHelper(document, sheetName)
+	Else
+		document.Sheets.copyByName(&quot;Vorlage&quot;, sheetName, 0)
+		helper = DocHelper(document, sheetName)
+		helper.SetRangeText(&quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
+	End If
+    AccountingHelper = helper
+End Function
+</script:module>

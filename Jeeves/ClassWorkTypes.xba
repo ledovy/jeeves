@@ -6,23 +6,21 @@ Option ClassModule
 Option Explicit
 
 &apos;CONSTANTS
+Public Const typeMaxEntries = 100
 
 &apos;ATTRIBUTES	
-
+Public TypesSize, CollapsedSize, SeparateSize As Integer
 Public Types(typeMaxEntries) As String
-Public TypesSize As Integer
 Public TypesCollapsed(typeMaxEntries) As Boolean
-Public CollapsedSize As Integer
-Public SeparateSize As Integer
 Public TypesRow(typeMaxEntries) As Integer
 
 Public helper as Object
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
-&apos;	TypesSize = 0
-&apos;	CollapsedSize = 0
-&apos;	SeparateSize = 0
+	&apos;TypesSize = 0
+	&apos;CollapsedSize = 0
+	&apos;SeparateSize = 0
 End Sub
 
 Public Sub Init(sheetHelper as Object)
@@ -41,9 +39,9 @@ Sub Reset
 End Sub
 
 Sub ReadTypes
-	&apos;TypesSize = 0
-	&apos;CollapsedSize = 0
-	&apos;SeparateSize = 0
+	TypesSize = 0
+	CollapsedSize = 0
+	SeparateSize = 0
 	Dim i As Integer
 	i = 1
 	Dim rowValue As String
@@ -105,14 +103,8 @@ Public Sub AddEffort(effort As Integer, workType As String)
 End Sub
 
 Public Function GetWorkEntry(workType As String)
-	Dim i As Integer
-	i = GetRow(workType)+1
-	Dim entry As Object
-	entry = New ClassWorkEntry
-	entry.title = workType
-	entry.factor = helper.GetText(typeCostColumn, i) + &quot; / &quot; + helper.GetText(typeTimeColumn, i) + &quot; Min.&quot;
-	entry.time = helper.GetDate(typeMinutesRoundedColumn, i)
-	entry.cost = helper.GetMoney(typeCostsFormattedColumn, i)
-	GetWorkEntry = entry
+	Dim row As Integer
+	row = GetRow(workType)+typeFirstWorkTypesRow
+	GetWorkEntry = WorkTypeEntry(helper, row)
 End Function
 </script:module>
