@@ -34,6 +34,10 @@ Public Function HasFailed as Boolean
 	HasFailed = failMessage &lt;&gt; &quot;&quot;
 End Function
 
+Private Sub WriteResult
+	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
+End Sub
+
 &apos;Implement RunTests, but drop everything below this line
 
 Private Const testValue = &quot;Test&quot;
@@ -56,7 +60,7 @@ Sub RunTests(cellHelper as Object)
 	AssertBool(5, True)
 	AssertBool(6, False)
 	
-	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
+	WriteResult()
 End Sub
 
 Sub AssertIsValueSet(value as String)

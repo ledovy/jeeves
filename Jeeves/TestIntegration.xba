@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestIntegration" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+Private targetRow as Integer
+Private testsSucceeded as Integer
+Private failMessage as String
+Private failInfo as String
+Private helper as Object
+
+Public TestName as String
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	testsSucceeded = 0
+	failInfo = &quot;&quot;
+	failMessage = &quot;&quot;
+End Sub
+
+Public Sub Init(row as Integer)
+	targetRow = row
+	TestName = ReadTestName(targetRow)
+End Sub
+
+Private Sub Fail(info, msg as String)
+	failInfo = info
+	failMessage = msg
+End Sub
+
+Public Function HasFailed as Boolean
+	HasFailed = failMessage &lt;&gt; &quot;&quot;
+End Function
+
+Private Sub WriteResult
+	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
+End Sub
+
+&apos;Implement RunTests, but drop everything below this line
+
+Sub RunTests
+	&apos;RunCalculationAndAccounting()
+	
+	WriteResult()
+End Sub
+</script:module>

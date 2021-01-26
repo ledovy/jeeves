@@ -7,9 +7,10 @@ Public Const resultColumnCaptions = 1
 Public Const resultColumnAllTests = 2
 Public Const resultRowHeight = 5
 Public Const resultRowAllTests = 2
-Public Const resultRowFindRowTests = resultRowAllTests + resultRowHeight
-Public Const resultRowGetSetValueTests = resultRowFindRowTests+ resultRowHeight
-Public Const resultRowLastTests = resultRowGetSetValueTests
+Public Const resultRowIntegrationTests 		= resultRowAllTests + resultRowHeight
+Public Const resultRowFindRowTests 		= resultRowAllTests + 2*resultRowHeight
+Public Const resultRowGetSetValueTests 	= resultRowAllTests + 3*resultRowHeight
+Public Const resultRowLastTests 		= resultRowAllTests + 3*resultRowHeight
 
 Private allTestsSucceeded, testsFailed as Integer
 Private failedInfo as String
@@ -22,6 +23,7 @@ Sub TestAll
 	Init()
 	ClearAllTestResults()
 	
+	TestIntegration()
 	TestFindRow()
 	TestGetSetValue()
 	
@@ -50,6 +52,22 @@ Sub ClearAllTestResults
 	For I = resultRowAllTests To resultRowLastTests Step resultRowHeight
 		ClearTestResults(I)
 	Next I
+End Sub
+
+&apos;TESTS: Integration
+Sub TestIntegration
+	&apos;Integration -&gt; Run
+	Init()
+	
+	currentTest = New TestIntegration
+	RunCurrentTest(resultRowIntegrationTests)
+End Sub
+
+Sub ClearIntegrationResults
+	&apos;Integration -&gt; Clear
+	Init()
+	Reset()
+	ClearTestResults(resultRowIntegrationTests)
 End Sub
 
 &apos;TESTS: FindRow

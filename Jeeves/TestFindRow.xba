@@ -34,6 +34,10 @@ Public Function HasFailed as Boolean
 	HasFailed = failMessage &lt;&gt; &quot;&quot;
 End Function
 
+Private Sub WriteResult
+	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
+End Sub
+
 &apos;Implement RunTests, but drop everything below this line
 
 Private Const testValue = &quot;Test&quot;
@@ -51,7 +55,7 @@ Sub RunTests(cellHelper as Object)
 	AssertFindRowNoMatch(1, True)
 	AssertFindRowNoMatch(1, False)
 	
-	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
+	WriteResult()
 End Sub
 
 Sub AssertFindRowMatch(startRow, expectedResult as Integer, skipEmpty as Boolean)

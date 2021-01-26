@@ -16,4 +16,5 @@
  <library:element library:name="ClassCalculation"/>
  <library:element library:name="ClassAccounting"/>
  <library:element library:name="Util"/>
+ <library:element library:name="TestIntegration"/>
 </library:library>
