@@ -86,13 +86,17 @@ End Sub
 &apos;METHODS
 
 Sub RunCurrentTest(targetRow)
-	ClearTestResults(resultRowAllTests)
-	ClearTestResults(targetRow)
-	
-	currentTest.Init(targetRow)
-	currentTest.RunTests(helper)
-	
-	UpdateResultInfo()
+	If helper.GetBool(resultColumnAllTests, targetRow-1) Then
+		ClearTestResults(resultRowAllTests)
+		ClearTestResults(targetRow)
+		
+		currentTest.Init(targetRow)
+		currentTest.RunTests(helper)
+		
+		UpdateResultInfo()
+	Else
+		helper.SetText(resultColumnAllTests, targetRow, &quot;SKIPPED&quot;)
+	End If
 End Sub
 
 Sub UpdateResultInfo
