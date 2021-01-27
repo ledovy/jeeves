@@ -9,15 +9,9 @@ Public calcHelper as Object
 Public configHelper as Object
 
 Sub InitHelper
-	If IsEmpty(timeHelper) Then
-		timeHelper = SheetHelper(timeSheetTitle)
-	End If
-	If IsEmpty(calcHelper) Then
-		calcHelper = SheetHelper(calcSheetTitle)
-	End If
-	If IsEmpty(configHelper) Then
-		configHelper = SheetHelper(configSheetTitle)
-	End If
+	timeHelper = SheetHelper(timeSheetTitle)
+	calcHelper = SheetHelper(calcSheetTitle)
+	configHelper = SheetHelper(configSheetTitle)
 End Sub
 
 
