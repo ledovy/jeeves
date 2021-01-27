@@ -25,6 +25,10 @@ Public Sub Init(row as Integer)
 	TestName = ReadTestName(targetRow)
 End Sub
 
+Private Sub Success
+	testsSucceeded = testsSucceeded + 1
+End Sub
+
 Private Sub Fail(info, msg as String)
 	failInfo = info
 	failMessage = msg
@@ -77,7 +81,7 @@ Sub AssertValueSet(value as String, expectedResult as Boolean)
 
 		actualResult = IsValueSet(value)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If expectedResult &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded, &quot;&quot;+value+&quot; was not &quot;+expectedResult)
 		End If
@@ -91,7 +95,7 @@ Sub AssertText(row as Integer, value as String)
 
 		actualResult = helper.GetText(valuesColumn, row)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		End If
@@ -100,7 +104,7 @@ Sub AssertText(row as Integer, value as String)
 		helper.SetText(valuesColumn, row, value)
 		actualResult = helper.GetText(valuesColumn, row)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		Else
@@ -116,7 +120,7 @@ Sub AssertNumber(row as Integer, value as Integer)
 
 		actualResult = helper.GetNumber(valuesColumn, row)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		End If
@@ -125,7 +129,7 @@ Sub AssertNumber(row as Integer, value as Integer)
 		helper.SetNumber(valuesColumn, row, value)
 		actualResult = helper.GetNumber(valuesColumn, row)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		Else
@@ -141,7 +145,7 @@ Sub AssertDate(row as Integer, value as Date)
 
 		actualResult = helper.GetDate(valuesColumn, row)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		End If
@@ -150,7 +154,7 @@ Sub AssertDate(row as Integer, value as Date)
 		helper.SetDate(valuesColumn, row, value)
 		actualResult = helper.GetDate(valuesColumn, row)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		Else
@@ -166,7 +170,7 @@ Sub AssertMoney(row as Integer, value as Currency)
 
 		actualResult = helper.GetMoney(valuesColumn, row)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		End If
@@ -175,7 +179,7 @@ Sub AssertMoney(row as Integer, value as Currency)
 		helper.SetMoney(valuesColumn, row, value)
 		actualResult = helper.GetMoney(valuesColumn, row)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		Else
@@ -191,7 +195,7 @@ Sub AssertBool(row as Integer, value as Boolean)
 
 		actualResult = helper.GetBool(valuesColumn, row)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		End If
@@ -200,7 +204,7 @@ Sub AssertBool(row as Integer, value as Boolean)
 		helper.SetBool(valuesColumn, row, value)
 		actualResult = helper.GetBool(valuesColumn, row)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If value &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+valuesColumn+&quot; / &quot;+row+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+value)
 		Else

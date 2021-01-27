@@ -49,15 +49,11 @@ Public Function WorkTypeEntry(helper as Object, row As Integer)
 	WorkTypeEntry = entry
 End Function
 
-Public Function LoadDocument(path, errorMsg as String)
-	If FileExists(path) Then
-		Dim properties(0) As New com.sun.star.beans.PropertyValue
-		properties(0).Name = &quot;Hidden&quot;
-		properties(0).Value = True
-	    LoadDocument = StarDesktop.loadComponentFromURL(ConvertToURL(path), &quot;_blank&quot;, 0, properties())
-	Else
-		MsgBox errorMsg+&quot;:&quot;+ chr(13) + path
-	End If
+Public Function LoadDocument(path as String)
+	Dim properties(0) As New com.sun.star.beans.PropertyValue
+	properties(0).Name = &quot;Hidden&quot;
+	properties(0).Value = True
+    LoadDocument = StarDesktop.loadComponentFromURL(ConvertToURL(path), &quot;_blank&quot;, 0, properties())
 End Function
 
 Public Sub ShowGreetings

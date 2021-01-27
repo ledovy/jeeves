@@ -6,7 +6,6 @@ Option ClassModule
 Option Explicit
 
 &apos;ATTRIBUTES	
-Private helper as Object
 Public ShowTimeSum As Boolean
 Public ShowCostSum As Boolean
 Public PathAccounting As String
@@ -18,8 +17,7 @@ Public Sub Class_Initialize
 	PathAccounting = &quot;&quot;
 End Sub
 
-Public Sub Init(sheetHelper as Object)
-	helper = sheetHelper
+Public Sub Init(helper as Object)
 	ShowTimeSum = helper.GetBool(configValueColumn, configShowTimeSumRow)
 	ShowCostSum = helper.GetBool(configValueColumn, configShowCostSumRow)
 	Dim title as String

@@ -25,13 +25,17 @@ Public Sub Init(row as Integer)
 	TestName = ReadTestName(targetRow)
 End Sub
 
+Private Sub Success
+	testsSucceeded = testsSucceeded + 1
+End Sub
+
 Private Sub Fail(info, msg as String)
 	failInfo = info
 	failMessage = msg
 End Sub
 
 Public Function HasFailed as Boolean
-	HasFailed = failMessage &lt;&gt; &quot;&quot;
+	HasFailed = failInfo &lt;&gt; &quot;&quot; OR failMessage &lt;&gt; &quot;&quot;
 End Function
 
 Private Sub WriteResult
@@ -40,9 +44,174 @@ End Sub
 
 &apos;Implement RunTests, but drop everything below this line
 
+Public Const testBasePath = &quot;/home/ledovy/git/jeeves/&quot;
+Public Const testDocAcme = testBasePath+&quot;integration-test/abrechnung-acme.ods&quot;
+Public Const testDocLedovy = testBasePath+&quot;integration-test/abrechnung-ledovy.ods&quot;
+Public Const testDocAccounting = testBasePath+&quot;integration-test/buchhaltung.ods&quot;
+
+Public calculation as Object
+Public accounting as Object
+Public timeHelper as Object
+Public calcHelper as Object
+Public configHelper as Object
+Public accHelper as Object
+Public accDoc as Object
+Public calcDoc as Object
+Public config As Object
+Public masterData As Object
+Public contactData As Object
+Public types As Object
+
+Sub InitHelper(path as String)
+	calcDoc = LoadDocument(path)
+	Success()
+	If Not IsEmpty(calcDoc) Then
+		timeHelper = DocHelper(calcDoc, timeSheetTitle)
+		calcHelper = DocHelper(calcDoc, calcSheetTitle)
+		configHelper = DocHelper(calcDoc, configSheetTitle)
+	Else
+		Fail(&quot;TestDocument not found&quot;, path)
+	End If
+End Sub
+
+Sub InitCalculation(file as String)
+	InitHelper(file)
+	If Not HasFailed Then
+		config = New ClassConfig
+		config.Init(configHelper)
+		masterData = New ClassMasterData
+		masterData.Init(timeHelper, file)
+		types = New ClassWorkTypes
+		types.Init(DocHelper(calcDoc, typeSheetTitle))
+		
+		calculation = new ClassCalculation
+		calculation.Init(timeHelper, calcHelper, config, masterData, types)
+	End If
+End Sub
+
+Sub InitAccounting(file as String)
+	InitHelper(file)
+	
+	If Not HasFailed Then
+		config = New ClassConfig
+		config.Init(configHelper)
+		
+		If FileExists(testDocAccounting) Then
+			InitAccountingHelper(file)
+			
+			accounting = new ClassAccounting
+			accounting.Init(calcHelper, accHelper, config, masterData, contactData)
+		Else
+			Fail(&quot;Document not found&quot;, path)
+		End If
+	End If
+End Sub
+
+Sub InitAccountingHelper(file as String)
+	accDoc = LoadDocument(testDocAccounting)
+
+    contactData = New ClassContact
+    contactData.Init(DocHelper(accDoc, accSheetTitle))
+
+	masterData = New ClassMasterData
+	masterData.Init(timeHelper, file)
+    accHelper = AccountingHelper(accDoc, masterData.calculationYear, contactData)
+End Sub
+
+Function AccountingHelper(document as Object, sheetName as String, contactData as Object)
+	Dim helper As Object
+    If document.Sheets.hasByName(sheetName) Then
+		helper = DocHelper(document, sheetName)
+	Else
+		document.Sheets.copyByName(&quot;Vorlage&quot;, sheetName, 0)
+		helper = DocHelper(document, sheetName)
+		helper.SetRangeText(&quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
+	End If
+    AccountingHelper = helper
+End Function
+
 Sub RunTests
-	&apos;RunCalculationAndAccounting()
+	InitCalculation(testDocLedovy)
+	If Not HasFailed Then
+		calculation.CreateCalculation()
+		calcHelper.Save()
+		AssertCalculationLedovy()
+	End If
+	
+	InitAccounting(testDocLedovy)
+	If Not HasFailed Then
+		accounting.UpdateAccounting()
+		AssertAccountingLedovy()
+	End If
+	
+	InitCalculation(testDocAcme)
+	If Not HasFailed Then
+		calculation.CreateCalculation()
+		calcHelper.Save()
+		AssertCalculationAcme()
+	End If
+	
+	InitAccounting(testDocAcme)
+	If Not HasFailed Then
+		accounting.UpdateAccounting()
+		AssertAccountingAcme()
+	End If
 	
 	WriteResult()
 End Sub
+
+Sub AssertValue(info, expected, actual as String)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, actual)
+		End If
+	End If
+End Sub
+
+Sub AssertCalcEntry(row as Integer, datum, work, rate, time, cost as String)
+	AssertValue(&quot;CalcEntry Date &quot;+row, datum, calcHelper.GetText(calcDateColumn, row))
+	AssertValue(&quot;CalcEntry Work &quot;+row, work, calcHelper.GetText(calcNameColumn, row))
+	AssertValue(&quot;CalcEntry Rate &quot;+row, rate, calcHelper.GetText(calcFactorColumn, row))
+	AssertValue(&quot;CalcEntry Time &quot;+row, time, calcHelper.GetText(calcTimeColumn, row))
+	AssertValue(&quot;CalcEntry Cost &quot;+row, cost, calcHelper.GetText(calcCostColumn, row))
+	
+End Sub
+
+Sub AssertAccEntry(row as Integer, job, calc, cost, file as String)
+	AssertValue(&quot;AccEntry Job &quot;+row, job, accHelper.GetText(accTitleColumn, row))
+	AssertValue(&quot;AccEntry Time &quot;+row, calc, accHelper.GetText(accTimeColumn, row))
+	AssertValue(&quot;AccEntry Cost &quot;+row, cost, accHelper.GetText(accCostColumn, row))
+	AssertValue(&quot;AccEntry File &quot;+row, file, accHelper.GetText(accFileColumn, row))
+	
+End Sub
+
+Sub AssertCalculationLedovy
+	InitHelper(testDocLedovy)
+	AssertValue(&quot;CalcTitle Customer&quot;, &quot;Ledovy Inc | Abrechnung Jeeves&quot;, calcHelper.GetRangeByName(&quot;A6&quot;).String)
+	AssertCalcEntry(calcStartRow, &quot;24.01.2021&quot;, &quot;Coden&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;11:15&quot;, &quot;SFr. 562.50&quot;)
+	AssertCalcEntry(calcStartRow+1, &quot;&quot;, &quot;&quot;, &quot;Total: &quot;, &quot;&quot;, &quot;SFr. 562.50&quot;)
+End Sub
+
+Sub AssertAccountingLedovy
+	InitHelper(testDocLedovy)
+	InitAccountingHelper(testDocLedovy)
+	AssertValue(&quot;CalcTitle Name&quot;, &quot;Mia Muster&quot;, calcHelper.GetRangeByName(&quot;A5&quot;).String)
+	AssertValue(&quot;CalcBank PC&quot;, &quot;PC: 90-123456-7&quot;, calcHelper.GetText(calcContactInfoColumn, calcStartRow+1+calcBankPcOffset))
+	AssertValue(&quot;CalcBank IBAN&quot;, &quot;IBAN: CH6500000000901234567&quot;, calcHelper.GetText(calcContactInfoColumn, calcStartRow+1+calcBankIbanOffset))
+	AssertValue(&quot;CalcBank Address&quot;, &quot;Kontoinhaberin: Mia Muster; Musterstrasse 12, 3400 Musterlingen&quot;, calcHelper.GetText(calcContactInfoColumn, calcStartRow+1+calcBankAddressOffset))
+	
+	AssertValue(&quot;AccTitle Name&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, calcHelper.GetRangeByName(&quot;A1&quot;).String)
+	AssertValue(&quot;Acc Customer&quot;, &quot;Ledovy Inc&quot;, accHelper.GetText(accCustomerColumn, accStartRow+accCustomerSpacing))
+	AssertAccEntry(accStartRow+accCustomerSpacing+1, &quot;Coding&quot;, &quot;27. Januar 2021&quot;, &quot;562.50&quot;, testDocLedovy)
+End Sub
+
+Sub AssertCalculationAcme
+	Fail(&quot;Not yet implemented&quot;, &quot;AssertCalculationAcme&quot;)
+End Sub
+
+Sub AssertAccountingAcme
+	Fail(&quot;Not yet implemented&quot;, &quot;AssertAccountingAcme&quot;)
+End Sub
+
 </script:module>

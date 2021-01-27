@@ -25,6 +25,10 @@ Public Sub Init(row as Integer)
 	TestName = ReadTestName(targetRow)
 End Sub
 
+Private Sub Success
+	testsSucceeded = testsSucceeded + 1
+End Sub
+
 Private Sub Fail(info, msg as String)
 	failInfo = info
 	failMessage = msg
@@ -72,7 +76,7 @@ Sub AssertFindRow(column, startRow, expectedResult as Integer, skipEmpty as Bool
 
 		actualResult = helper.FindRow(column, startRow, testValue, skipEmpty)
 
-		testsSucceeded = testsSucceeded + 1
+		Success()
 		If expectedResult &lt;&gt; actualResult Then
 			Fail(TestName+&quot; &quot;+testsSucceeded+&quot; (&quot;+column+&quot; / &quot;+startRow+&quot; / &quot;+skipEmpty+&quot;)&quot;, &quot;&quot;+actualResult+&quot; was not &quot;+expectedResult)
 		End If

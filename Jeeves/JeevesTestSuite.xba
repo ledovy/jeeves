@@ -130,7 +130,7 @@ End Sub
 
 Sub WriteTestResult(row as Integer, nrSucceeded as Integer, info, message as String)
 	Dim result as String
-	If message &lt;&gt; &quot;&quot; Then
+	If info &lt;&gt; &quot;&quot; OR message &lt;&gt; &quot;&quot; Then
 		result = &quot;FAILURE&quot;
 	Else
 		result = &quot;SUCCESS&quot;
