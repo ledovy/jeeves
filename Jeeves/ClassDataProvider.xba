@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ClassDataProvider" script:language="StarBasic">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;CONSTANTS
+
+&apos;ATTRIBUTES
+Public calcPath as String
+Public calcDoc as Object
+Public timeHelper as Object
+Public typeHelper as Object
+Public calcHelper as Object
+Public configHelper as Object
+Public masterData As Object
+Public types As Object
+Public config As Object
+
+Public accPath as String
+Public accDoc as Object
+Public accHelper as Object
+Public contactData As Object
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	
+End Sub
+
+Public Sub Init(doc as Object, calcFile, accFile as String)
+	calcPath = calcFile
+	calcDoc = doc
+	accPath = accFile
+End Sub
+
+Sub InitCalculation
+	LoadTimeHelper()
+	LoadTypeHelper()
+	LoadCalcHelper()
+	LoadConfigHelper()
+	
+	LoadMasterData()
+	LoadWorkTypes()
+	LoadConfiguration()
+End Sub
+
+Sub LoadTimeHelper
+	If Not IsEmpty(calcDoc) Then
+		timeHelper = DocHelper(calcDoc, timeSheetTitle)
+	Else
+		MsgBox &quot;no calcDoc: &quot;+calcPath
+	End If
+End Sub
+
+Sub LoadTypeHelper
+	If Not IsEmpty(calcDoc) Then
+		typeHelper = DocHelper(calcDoc, typeSheetTitle)
+	Else
+		MsgBox &quot;no calcDoc: &quot;+calcPath
+	End If
+End Sub
+
+Sub LoadCalcHelper
+	If Not IsEmpty(calcDoc) Then
+		calcHelper = DocHelper(calcDoc, calcSheetTitle)
+	Else
+		MsgBox &quot;no calcDoc: &quot;+calcPath
+	End If
+End Sub
+
+Sub LoadConfigHelper
+	If Not IsEmpty(calcDoc) Then
+		configHelper = DocHelper(calcDoc, configSheetTitle)
+	Else
+		MsgBox &quot;no calcDoc: &quot;+calcPath
+	End If
+End Sub
+
+Sub LoadMasterData
+	If Not IsEmpty(timeHelper) Then
+		masterData = New ClassMasterData
+		masterData.Init(timeHelper, calcPath)
+	Else
+		MsgBox &quot;no timeSheet: &quot;+calcPath
+	End If
+End Sub
+
+Sub LoadWorkTypes
+	If Not IsEmpty(typeHelper) Then
+		types = New ClassWorkTypes
+		types.Init(typeHelper)
+	Else
+		MsgBox &quot;no typeSheet: &quot;+calcPath
+	End If
+End Sub
+Sub LoadConfiguration
+	If Not IsEmpty(configHelper) Then
+		config = New ClassConfig
+		config.Init(configHelper)
+	Else
+		MsgBox &quot;no configSheet: &quot;+calcPath
+	End If
+End Sub
+
+
+Sub InitAccounting
+	If FileExists(accPath) Then
+		accDoc = LoadDocument(accPath)
+		LoadContactHelper()
+		LoadTimeHelper()
+		LoadCalcHelper()
+	
+	    LoadContacData()
+		LoadMasterData()
+	    
+	    accHelper = AccountingHelper(masterData.calculationYear)
+	Else
+		MsgBox &quot;no accounting document: &quot;+accPath
+	End If
+End Sub
+
+Sub LoadContactHelper
+	If Not IsEmpty(accDoc) Then
+		contactHelper = DocHelper(accDoc, accSheetTitle)
+	Else
+		MsgBox &quot;no accDoc: &quot;+accPath
+	End If
+End Sub
+
+Sub LoadContactData
+	If Not IsEmpty(contactHelper) Then
+		contactData = New ClassContact
+		contactData.Init(contactHelper)
+	Else
+		MsgBox &quot;no contactSheet: &quot;+accPath
+	End If
+End Sub
+
+Function LoadAccHelper
+	Dim sheetName as String
+	sheetName = masterData.calculationYear
+    If accDoc.Sheets.hasByName(sheetName) Then
+		accHelper = DocHelper(accDoc, sheetName)
+	Else
+		accDoc.Sheets.copyByName(&quot;Vorlage&quot;, sheetName, 0)
+		accHelper = DocHelper(accDoc, sheetName)
+		accHelper.SetRangeText(&quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
+	End If
+End Function
+</script:module>

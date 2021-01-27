@@ -3,7 +3,7 @@
 <library:library xmlns:library="http://openoffice.org/2000/library" library:name="Jeeves" library:readonly="false" library:passwordprotected="false">
  <library:element library:name="ClassMasterData"/>
  <library:element library:name="JeevesTestSuite"/>
- <library:element library:name="ClassDocProvider"/>
+ <library:element library:name="TestIntegration"/>
  <library:element library:name="ClassWorkTypes"/>
  <library:element library:name="ClassConfig"/>
  <library:element library:name="ClassWorkEntry"/>
@@ -16,5 +16,5 @@
  <library:element library:name="ClassCalculation"/>
  <library:element library:name="ClassAccounting"/>
  <library:element library:name="Util"/>
- <library:element library:name="TestIntegration"/>
+ <library:element library:name="ClassDataProvider"/>
 </library:library>
