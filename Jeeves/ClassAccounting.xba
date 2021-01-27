@@ -17,13 +17,14 @@ Public Sub Class_Initialize
 	
 End Sub
 
-Public Sub Init(calcSheet, accSheet, configuration, master, contact as Object)
-	calcHelper = calcSheet
-	accHelper = accSheet
+Public Sub Init(dataProvider as Object)
+	dataProvider.InitAccountingData()
+	calcHelper = dataProvider.calcHelper
+	accHelper = dataProvider.accHelper
 	
-	config = configuration
-	masterData = master
-	contactData = contact
+	config = dataProvider.config
+	masterData = dataProvider.masterData
+	contactData = dataProvider.contactData
 	totalRow = calcHelper.FindRow(calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
 End Sub
 

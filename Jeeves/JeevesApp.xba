@@ -4,15 +4,16 @@
 
 Public calculation as Object
 Public accounting as Object
-Public timeHelper as Object
-Public calcHelper as Object
-Public configHelper as Object
+Public dataProvider As Object
+&apos;Public timeHelper as Object
+&apos;Public calcHelper as Object
+&apos;Public configHelper as Object
 
-Sub InitHelper
-	timeHelper = SheetHelper(timeSheetTitle)
-	calcHelper = SheetHelper(calcSheetTitle)
-	configHelper = SheetHelper(configSheetTitle)
-End Sub
+&apos;Sub InitHelper
+&apos;	timeHelper = SheetHelper(timeSheetTitle)
+&apos;	calcHelper = SheetHelper(calcSheetTitle)
+&apos;	configHelper = SheetHelper(configSheetTitle)
+&apos;End Sub
 
 
 Sub RunCalculationAndAccounting
@@ -36,18 +37,14 @@ Sub ClearCalculation
 End Sub
 
 Sub InitCalculation
-	InitHelper()
-	
-	Dim config, masterData, types as Object
-	config = New ClassConfig
-	config.Init(configHelper)
-	masterData = New ClassMasterData
-	masterData.Init(timeHelper, ThisComponent.getLocation())
-	types = New ClassWorkTypes
-	types.Init(SheetHelper(typeSheetTitle))
-	
+	ReloadDataProvider()
 	calculation = new ClassCalculation
-	calculation.Init(timeHelper, calcHelper, config, masterData, types)
+	calculation.Init(dataProvider)
+End Sub
+
+Sub ReloadDataProvider
+	dataProvider = new ClassDataProvider
+	dataProvider.Init(ThisComponent)
 End Sub
 
 Sub RunAccounting
@@ -58,38 +55,9 @@ Sub RunAccounting
 End Sub
 
 Sub InitAccounting
-	InitHelper()
-			
-	Dim doc, config, masterData, contactData As Object
-	config = New ClassConfig
-	config.Init(configHelper)
-	
-	If FileExists(config.PathAccounting) Then
-		doc = LoadDocument(config.PathAccounting)
-	
-	    contactData = New ClassContact
-	    contactData.Init(DocHelper(doc, accSheetTitle))
-	
-		masterData = New ClassMasterData
-		masterData.Init(timeHelper, ThisComponent.getLocation())
-	    accHelper = AccountingHelper(doc, masterData.calculationYear, contactData)
-		
-		accounting = new ClassAccounting
-		accounting.Init(calcHelper, accHelper, config, masterData, contactData)
-	Else
-		MsgBox &quot;Konfiguration -&gt; &apos;Pfad Buchhaltung&apos; nicht gefunden: &quot;+ chr(13) + path
-	End If
+	ReloadDataProvider()
+	accounting = new ClassAccounting
+	accounting.Init(dataProvider)
 End Sub
 
-Function AccountingHelper(document as Object, sheetName as String, contactData as Object)
-	Dim helper As Object
-    If document.Sheets.hasByName(sheetName) Then
-		helper = DocHelper(document, sheetName)
-	Else
-		document.Sheets.copyByName(&quot;Vorlage&quot;, sheetName, 0)
-		helper = DocHelper(document, sheetName)
-		helper.SetRangeText(&quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
-	End If
-    AccountingHelper = helper
-End Function
 </script:module>

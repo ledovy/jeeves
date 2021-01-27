@@ -21,6 +21,7 @@ Public config As Object
 Public accPath as String
 Public accDoc as Object
 Public accHelper as Object
+Public contactHelper As Object
 Public contactData As Object
 
 &apos;CONSTRUCTOR
@@ -28,13 +29,22 @@ Public Sub Class_Initialize
 	
 End Sub
 
-Public Sub Init(doc as Object, calcFile, accFile as String)
-	calcPath = calcFile
+Public Sub Init(doc as Object)
 	calcDoc = doc
+	calcPath = doc.getLocation()
+	
+	LoadConfigHelper()
+	LoadConfiguration()
+	accPath = config.PathAccounting
+End Sub
+
+Public Sub InitTest(doc as Object, calcFile, accFile as String)
+	calcDoc = doc
+	calcPath = calcFile
 	accPath = accFile
 End Sub
 
-Sub InitCalculation
+Public Sub InitCalculationData
 	LoadTimeHelper()
 	LoadTypeHelper()
 	LoadCalcHelper()
@@ -104,17 +114,16 @@ Sub LoadConfiguration
 End Sub
 
 
-Sub InitAccounting
+Public Sub InitAccountingData
 	If FileExists(accPath) Then
 		accDoc = LoadDocument(accPath)
 		LoadContactHelper()
 		LoadTimeHelper()
 		LoadCalcHelper()
 	
-	    LoadContacData()
+	    LoadContactData()
 		LoadMasterData()
-	    
-	    accHelper = AccountingHelper(masterData.calculationYear)
+	    LoadAccHelper()
 	Else
 		MsgBox &quot;no accounting document: &quot;+accPath
 	End If

@@ -19,13 +19,14 @@ Public Sub Class_Initialize
 	currentTargetRow = calcStartRow
 End Sub
 
-Public Sub Init(timeSheet, calcSheet, configuration, data, types as Object)
-	timeHelper = timeSheet
-	calcHelper = calcSheet
+Public Sub Init(dataProvider as Object)
+	dataProvider.InitCalculationData()
+	timeHelper = dataProvider.timeHelper
+	calcHelper = dataProvider.calcHelper
 	
-	config = configuration
-	masterData = data
-	workTypes = types
+	config = dataProvider.config
+	masterData = dataProvider.masterData
+	workTypes = dataProvider.types
 	currentTargetRow = calcStartRow
 End Sub
 
