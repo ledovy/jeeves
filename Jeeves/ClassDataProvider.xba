@@ -120,6 +120,7 @@ Public Sub InitAccountingData
 		LoadContactHelper()
 		LoadTimeHelper()
 		LoadCalcHelper()
+		LoadContactHelper()
 	
 	    LoadContactData()
 		LoadMasterData()
