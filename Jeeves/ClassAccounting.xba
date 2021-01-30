@@ -34,7 +34,8 @@ End Sub
 Public Sub UpdateAccounting
 	WriteCalculationContact()
 	WriteCalculationToAccounting()
-	accHelper.Save()
+	accHelper.SaveDoc()
+	accHelper.CloseDoc()
 End Sub
 
 Sub WriteCalculationContact
@@ -89,7 +90,7 @@ Sub WriteCalculationToAccounting
     accHelper.SortRange(accTimeColumn, accCustomerColumn, customerRow+1, accCostColumn, currentRow-1)
 	&apos;rewrite total
 	accHelper.SetFormula(accCostColumn, lastRow, &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;)
-	MsgBox msg
+	Info(msg)
 End Sub
 
 

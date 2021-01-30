@@ -59,7 +59,7 @@ Sub LoadTimeHelper
 	If Not IsEmpty(calcDoc) Then
 		timeHelper = DocHelper(calcDoc, timeSheetTitle)
 	Else
-		MsgBox &quot;no calcDoc: &quot;+calcPath
+		Info(&quot;no calcDoc: &quot;+calcPath)
 	End If
 End Sub
 
@@ -67,7 +67,7 @@ Sub LoadTypeHelper
 	If Not IsEmpty(calcDoc) Then
 		typeHelper = DocHelper(calcDoc, typeSheetTitle)
 	Else
-		MsgBox &quot;no calcDoc: &quot;+calcPath
+		Info(&quot;no calcDoc: &quot;+calcPath)
 	End If
 End Sub
 
@@ -75,7 +75,7 @@ Sub LoadCalcHelper
 	If Not IsEmpty(calcDoc) Then
 		calcHelper = DocHelper(calcDoc, calcSheetTitle)
 	Else
-		MsgBox &quot;no calcDoc: &quot;+calcPath
+		Info(&quot;no calcDoc: &quot;+calcPath)
 	End If
 End Sub
 
@@ -83,7 +83,7 @@ Sub LoadConfigHelper
 	If Not IsEmpty(calcDoc) Then
 		configHelper = DocHelper(calcDoc, configSheetTitle)
 	Else
-		MsgBox &quot;no calcDoc: &quot;+calcPath
+		Info(&quot;no calcDoc: &quot;+calcPath)
 	End If
 End Sub
 
@@ -92,7 +92,7 @@ Sub LoadMasterData
 		masterData = New ClassMasterData
 		masterData.Init(timeHelper, calcPath)
 	Else
-		MsgBox &quot;no timeSheet: &quot;+calcPath
+		Info(&quot;no timeSheet: &quot;+calcPath)
 	End If
 End Sub
 
@@ -101,7 +101,7 @@ Sub LoadWorkTypes
 		types = New ClassWorkTypes
 		types.Init(typeHelper)
 	Else
-		MsgBox &quot;no typeSheet: &quot;+calcPath
+		Info(&quot;no typeSheet: &quot;+calcPath)
 	End If
 End Sub
 Sub LoadConfiguration
@@ -109,7 +109,7 @@ Sub LoadConfiguration
 		config = New ClassConfig
 		config.Init(configHelper)
 	Else
-		MsgBox &quot;no configSheet: &quot;+calcPath
+		Info(&quot;no configSheet: &quot;+calcPath)
 	End If
 End Sub
 
@@ -126,7 +126,7 @@ Public Sub InitAccountingData
 		LoadMasterData()
 	    LoadAccHelper()
 	Else
-		MsgBox &quot;no accounting document: &quot;+accPath
+		Info(&quot;no accounting document: &quot;+accPath)
 	End If
 End Sub
 
@@ -134,7 +134,7 @@ Sub LoadContactHelper
 	If Not IsEmpty(accDoc) Then
 		contactHelper = DocHelper(accDoc, accSheetTitle)
 	Else
-		MsgBox &quot;no accDoc: &quot;+accPath
+		Info(&quot;no accDoc: &quot;+accPath)
 	End If
 End Sub
 
@@ -143,7 +143,7 @@ Sub LoadContactData
 		contactData = New ClassContact
 		contactData.Init(contactHelper)
 	Else
-		MsgBox &quot;no contactSheet: &quot;+accPath
+		Info(&quot;no contactSheet: &quot;+accPath)
 	End If
 End Sub
 

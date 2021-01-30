@@ -53,15 +53,47 @@ Public calculation as Object
 Public accounting as Object
 Public data As Object
 
-Sub InitTestCalculation(file as String)
-	ReloadDataProvider(file)
+Sub RunTests(cellHelper as Object)
+	helper = cellHelper
+	
+	ReloadDataProvider(testDocLedovy)
+	InitTestCalculation()
+	If Not HasFailed Then
+		calculation.CreateCalculation()
+		AssertCalculationLedovy()
+	End If
+	
+	InitTestAccounting()
+	If Not HasFailed Then
+		accounting.UpdateAccounting()
+		AssertAccountingLedovy()
+	End If
+	data.calcHelper.CloseDoc()
+	
+	ReloadDataProvider(testDocAcme)
+	InitTestCalculation()
+	If Not HasFailed Then
+		calculation.CreateCalculation()
+		AssertCalculationAcme()
+	End If
+	
+	InitTestAccounting()
+	If Not HasFailed Then
+		accounting.UpdateAccounting()
+		AssertAccountingAcme()
+	End If
+	data.calcHelper.CloseDoc()
+	
+	WriteResult()
+End Sub
+
+Sub InitTestCalculation
 	data.InitCalculationData()
 	calculation = new ClassCalculation
 	calculation.Init(data)
 End Sub
 
-Sub InitTestAccounting(file as String)
-	ReloadDataProvider(file)
+Sub InitTestAccounting
 	data.InitAccountingData()
 	accounting = new ClassAccounting
 	accounting.Init(data)
@@ -72,89 +104,98 @@ Sub ReloadDataProvider(file as String)
 	data.InitTest(LoadDocument(file), file, testDocAccounting)
 End Sub
 
-Sub RunTests
-	InitTestCalculation(testDocLedovy)
-	If Not HasFailed Then
-		calculation.CreateCalculation()
-		data.calcHelper.Save()
-		AssertCalculationLedovy()
-	End If
-	
-	InitTestAccounting(testDocLedovy)
-	If Not HasFailed Then
-		accounting.UpdateAccounting()
-		AssertAccountingLedovy()
-	End If
-	
-	InitTestCalculation(testDocAcme)
-	If Not HasFailed Then
-		calculation.CreateCalculation()
-		calcHelper.Save()
-		AssertCalculationAcme()
-	End If
-	
-	InitTestAccounting(testDocAcme)
-	If Not HasFailed Then
-		accounting.UpdateAccounting()
-		AssertAccountingAcme()
-	End If
-	
-	WriteResult()
-End Sub
-
 Sub AssertValue(info, expected, actual as String)
 	If Not HasFailed Then
 		Success()
 		If expected &lt;&gt; actual Then
-			Fail(info, actual)
+			Fail(info, expected+&quot; &lt;&gt; &quot;+actual)
 		End If
 	End If
 End Sub
 
 Sub AssertCalcEntry(row as Integer, datum, work, rate, time, cost as String)
-	AssertValue(&quot;CalcEntry Date &quot;+row, datum, data.calcHelper.GetText(calcDateColumn, row))
-	AssertValue(&quot;CalcEntry Work &quot;+row, work, data.calcHelper.GetText(calcNameColumn, row))
-	AssertValue(&quot;CalcEntry Rate &quot;+row, rate, data.calcHelper.GetText(calcFactorColumn, row))
-	AssertValue(&quot;CalcEntry Time &quot;+row, time, data.calcHelper.GetText(calcTimeColumn, row))
-	AssertValue(&quot;CalcEntry Cost &quot;+row, cost, data.calcHelper.GetText(calcCostColumn, row))
+	Dim resultDatum, resultWork, resultRate, resultTime, resultCost as String
+	resultDatum = data.calcHelper.GetText(calcDateColumn, row)
+	resultWork = data.calcHelper.GetText(calcNameColumn, row)
+	resultRate = data.calcHelper.GetText(calcFactorColumn, row)
+	resultTime = data.calcHelper.GetText(calcTimeColumn, row)
+	resultCost = data.calcHelper.GetText(calcCostColumn, row)
+	
+	AssertValue(&quot;CalcEntry Date &quot;+row, datum, resultDatum)
+	AssertValue(&quot;CalcEntry Work &quot;+row, work, resultWork)
+	AssertValue(&quot;CalcEntry Rate &quot;+row, rate, resultRate)
+	AssertValue(&quot;CalcEntry Time &quot;+row, time, resultTime)
+	AssertValue(&quot;CalcEntry Cost &quot;+row, cost, resultCost)
 	
 End Sub
 
 Sub AssertAccEntry(row as Integer, job, calc, cost, file as String)
-	AssertValue(&quot;AccEntry Job &quot;+row, job, data.accHelper.GetText(accTitleColumn, row))
-	AssertValue(&quot;AccEntry Time &quot;+row, calc, data.accHelper.GetText(accTimeColumn, row))
-	AssertValue(&quot;AccEntry Cost &quot;+row, cost, data.accHelper.GetText(accCostColumn, row))
-	AssertValue(&quot;AccEntry File &quot;+row, file, data.accHelper.GetText(accFileColumn, row))
+	Dim resultJob, resultCalc, resultCost, resultFile as String
+	resultJob = data.accHelper.GetText(accTitleColumn, row)
+	resultCalc = data.accHelper.GetText(accTimeColumn, row)
+	resultCost = data.accHelper.GetText(accCostColumn, row)
+	resultFile = data.accHelper.GetText(accFileColumn, row)
+	
+	AssertValue(&quot;AccEntry Job &quot;+row, job, resultJob)
+	AssertValue(&quot;AccEntry Time &quot;+row, calc, resultCalc)
+	AssertValue(&quot;AccEntry Cost &quot;+row, cost, resultCost)
+	AssertValue(&quot;AccEntry File &quot;+row, file, resultFile)
 	
 End Sub
 
 Sub AssertCalculationLedovy
-	ReloadDataProvider(testDocLedovy)
 	data.InitCalculationData()
 	AssertValue(&quot;CalcTitle Customer&quot;, &quot;Ledovy Inc | Abrechnung Jeeves&quot;, data.calcHelper.GetRangeByName(&quot;A6&quot;).String)
+
 	AssertCalcEntry(calcStartRow, &quot;24.01.2021&quot;, &quot;Coden&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;11:15&quot;, &quot;SFr. 562.50&quot;)
+
 	AssertCalcEntry(calcStartRow+1, &quot;&quot;, &quot;&quot;, &quot;Total: &quot;, &quot;&quot;, &quot;SFr. 562.50&quot;)
 End Sub
 
 Sub AssertAccountingLedovy
-	ReloadDataProvider(testDocLedovy)
 	data.InitAccountingData()
-	AssertValue(&quot;CalcTitle Name&quot;, &quot;Mia Muster&quot;, data.calcHelper.GetRangeByName(&quot;A5&quot;).String)
+	AssertValue(&quot;CalcTitle Name&quot;, &quot;Mia Muster&quot;, data.calcHelper.GetRangeText(&quot;A5&quot;))
 	AssertValue(&quot;CalcBank PC&quot;, &quot;PC: 90-123456-7&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcStartRow+1+calcBankPcOffset))
 	AssertValue(&quot;CalcBank IBAN&quot;, &quot;IBAN: CH6500000000901234567&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcStartRow+1+calcBankIbanOffset))
 	AssertValue(&quot;CalcBank Address&quot;, &quot;Kontoinhaberin: Mia Muster; Musterstrasse 12, 3400 Musterlingen&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcStartRow+1+calcBankAddressOffset))
 	
-	AssertValue(&quot;AccTitle Name&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, data.calcHelper.GetRangeByName(&quot;A1&quot;).String)
+	AssertValue(&quot;AccTitle Name&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, data.accHelper.GetRangeByName(&quot;A1&quot;).String)
 	AssertValue(&quot;Acc Customer&quot;, &quot;Ledovy Inc&quot;, data.accHelper.GetText(accCustomerColumn, accStartRow+accCustomerSpacing))
-	AssertAccEntry(accStartRow+accCustomerSpacing+1, &quot;Coding&quot;, &quot;27. Januar 2021&quot;, &quot;562.50&quot;, testDocLedovy)
+	
+	AssertAccEntry(accStartRow+accCustomerSpacing+1, &quot;Coding&quot;, helper.GetText(6, 1), &quot;SFr. 562.50&quot;, testDocLedovy)
 End Sub
 
+Dim calcTotalRow as Integer
+
 Sub AssertCalculationAcme
-	Fail(&quot;Not yet implemented&quot;, &quot;AssertCalculationAcme&quot;)
+	data.InitCalculationData()
+	AssertValue(&quot;CalcTitle Customer&quot;, &quot;ACME | Abrechnung Rüebli&quot;, data.calcHelper.GetRangeByName(&quot;A6&quot;).String)
+
+	AssertCalcEntry(calcStartRow, &quot;11.01.2021&quot;, &quot;Normal 2&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;08:00&quot;, &quot;SFr. 400.00&quot;)
+	AssertCalcEntry(calcStartRow+1, &quot;12.01.2021&quot;, &quot;Normal 1&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;01:15&quot;, &quot;SFr. 62.50&quot;)
+	AssertCalcEntry(calcStartRow+2, &quot;13.01.2021 - 14.01.2021&quot;, &quot;Standardschreiben&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;00:30&quot;, &quot;SFr. 25.00&quot;)
+	AssertCalcEntry(calcStartRow+3, &quot;15.01.2021 - 16.01.2021&quot;, &quot;Facebook&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;01:45&quot;, &quot;SFr. 87.50&quot;)
+	AssertCalcEntry(calcStartRow+4, &quot;17.01.2021&quot;, &quot;Kd-zeit 2&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;01:40&quot;, &quot;SFr. 83.33&quot;)
+	AssertCalcEntry(calcStartRow+5, &quot;18.01.2021&quot;, &quot;Kd-zeit 1&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;01:30&quot;, &quot;SFr. 75.00&quot;)
+	AssertCalcEntry(calcStartRow+6, &quot;19.01.2021&quot;, &quot;Kd-geld 2&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;02:15&quot;, &quot;SFr. 100.00&quot;)
+	AssertCalcEntry(calcStartRow+7, &quot;20.01.2021&quot;, &quot;Kd-geld 1&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;02:00&quot;, &quot;SFr. 100.00&quot;)
+	calcTotalRow = calcStartRow+8
+	AssertCalcEntry(calcTotalRow, &quot;&quot;, &quot;&quot;, &quot;Total: &quot;, &quot;&quot;, &quot;SFr. 933.33&quot;)
 End Sub
 
 Sub AssertAccountingAcme
-	Fail(&quot;Not yet implemented&quot;, &quot;AssertAccountingAcme&quot;)
+	data.InitAccountingData()
+	AssertValue(&quot;CalcTitle Name&quot;, &quot;Mia Muster&quot;, data.calcHelper.GetRangeText(&quot;A5&quot;))
+	AssertValue(&quot;CalcBank PC&quot;, &quot;PC: 90-123456-7&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcTotalRow+calcBankPcOffset))
+	AssertValue(&quot;CalcBank IBAN&quot;, &quot;IBAN: CH6500000000901234567&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcTotalRow+calcBankIbanOffset))
+	AssertValue(&quot;CalcBank Address&quot;, &quot;Kontoinhaberin: Mia Muster; Musterstrasse 12, 3400 Musterlingen&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcTotalRow+calcBankAddressOffset))
+	
+	AssertValue(&quot;AccTitle Name&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, data.accHelper.GetRangeByName(&quot;A1&quot;).String)
+	Dim accCustomerRow as Integer
+	accCustomerRow = accStartRow+2*accCustomerSpacing+1
+	AssertValue(&quot;Acc Customer&quot;, &quot;ACME&quot;, data.accHelper.GetText(accCustomerColumn, accCustomerRow))
+	
+	AssertAccEntry(accCustomerRow+1, &quot;Lieferung Rüebli&quot;, helper.GetText(6, 1), &quot;SFr. 933.33&quot;, testDocAcme)
 End Sub
 
 </script:module>

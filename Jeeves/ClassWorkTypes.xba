@@ -85,7 +85,7 @@ Private Function GetRow(workType As String) As Integer
 			Exit Function
 		End If
 	Next i
-	MsgBox &quot;Unbekannte Kategorie: &apos;&quot;+workType+&quot;&apos;&quot;
+	Info(&quot;Unbekannte Kategorie: &apos;&quot;+workType+&quot;&apos;&quot;)
 	GetRow = -1
 End Function
 

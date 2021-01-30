@@ -6,6 +6,7 @@ Option ClassModule
 Option Explicit
 
 &apos;CONSTANTS
+Public Const DateFormat = &quot;TT. MMMM JJJJ&quot;
 Public Const TimeFormat = &quot;HH:MM&quot;
 Public Const CurrencyFormat = &quot;[$SFr.-807] #&apos;##0.00;[$SFr.-807] -#&apos;##0.00&quot;
 
@@ -73,6 +74,7 @@ End Function
 
 Public Function SetDate(column, row as Integer, value as Date)
 	GetCell(column, row).value = Value
+	SetFormatDate(column, row)
 End Function
 
 Public Function GetMoney(column, row as Integer) as Currency
@@ -81,6 +83,7 @@ End Function
 
 Public Function SetMoney(column, row as Integer, value as Currency)
 	GetCell(column, row).value = Value
+	SetFormatMoney(column, row)
 End Function
 
 Public Function GetBool(column, row as Integer) as Boolean
@@ -111,8 +114,16 @@ Public Function GetRangeByName(rangeName as String) as Object
 	GetRangeByName = sheet.getCellRangeByName(rangeName)
 End Function
 
+Public Function GetRangeText(rangeName)
+	Dim range as Object
+	range = GetRangeByName(rangeName)
+	GetRangeText = range.String
+End Function
+
 Public Function SetRangeText(rangeName, value as String)
-	GetRangeByName(rangeName).String = value
+	Dim range as Object
+	range = GetRangeByName(rangeName)
+	range.String = value
 End Function
 
 Public Function InsertRows(index, count as Integer)
@@ -126,6 +137,10 @@ End Function
 Public Function RemoveRows(index, count as Integer)
 	sheet.Rows.removeByIndex(index, count)
 End Function
+
+Public Sub SetFormatDate(column, row As Integer)
+	SetFormat(column, row, DateFormat)
+End Sub
 
 Public Sub SetFormatTime(column, row As Integer)
 	SetFormat(column, row, TimeFormat)
@@ -168,9 +183,12 @@ Public Sub SortRange(sortColumn, startColumn, startRow, endColumn, endRow as Int
     range.Sort(sortOptions)
 End Sub
 
-Public Sub Save
-	document.store()
+Public Sub CloseDoc
     document.Close(True)
+End Sub
+
+Public Sub SaveDoc
+	document.store()
 End Sub
 
 Public Function IsReady as Boolean

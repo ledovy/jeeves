@@ -38,6 +38,7 @@ Public Sub CreateCalculation
 	ProcessEntries()
 	AddCollapsedEntries()
 	WriteSummary()
+	calcHelper.SaveDoc()
 End Sub
 
 Public Sub ClearOldEntries
@@ -69,7 +70,7 @@ Sub ProcessEntries
 		rowValue = timeHelper.GetText(timeDateColumn, i)
 	Loop
 	If (i &gt; (timeFirstEntryRow+timeMaxEntries)) Then
-		MsgBox &quot;Maximale Anzahl von &quot;+timeMaxEntries+&quot; Zeilen überschritten: &quot;+(i-timeFirstEntryRow)
+		Info(&quot;Maximale Anzahl von &quot;+timeMaxEntries+&quot; Zeilen überschritten: &quot;+(i-timeFirstEntryRow))
 	End If
 End Sub
 
@@ -90,7 +91,7 @@ Sub WriteRow (rowIndex As Integer, entry as Object)
 		calcHelper.SetFormula(calcTimeColumn, rowIndex, &quot;=&quot;+timeValue+&quot;/(60*24)&quot;)
 		calcHelper.SetFormatTime(calcTimeColumn, rowIndex)
 		calcHelper.SetMoney(calcCostColumn, rowIndex, entry.cost)
-		calcHelper.SetFormatMoney(calcCostColumn, rowIndex)
+		&apos;calcHelper.SetFormatMoney(calcCostColumn, rowIndex)
 End Sub
 
 Sub AddCollapsedEntries

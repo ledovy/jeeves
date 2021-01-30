@@ -27,10 +27,22 @@ Sub TestAll
 	TestFindRow()
 	TestGetSetValue()
 	
-	WriteTestResult(resultRowAllTests, allTestsSucceeded, &quot;&quot;+testsFailed, failedInfo)
+	WriteAllResult()
+End Sub
+
+Sub WriteAllResult
+	Dim msg as String
+	If testsFailed &gt; 0 Then
+		msg = &quot;&quot;+testsFailed
+	Else
+		msg = &quot;&quot;
+	End If
+	
+	WriteTestResult(resultRowAllTests, allTestsSucceeded, msg, failedInfo)
 End Sub
 
 Sub Init
+	SetTestMode(True)
 	helper = SheetHelper(titleSheetTestSuite)	
 End Sub
 

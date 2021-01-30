@@ -3,14 +3,14 @@
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="Util" script:language="StarBasic">REM  *****  BASIC  *****
 
 Public Sub Main
-	MsgBox &quot;Jeeves v2.1.1-SNAPSHOT&quot;
+	Info(&quot;Jeeves v2.1.1-SNAPSHOT&quot;)
 End Sub
 
 Public Sub CheckValue(title as String, value as String) as String
 	Dim valid as Boolean
 	valid = IsValueSet(value)
 	If Not valid Then
-		MsgBox &quot;&quot; + title + &quot; fehlt&quot;
+		Info(&quot;&quot; + title + &quot; fehlt&quot;)
 	End If
 	CheckValue = value
 End Sub
@@ -60,7 +60,19 @@ Public Sub ShowGreetings
 	Dim t as Date
 	t = Now()
 	If MONTH(t)=10 AND DAY(t)=29 Then
-		MsgBox &quot;Herzlichen Glückwunsch zum Geburtstag!&quot;
+		Info(&quot;Herzlichen Glückwunsch zum Geburtstag!&quot;)
+	End If
+End Sub
+
+Dim testMode as Boolean
+
+Sub SetTestMode(mode as Boolean)
+	testMode = mode
+End Sub
+
+Public Sub Info(msg as String)
+	If NOT testMode Then
+		MsgBox msg
 	End If
 End Sub
 </script:module>
