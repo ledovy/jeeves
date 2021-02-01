@@ -5,7 +5,8 @@ Automatisierte Abrechnung/Buchhaltung für LibreOffice
 - Vorlagen herunterladen
 - LibreOffice öffnen und Jeeves-Macro importieren:
  - Tools->Macros->Organize Macros->Basic...->Organizer...->Libraries->Import...
- - select C:\path\to\Jeeves\dialog.xlb
+ - select C:\path\to\Jeeves\script.xlb
+ - check "Replace existing libraries"
 
 ## Installation
 - vorlage_buchhaltung.ods kopieren (C:\Pfad\buchhaltung.ods)
