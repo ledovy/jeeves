@@ -49,6 +49,33 @@ Public Function WorkTypeEntry(helper as Object, row As Integer)
 	WorkTypeEntry = entry
 End Function
 
+Public Sub WorkTypeNewRow(data as Object)
+	Dim helper as Object
+	helper = data.typeHelper
+	Dim row, formRow as Integer
+	
+	row = helper.FindRow(typeTypeColumn, typeFirstWorkTypesRow, &quot;&quot;, True)
+	formRow = row + 1
+	helper.InsertRows(row, 1)
+	
+	helper.SetText(typeTypeColumn, row, &quot;???&quot;)
+	helper.SetText(typeCollapsedColumn, row, &quot;Nein&quot;)
+	helper.SetText(typeCollapsedMinutesColumn, row, 0)
+	helper.SetMoney(typeCostColumn, row, data.config.DefaultFactorCost)
+	helper.SetNumber(typeTimeColumn, row, data.config.DefaultFactorTime)
+	helper.SetFormula(typeCostPerMinutesColumn, row, &quot;=D&quot;+formRow+&quot;/E&quot;+formRow)
+	helper.SetFormatMoney(typeCostPerMinutesColumn, row)
+	helper.SetNumber(typeEffortColumn, row, 0)
+	helper.SetFormula(typeMinutesRoundedColumn, row, &quot;=CEILING(G&quot;+formRow+&quot;;C&quot;+formRow+&quot;;0)&quot;)
+	helper.SetFormula(typeMinutesFormattedColumn, row, &quot;=H&quot;+formRow+&quot;/(24*60)&quot;)
+	helper.SetFormatTime(typeMinutesFormattedColumn, row)
+	helper.SetFormula(typeCostsFormattedColumn, row, &quot;=H&quot;+formRow+&quot;*F&quot;+formRow+&quot;&quot;)
+	helper.SetFormatMoney(typeCostsFormattedColumn, row)
+	helper.GetRangeByName(&quot;A&quot;+formRow+&quot;:E&quot;+formRow+&quot;&quot;).CharColor = RGB(0,128,0)
+	helper.GetRangeByName(&quot;F&quot;+formRow+&quot;:J&quot;+formRow+&quot;&quot;).CharColor = RGB(128,0,0)
+	helper.SaveDoc()
+End Sub
+
 Public Function LoadDocument(path as String)
 	Dim properties(0) As New com.sun.star.beans.PropertyValue
 	properties(0).Name = &quot;Hidden&quot;

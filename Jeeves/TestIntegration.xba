@@ -52,6 +52,7 @@ Public Const testDocAccounting = testBasePath+&quot;integration-test/buchhaltung
 Public calculation as Object
 Public accounting as Object
 Public data As Object
+Dim calcTotalRow as Integer
 
 Sub RunTests(cellHelper as Object)
 	helper = cellHelper
@@ -147,25 +148,32 @@ Sub AssertCalculationLedovy
 	data.InitCalculationData()
 	AssertValue(&quot;CalcTitle Customer&quot;, &quot;Ledovy Inc | Abrechnung Jeeves&quot;, data.calcHelper.GetRangeByName(&quot;A6&quot;).String)
 
-	AssertCalcEntry(calcStartRow, &quot;24.01.2021&quot;, &quot;Coden&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;11:15&quot;, &quot;SFr. 562.50&quot;)
+	AssertCalcEntry(calcStartRow, &quot;11.01.2021&quot;, &quot;single default&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;02:00&quot;, &quot;SFr. 100.00&quot;)
+	AssertCalcEntry(calcStartRow+1, &quot;12.01.2021&quot;, &quot;single custom&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, &quot;02:00&quot;, &quot;SFr. 120.00&quot;)
+	AssertCalcEntry(calcStartRow+2, &quot;13.01.2021&quot;, &quot;single override&quot;, &quot;SFr. 70.00 / 60 Min.&quot;, &quot;02:00&quot;, &quot;SFr. 140.00&quot;)
+	
+	AssertCalcEntry(calcStartRow+3, &quot;14.01.2021 - 16.01.2021&quot;, &quot;Standardschreiben&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;04:00&quot;, &quot;SFr. 200.00&quot;)
+	AssertCalcEntry(calcStartRow+4, &quot;15.01.2021 - 17.01.2021&quot;, &quot;Facebook&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, &quot;04:00&quot;, &quot;SFr. 240.00&quot;)
+	
+	AssertCalcEntry(calcStartRow+5, &quot;24.01.2021&quot;, &quot;Coden&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;11:15&quot;, &quot;SFr. 562.50&quot;)
 
-	AssertCalcEntry(calcStartRow+1, &quot;&quot;, &quot;&quot;, &quot;Total: &quot;, &quot;&quot;, &quot;SFr. 562.50&quot;)
+	calcTotalRow = calcStartRow+6
+	AssertCalcEntry(calcTotalRow, &quot;&quot;, &quot;&quot;, &quot;Total: &quot;, &quot;&quot;, &quot;SFr. 1&apos;362.50&quot;)
 End Sub
 
 Sub AssertAccountingLedovy
 	data.InitAccountingData()
-	AssertValue(&quot;CalcTitle Name&quot;, &quot;Mia Muster&quot;, data.calcHelper.GetRangeText(&quot;A5&quot;))
-	AssertValue(&quot;CalcBank PC&quot;, &quot;PC: 90-123456-7&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcStartRow+1+calcBankPcOffset))
-	AssertValue(&quot;CalcBank IBAN&quot;, &quot;IBAN: CH6500000000901234567&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcStartRow+1+calcBankIbanOffset))
-	AssertValue(&quot;CalcBank Address&quot;, &quot;Kontoinhaberin: Mia Muster; Musterstrasse 12, 3400 Musterlingen&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcStartRow+1+calcBankAddressOffset))
-	
 	AssertValue(&quot;AccTitle Name&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, data.accHelper.GetRangeByName(&quot;A1&quot;).String)
 	AssertValue(&quot;Acc Customer&quot;, &quot;Ledovy Inc&quot;, data.accHelper.GetText(accCustomerColumn, accStartRow+accCustomerSpacing))
 	
-	AssertAccEntry(accStartRow+accCustomerSpacing+1, &quot;Coding&quot;, helper.GetText(6, 1), &quot;SFr. 562.50&quot;, testDocLedovy)
+	AssertValue(&quot;CalcTitle Name&quot;, &quot;Mia Muster&quot;, data.calcHelper.GetRangeText(&quot;A5&quot;))
+	AssertValue(&quot;CalcBank PC&quot;, &quot;PC: 90-123456-7&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcTotalRow+calcBankPcOffset))
+	AssertValue(&quot;CalcBank IBAN&quot;, &quot;IBAN: CH6500000000901234567&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcTotalRow+calcBankIbanOffset))
+	AssertValue(&quot;CalcBank Address&quot;, &quot;Kontoinhaberin: Mia Muster; Musterstrasse 12, 3400 Musterlingen&quot;, data.calcHelper.GetText(calcContactInfoColumn, calcTotalRow+calcBankAddressOffset))
+		
+	AssertAccEntry(accStartRow+accCustomerSpacing+1, &quot;Coding&quot;, helper.GetText(6, 1), &quot;SFr. 1&apos;362.50&quot;, testDocLedovy)
 End Sub
 
-Dim calcTotalRow as Integer
 
 Sub AssertCalculationAcme
 	data.InitCalculationData()

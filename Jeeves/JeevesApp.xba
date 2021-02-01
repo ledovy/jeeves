@@ -5,16 +5,23 @@
 Public calculation as Object
 Public accounting as Object
 Public dataProvider As Object
-&apos;Public timeHelper as Object
-&apos;Public calcHelper as Object
-&apos;Public configHelper as Object
 
-&apos;Sub InitHelper
-&apos;	timeHelper = SheetHelper(timeSheetTitle)
-&apos;	calcHelper = SheetHelper(calcSheetTitle)
-&apos;	configHelper = SheetHelper(configSheetTitle)
-&apos;End Sub
 
+Sub ReloadDataProvider
+	dataProvider = new ClassDataProvider
+	dataProvider.Init(ThisComponent)
+End Sub
+
+&apos; typeSheet: Arbeitstypen
+
+Sub AddNewWorkType
+	&apos;Neuen Arbeitstyp erfassen
+	ReloadDataProvider()
+	dataProvider.LoadTypeHelper()
+	WorkTypeNewRow(dataProvider)
+End Sub
+
+&apos; calcSheet: Abrechnung
 
 Sub RunCalculationAndAccounting
 	&apos;Rechnung neu erstellen und Buchhaltung aktualisieren
@@ -40,11 +47,6 @@ Sub InitCalculation
 	ReloadDataProvider()
 	calculation = new ClassCalculation
 	calculation.Init(dataProvider)
-End Sub
-
-Sub ReloadDataProvider
-	dataProvider = new ClassDataProvider
-	dataProvider.Init(ThisComponent)
 End Sub
 
 Sub RunAccounting

@@ -9,6 +9,9 @@ Option Explicit
 Public ShowTimeSum As Boolean
 Public ShowCostSum As Boolean
 Public PathAccounting As String
+Public JeevesVersion as String
+Public DefaultFactorCost as Currency
+Public DefaultFactorTime as Integer
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
@@ -23,5 +26,9 @@ Public Sub Init(helper as Object)
 	Dim title as String
 	title = configSheetTitle+&quot; &apos;&quot;+helper.getText(configCaptionColumn, configPathAccountingRow)+&quot;&apos;&quot;
 	PathAccounting = helper.GetTextChecked(title, configValueColumn, configPathAccountingRow)
+	title = configSheetTitle+&quot; &apos;&quot;+helper.getText(configCaptionColumn, configJeevesVersionRow)+&quot;&apos;&quot;
+	JeevesVersion = helper.GetTextChecked(title, configValueColumn, configJeevesVersionRow)
+	DefaultFactorCost = helper.GetMoney(configValueColumn, configDefaultFactorCostRow)
+	DefaultFactorTime = helper.GetNumber(configValueColumn, configDefaultFactorTimeRow)
 End Sub
 </script:module>

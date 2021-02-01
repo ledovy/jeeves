@@ -25,6 +25,7 @@ Public Sub Init(dataProvider as Object)
 	config = dataProvider.config
 	masterData = dataProvider.masterData
 	contactData = dataProvider.contactData
+	&apos;TODO rename calcTotalRow
 	totalRow = calcHelper.FindRow(calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
 End Sub
 

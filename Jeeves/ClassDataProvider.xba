@@ -55,7 +55,7 @@ Public Sub InitCalculationData
 	LoadConfiguration()
 End Sub
 
-Sub LoadTimeHelper
+Public Sub LoadTimeHelper
 	If Not IsEmpty(calcDoc) Then
 		timeHelper = DocHelper(calcDoc, timeSheetTitle)
 	Else
@@ -63,7 +63,7 @@ Sub LoadTimeHelper
 	End If
 End Sub
 
-Sub LoadTypeHelper
+Public Sub LoadTypeHelper
 	If Not IsEmpty(calcDoc) Then
 		typeHelper = DocHelper(calcDoc, typeSheetTitle)
 	Else
@@ -71,7 +71,7 @@ Sub LoadTypeHelper
 	End If
 End Sub
 
-Sub LoadCalcHelper
+Public Sub LoadCalcHelper
 	If Not IsEmpty(calcDoc) Then
 		calcHelper = DocHelper(calcDoc, calcSheetTitle)
 	Else
@@ -79,7 +79,7 @@ Sub LoadCalcHelper
 	End If
 End Sub
 
-Sub LoadConfigHelper
+Public Sub LoadConfigHelper
 	If Not IsEmpty(calcDoc) Then
 		configHelper = DocHelper(calcDoc, configSheetTitle)
 	Else
@@ -87,7 +87,7 @@ Sub LoadConfigHelper
 	End If
 End Sub
 
-Sub LoadMasterData
+Public Sub LoadMasterData
 	If Not IsEmpty(timeHelper) Then
 		masterData = New ClassMasterData
 		masterData.Init(timeHelper, calcPath)
@@ -96,7 +96,7 @@ Sub LoadMasterData
 	End If
 End Sub
 
-Sub LoadWorkTypes
+Public Sub LoadWorkTypes
 	If Not IsEmpty(typeHelper) Then
 		types = New ClassWorkTypes
 		types.Init(typeHelper)
@@ -104,7 +104,8 @@ Sub LoadWorkTypes
 		Info(&quot;no typeSheet: &quot;+calcPath)
 	End If
 End Sub
-Sub LoadConfiguration
+
+Public Sub LoadConfiguration
 	If Not IsEmpty(configHelper) Then
 		config = New ClassConfig
 		config.Init(configHelper)
@@ -130,7 +131,7 @@ Public Sub InitAccountingData
 	End If
 End Sub
 
-Sub LoadContactHelper
+Public Sub LoadContactHelper
 	If Not IsEmpty(accDoc) Then
 		contactHelper = DocHelper(accDoc, accSheetTitle)
 	Else
@@ -138,7 +139,7 @@ Sub LoadContactHelper
 	End If
 End Sub
 
-Sub LoadContactData
+Public Sub LoadContactData
 	If Not IsEmpty(contactHelper) Then
 		contactData = New ClassContact
 		contactData.Init(contactHelper)
@@ -147,7 +148,7 @@ Sub LoadContactData
 	End If
 End Sub
 
-Function LoadAccHelper
+Public Sub LoadAccHelper
 	Dim sheetName as String
 	sheetName = masterData.calculationYear
     If accDoc.Sheets.hasByName(sheetName) Then
@@ -157,5 +158,5 @@ Function LoadAccHelper
 		accHelper = DocHelper(accDoc, sheetName)
 		accHelper.SetRangeText(&quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
 	End If
-End Function
+End Sub
 </script:module>
