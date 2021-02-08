@@ -22,4 +22,4 @@ Automatisierte Abrechnung/Buchhaltung für LibreOffice
 - abrechnung-kunde.ods->Abrechnung: Rechnung erstellen anklicken
 
 ## Infos
-Version 2.1.1-SNAPSHOT
+Version 2.1.2
