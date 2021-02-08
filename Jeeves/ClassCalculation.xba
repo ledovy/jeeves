@@ -5,11 +5,7 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
-&apos;CONSTANTS
-&apos;Public Const TimeFormat = &quot;HH:MM&quot;
-
 &apos;ATTRIBUTES
-&apos;Public document as Object
 Dim timeHelper, typeHelper, calcHelper, configHelper, accHelper as Object
 Dim config, masterData, contactData, workTypes As Object
 Dim currentTargetRow As Integer

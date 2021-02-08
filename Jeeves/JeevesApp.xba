@@ -12,10 +12,62 @@ Sub ReloadDataProvider
 	dataProvider.Init(ThisComponent)
 End Sub
 
+&apos; timeSheet: Zeiterfassung
+
+Sub ResetTimeAllTimeRows
+	&apos;BUTTON: clear Arbeitszeiten
+	If Info(&quot;Wirklich alle erfassten Arbeitszeiten löschen?&quot;, MB_YESNO + MB_DEFBUTTON2 + MB_ICONQUESTION,&quot;Arbeitszeiten löschen&quot;) = IDYES Then
+		ReloadDataProvider()
+		Dim resetter as new ClassTimeReset
+		resetter.Init(dataProvider)
+		resetter.ResetTimeValues(timeFirstEntryRow, timeMaxEntries)
+	End If
+End Sub
+
+Sub ResetTimeAllMaxRows
+	&apos;BUTTON: clear Kostendach
+	If Info(&quot;Wirklich alle Kostendächer zurücksetzen?&quot;, MB_YESNO + MB_DEFBUTTON2 + MB_ICONQUESTION,&quot;Kostendächer zurücksetzen&quot;) = IDYES Then
+		ReloadDataProvider()
+		Dim resetter as new ClassTimeReset
+		resetter.Init(dataProvider)
+		resetter.ResetMaxCostValues(timeFirstEntryRow, timeMaxEntries)
+	End If
+End Sub
+
+Sub ResetTimeAllFactorRows
+	&apos;BUTTON: clear Stundensatz
+	If Info(&quot;Wirklich alle Stundensätze zurücksetzen?&quot;, MB_YESNO + MB_DEFBUTTON2 + MB_ICONQUESTION,&quot;Stundensätze zurücksetzen&quot;) = IDYES Then
+		ReloadDataProvider()
+		Dim resetter as new ClassTimeReset
+		resetter.Init(dataProvider)
+		resetter.ResetCostFactorValues(timeFirstEntryRow, timeMaxEntries)
+	End If
+End Sub
+
+Sub ResetTimeAllHelpRows
+	&apos;BUTTON: clear Hilfswerte
+	If Info(&quot;Wirklich alle Hilfswerte wiederherstellen?&quot;, MB_YESNO + MB_DEFBUTTON2 + MB_ICONQUESTION,&quot;Hilfswerte wiederherstellen&quot;) = IDYES Then
+		ReloadDataProvider()
+		Dim resetter as new ClassTimeReset
+		resetter.Init(dataProvider)
+		resetter.ResetHelpValues(timeFirstEntryRow, timeMaxEntries)
+	End If
+End Sub
+
+Sub ResetTimeMasterData
+	&apos;BUTTON: clear Stammdaten
+	If Info(&quot;Wirklich alle Stammdaten löschen?&quot;, MB_YESNO + MB_DEFBUTTON2 + MB_ICONQUESTION,&quot;Stammdaten löschen&quot;) = IDYES Then
+		ReloadDataProvider()
+		Dim resetter as new ClassTimeReset
+		resetter.Init(dataProvider)
+		resetter.ResetMasterData()
+	End If
+End Sub
+
 &apos; typeSheet: Arbeitstypen
 
 Sub AddNewWorkType
-	&apos;Neuen Arbeitstyp erfassen
+	&apos;BUTTON: Neuen Arbeitstyp erfassen
 	ReloadDataProvider()
 	dataProvider.LoadTypeHelper()
 	WorkTypeNewRow(dataProvider)
@@ -24,20 +76,20 @@ End Sub
 &apos; calcSheet: Abrechnung
 
 Sub RunCalculationAndAccounting
-	&apos;Rechnung neu erstellen und Buchhaltung aktualisieren
+	&apos;BUTTON: Rechnung neu erstellen und Buchhaltung aktualisieren
 	RunCalculation()
 	RunAccounting()
 End Sub
 
 Sub RunCalculation
-	&apos;Rechnung aktualisieren
+	&apos;BUTTON: Rechnung aktualisieren
 	InitCalculation()
 	
 	calculation.CreateCalculation()
 End Sub
 
 Sub ClearCalculation
-	&apos;Rechnung leeren
+	&apos;BUTTON: Rechnung leeren
 	InitCalculation()
 	
 	calculation.ClearOldEntries()

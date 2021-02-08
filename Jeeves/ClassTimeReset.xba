@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ClassTimeReset" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;ATTRIBUTES
+Dim timeHelper as Object
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	
+End Sub
+
+
+Public Sub Init(dataProvider as Object)
+	dataProvider.LoadTimeHelper()
+	timeHelper = dataProvider.timeHelper
+End Sub
+
+Public Sub ResetTimeValues(startRow as Integer, Optional numRows as Integer)
+	Dim number as Integer
+	If IsMissing(numRows) Then
+		number = 1
+	Else
+		number = numRows
+	End If
+	Dim row as Integer
+	For row = startRow To startRow+number-1
+		ResetTimeRow(row)
+	Next row
+End Sub
+
+Public Sub ResetTimeRow(row as Integer)
+	ClearText(timeDateColumn, row)
+	ClearText(timeTimeColumn, row)
+	ClearText(timeTypeColumn, row)
+	ClearText(timeNameColumn, row)
+End Sub
+
+Public Sub ResetMaxCostValues(startRow as Integer, Optional numRows as Integer)
+	Dim number as Integer
+	If IsMissing(numRows) Then
+		number = 1
+	Else
+		number = numRows
+	End If
+	Dim row as Integer
+	For row = startRow To startRow+number-1
+		ResetMaxCostRow(row)
+	Next row
+End Sub
+
+Public Sub ResetMaxCostRow(row as Integer)
+	ClearNumber(timeMaxTimeColumn, row)
+	ClearMoney(timeMaxCostColumn, row)
+End Sub
+
+Public Sub ResetCostFactorValues(startRow as Integer, Optional numRows as Integer)
+	Dim number as Integer
+	If IsMissing(numRows) Then
+		number = 1
+	Else
+		number = numRows
+	End If
+	Dim row as Integer
+	For row = startRow To startRow+number-1
+		ResetCostFactorRow(row)
+	Next row
+End Sub
+
+Public Sub ResetCostFactorRow(row as Integer)
+	Dim y as Integer
+	y = row+1
+	ResetFormula(timeFactorCostColumn, row, &quot;=IF(ISBLANK(C&quot;+y+&quot;);$Konfiguration.B$6;VLOOKUP(C&quot;+y+&quot;;Arbeitstypen.$A$2:$E$101;4;0))&quot;)
+	ResetFormula(timeFactorTimeColumn, row, &quot;=IF(ISBLANK(C&quot;+y+&quot;);$Konfiguration.B$7;VLOOKUP(C&quot;+y+&quot;;Arbeitstypen.$A$2:$E$101;5;0))&quot;)
+End Sub
+
+Public Sub ResetHelpValues(startRow as Integer, Optional numRows as Integer)
+	Dim number as Integer
+	If IsMissing(numRows) Then
+		number = 1
+	Else
+		number = numRows
+	End If
+	Dim row as Integer
+	For row = startRow To startRow+number-1
+		ResetHelpRow(row)
+	Next row
+End Sub
+
+Public Sub ResetHelpRow(row as Integer)
+	Dim y as Integer
+	y = row+1
+	ResetFormula(timeCollapsedColumn, row, &quot;=VLOOKUP(C&quot;+y+&quot;;Arbeitstypen.$A$2:$B$101;2;0)&quot;)
+	ResetFormula(timeCostColumn, row, &quot;=B&quot;+y+&quot;*N&quot;+y+&quot;&quot;)
+	ResetFormula(timeTimeRoundedColumn, row, &quot;=IF(E&quot;+y+&quot;&lt;=0;CEILING(B&quot;+y+&quot;;15);MIN(CEILING(B&quot;+y+&quot;;15);E&quot;+y+&quot;))&quot;)
+	ResetFormula(timeTimeFormattedColumn, row, &quot;=K&quot;+y+&quot;/(24*60)&quot;)
+	ResetFormula(timeCostRoundedColumn, row, &quot;=IF(F&quot;+y+&quot;&lt;=0;K&quot;+y+&quot;*N&quot;+y+&quot;;MIN(K&quot;+y+&quot;*N&quot;+y+&quot;;F&quot;+y+&quot;))&quot;)
+	ResetFormula(timeCostFactorColumn, row, &quot;=G&quot;+y+&quot;/H&quot;+y+&quot;&quot;)
+End Sub
+
+Public Sub ResetMasterData()
+	ClearText(masterValueColumn, masterCustomerNameRow)
+	ClearText(masterValueColumn, masterCustomerCompanyRow)
+	ClearText(masterValueColumn, masterCustomerEmailRow)
+	ClearText(masterValueColumn, masterCalculationTitleRow)
+	ClearText(masterValueColumn, masterAccountingTitleRow)
+	ClearText(masterValueColumn, masterStartDateRow)
+	ResetFormula(masterValueColumn, masterCalculationDateRow, &quot;=TODAY()&quot;)
+	ResetFormula(masterValueColumn, masterCalculationYearRow, &quot;=B7&quot;)
+End Sub
+
+Private Sub ClearText(column, row as Integer)
+	If timeHelper.GetText(column, row) &lt;&gt; &quot;&quot; Then
+		timeHelper.SetText(column, row, &quot;&quot;)
+	End If
+End Sub
+
+
+Private Sub ClearNumber(column, row as Integer)
+	If timeHelper.GetNumber(column, row) &lt;&gt; 0 Then
+		timeHelper.SetNumber(column, row, 0)
+	End If
+End Sub
+
+Private Sub ClearMoney(column, row as Integer)
+	If timeHelper.GetMoney(column, row) &lt;&gt; 0 Then
+		timeHelper.SetMoney(column, row, 0)
+	End If
+End Sub
+
+Private Sub ResetFormula(column, row as Integer, formel as String)
+	If timeHelper.GetCell(column, row).Formula &lt;&gt; formel Then
+	&apos;ClearText(column, row)
+		timeHelper.SetFormula(column, row, formel)
+	End If
+End Sub
+</script:module>

@@ -10,7 +10,7 @@ Public Sub CheckValue(title as String, value as String) as String
 	Dim valid as Boolean
 	valid = IsValueSet(value)
 	If Not valid Then
-		Info(&quot;&quot; + title + &quot; fehlt&quot;)
+		Warn(title &amp; &quot; fehlt&quot;)
 	End If
 	CheckValue = value
 End Sub
@@ -87,7 +87,8 @@ Public Sub ShowGreetings
 	Dim t as Date
 	t = Now()
 	If MONTH(t)=10 AND DAY(t)=29 Then
-		Info(&quot;Herzlichen Glückwunsch zum Geburtstag!&quot;)
+	&apos;If MONTH(t)=2 AND DAY(t)=8 Then
+		Info(&quot;Herzlichen Glückwunsch zum Geburtstag!&quot;, MB_ICONINFORMATION, &quot;Happy Birthday&quot;)
 	End If
 End Sub
 
@@ -97,9 +98,31 @@ Sub SetTestMode(mode as Boolean)
 	testMode = mode
 End Sub
 
-Public Sub Info(msg as String)
+Public Function Info(msg as String, Optional options as Integer, Optional title as String)
 	If NOT testMode Then
-		MsgBox msg
+		Dim flags as Integer
+		If IsMissing(options) Then
+			flags = MB_ICONINFORMATION
+		Else
+			flags = options
+		End If
+		
+		Dim header as String
+		If IsMissing(title) Then
+			header = &quot;Jeeves&quot;
+		Else
+			header = title
+		End If
+		
+		
+		Info = MsgBox(msg, flags, title)
+	Else
+		Info = 5
 	End If
-End Sub
+End Function
+
+Public Function Warn(msg as String)
+	Warn = Info(msg, MB_ICONEXCLAMATION, &quot;Warnung&quot;)
+End Function
+
 </script:module>

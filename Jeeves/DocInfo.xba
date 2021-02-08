@@ -17,6 +17,7 @@ Public Const timeCostColumn = 9
 Public Const timeTimeRoundedColumn = 10
 Public Const timeTimeFormattedColumn = 11
 Public Const timeCostRoundedColumn = 12
+Public Const timeCostFactorColumn = 13
 Public Const timeFirstEntryRow = 12
 
 Public Const timeMaxEntries = 300
