@@ -58,7 +58,7 @@ Sub ProcessEntries
 			sumValue = timeHelper.GetText(timeTimeColumn, i)
 		Else
 			sumValue = timeHelper.GetText(timeTimeRoundedColumn, i)
-			AddRow(WorkRowEntry(timeHelper, i))
+			AddRow(CalcRowEntry(timeHelper, i))
 		End If
 		workTypes.AddEffort(sumValue, typeValue)
 		&apos; increment

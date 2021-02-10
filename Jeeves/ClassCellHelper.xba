@@ -60,6 +60,10 @@ Public Function SetText(column, row as Integer, value as String)
 	GetCell(column, row).String = value
 End Function
 
+Public Function HasText(column, row as Integer)
+	HasText = &quot;&quot; &lt;&gt; GetText(column, row)
+End Function
+
 Public Function GetNumber(column, row as Integer) as Integer
 	GetNumber = GetCell(column, row).value
 End Function

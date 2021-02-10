@@ -105,6 +105,6 @@ End Sub
 Public Function GetWorkEntry(workType As String)
 	Dim row As Integer
 	row = GetRow(workType)+typeFirstWorkTypesRow
-	GetWorkEntry = WorkTypeEntry(helper, row)
+	GetWorkEntry = CalcTypeEntry(helper, row)
 End Function
 </script:module>

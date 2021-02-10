@@ -6,7 +6,7 @@
  <library:element library:name="TestIntegration"/>
  <library:element library:name="ClassWorkTypes"/>
  <library:element library:name="ClassConfig"/>
- <library:element library:name="ClassWorkEntry"/>
+ <library:element library:name="ClassTimeReset"/>
  <library:element library:name="JeevesApp"/>
  <library:element library:name="ClassContact"/>
  <library:element library:name="TestFindRow"/>
@@ -17,5 +17,6 @@
  <library:element library:name="ClassAccounting"/>
  <library:element library:name="Util"/>
  <library:element library:name="ClassDataProvider"/>
- <library:element library:name="ClassTimeReset"/>
+ <library:element library:name="StructCalcEntry"/>
+ <library:element library:name="StructAccEntry"/>
 </library:library>

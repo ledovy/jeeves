@@ -21,6 +21,7 @@ Public config As Object
 Public accPath as String
 Public accDoc as Object
 Public accHelper as Object
+Public accCustomerHelper as Object
 Public contactHelper As Object
 Public contactData As Object
 
@@ -126,6 +127,7 @@ Public Sub InitAccountingData
 	    LoadContactData()
 		LoadMasterData()
 	    LoadAccHelper()
+	    LoadAccCustomerHelper()
 	Else
 		Info(&quot;no accounting document: &quot;+accPath)
 	End If
@@ -158,5 +160,10 @@ Public Sub LoadAccHelper
 		accHelper = DocHelper(accDoc, sheetName)
 		accHelper.SetRangeText(&quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
 	End If
+End Sub
+
+Public Sub LoadAccCustomerHelper
+	&apos;TODO implement
+	&apos;accCustomerHelper = DocHelper(accDoc, sheetName)
 End Sub
 </script:module>

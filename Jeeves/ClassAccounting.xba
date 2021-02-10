@@ -10,7 +10,7 @@ Option Explicit
 &apos;ATTRIBUTES
 Dim calcHelper, accHelper as Object
 Dim config, masterData, contactData as Object
-Dim totalRow As Integer
+Dim calcTotalRow As Integer
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
@@ -21,12 +21,13 @@ Public Sub Init(dataProvider as Object)
 	dataProvider.InitAccountingData()
 	calcHelper = dataProvider.calcHelper
 	accHelper = dataProvider.accHelper
+	accCustomerHelper = dataProvider.accCustomerHelper
 	
 	config = dataProvider.config
 	masterData = dataProvider.masterData
 	contactData = dataProvider.contactData
 	&apos;TODO rename calcTotalRow
-	totalRow = calcHelper.FindRow(calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
+	calcTotalRow = calcHelper.FindRow(calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
 End Sub
 
 
@@ -35,64 +36,70 @@ End Sub
 Public Sub UpdateAccounting
 	WriteCalculationContact()
 	WriteCalculationToAccounting()
-	accHelper.SaveDoc()
-	accHelper.CloseDoc()
 End Sub
 
 Sub WriteCalculationContact
 	calcHelper.SetRangeText(&quot;A5&quot;,  contactData.contactFirstName+&quot; &quot;+contactData.contactLastName)
-	calcHelper.SetText(calcContactInfoColumn, totalRow+calcBankPcOffset, &quot;PC: &quot;+contactData.bankPc)
-	calcHelper.SetText(calcContactInfoColumn, totalRow+calcBankIbanOffset, &quot;IBAN: &quot;+contactData.bankIban)
-	calcHelper.SetText(calcContactInfoColumn, totalRow+calcBankAddressOffset, &quot;Kontoinhaberin: &quot;+contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot;; &quot;+contactData.contactAddress)
-	calcHelper.SetText(calcContactInfoColumn, totalRow+calcFirstNameOffset, contactData.contactFirstName)
+	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcBankPcOffset, &quot;PC: &quot;+contactData.bankPc)
+	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcBankIbanOffset, &quot;IBAN: &quot;+contactData.bankIban)
+	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcBankAddressOffset, &quot;Kontoinhaberin: &quot;+contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot;; &quot;+contactData.contactAddress)
+	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcFirstNameOffset, contactData.contactFirstName)
 End Sub
 
+Dim lastRow As Integer
+Dim msg as String
+
 Sub WriteCalculationToAccounting
-	Dim company As String
-	company = masterData.customerCompany
-	Dim currentRow, customerRow, entryRow, lastRow As Integer
-	&apos;loop to find customer
-	customerRow = accHelper.FindRow(accCustomerColumn, accStartRow, company, True)
 	lastRow = accHelper.FindRow(accCustomerColumn, accStartRow, &quot;Total&quot;, True)
-	If customerRow &lt; 0 Then
-	&apos;if customer does not exist, create a new title
-		customerRow = lastRow-1
-		accHelper.InsertRows(customerRow-1, accCustomerSpacing)
-		accHelper.SetText(accCustomerColumn, customerRow, company)
-		lastRow = lastRow+accCustomerSpacing
-	End If
-	&apos;find entry-row (update existing or insert new line)
-	Dim msg as String
-	&apos;TODO FindRow
-	entryRow = -1
-	currentRow = customerRow+1
-	&apos;TODO HasValue(cell, value)
-	Do While &quot;&quot; &lt;&gt; accHelper.GetText(accTitleColumn, currentRow)
-		If masterData.fileName = accHelper.GetText(accFileColumn, currentRow) Then
-			entryRow = currentRow
-		End If
-		currentRow = currentRow+1
-	Loop
+	
+	Dim customerRow as Integer
+	customerRow = GetCustomerRow(masterData.customerCompany)+1
+	
+	Dim entryRow as Integer
+	entryRow = GetEntryRow(customerRow)
+	
+	WriteAccRow(AccRowEntry(calcHelper, calcTotalRow, masterData), entryRow)
+    accHelper.SortRange(accTimeColumn, accCustomerColumn, customerRow, accCostColumn, entryRow+1)
+	accHelper.SetFormula(accCostColumn, lastRow, &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;)
+	
+	accHelper.SaveDoc()
+	accHelper.CloseDoc()
+	Info(msg)
+End Sub
+
+Private Function GetEntryRow(row as Integer)
+	Dim entryRow As Integer
+	entryRow = accHelper.FindRow(accFileColumn, row, masterData.fileName, False)
 	If entryRow &lt; 0 Then
-		entryRow = currentRow
-		accHelper.InsertRows(currentRow, 1)
-		currentRow = currentRow+1
+		&apos;create new entry-row
+		entryRow = accHelper.FindRow(accTitleColumn, row, &quot;&quot;, False)+1
+		accHelper.InsertRows(entryRow, 1)
 		lastRow = lastRow+1
 		msg = &quot;Eintrag zur Buchhaltung hinzugefügt&quot;
 	Else
 		msg = &quot;Eintrag in Buchhaltung aktualisiert&quot;
 	End If
+	GetEntryRow = entryRow
+End Function
+
+Private Function GetCustomerRow(company as String)
+	Dim row as Integer
+	row = accHelper.FindRow(accCustomerColumn, accStartRow, company, True)
+	If row &lt; 0 Then
+	&apos;if customer does not exist, create a new title
+		row = lastRow-1
+		accHelper.InsertRows(row-1, accCustomerSpacing)
+		accHelper.SetText(accCustomerColumn, row, company)
+		lastRow = lastRow+accCustomerSpacing
+	End If
+	GetCustomerRow = row
+End Function
+
+Private Sub WriteAccRow(entry as Object, row as Integer)
 	&apos;write entry for calculation
-	accHelper.SetText(accTitleColumn, entryRow, masterData.accountingTitle)
-	accHelper.SetDate(accTimeColumn, entryRow, masterData.calculationDateValue)
-	accHelper.SetMoney(accCostColumn, entryRow, calcHelper.GetMoney(calcCostColumn, totalRow))
-	accHelper.SetText(accFileColumn, entryRow, masterData.fileName)
-	&apos;sort entries
-    accHelper.SortRange(accTimeColumn, accCustomerColumn, customerRow+1, accCostColumn, currentRow-1)
-	&apos;rewrite total
-	accHelper.SetFormula(accCostColumn, lastRow, &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;)
-	Info(msg)
+	accHelper.SetText(accTitleColumn, row, entry.title)
+	accHelper.SetDate(accTimeColumn, row, entry.time)
+	accHelper.SetMoney(accCostColumn, row, entry.cost)
+	accHelper.SetText(accFileColumn, row, entry.fileName)
 End Sub
-
-
 </script:module>

@@ -33,20 +33,35 @@ Public Function DocHelper(doc as Object, sheet as String) as Object
 	DocHelper = h
 End Function
 
-Public Function WorkRowEntry(helper as Object, row As Integer)
-	Dim entry As New ClassWorkEntry
-	entry.Init(helper, row)
-	WorkRowEntry = entry
+Public Function CalcRowEntry(helper as Object, row As Integer)
+	Dim entry As New StructCalcEntry
+	&apos;entry.Init(helper, row)
+	entry.datum = helper.GetText(timeDateColumn, row)
+	entry.factor = helper.GetText(timeFactorCostColumn, row) + &quot; / &quot; + helper.GetText(timeFactorTimeColumn, row) + &quot; Min.&quot;
+	entry.time = helper.GetDate(timeTimeRoundedColumn, row)
+	entry.cost = helper.GetMoney(timeCostRoundedColumn, row)
+	entry.title = helper.GetText(timeNameColumn, row)
+	CalcRowEntry = entry
 End Function
 
-Public Function WorkTypeEntry(helper as Object, row As Integer)
+Public Function CalcTypeEntry(helper as Object, row As Integer)
 	Dim entry As Object
-	entry = New ClassWorkEntry
+	entry = New StructCalcEntry
 	entry.title = helper.GetText(typeTypeColumn, row)
 	entry.factor = helper.GetText(typeCostColumn, row) + &quot; / &quot; + helper.GetText(typeTimeColumn, row) + &quot; Min.&quot;
 	entry.time = helper.GetDate(typeMinutesRoundedColumn, row)
 	entry.cost = helper.GetMoney(typeCostsFormattedColumn, row)
-	WorkTypeEntry = entry
+	CalcTypeEntry = entry
+End Function
+
+Public Function AccRowEntry(helper as Object, row as Integer, masterData as Object)
+	Dim entry As Object
+	entry = New StructAccEntry
+	entry.title = masterData.accountingTitle
+	entry.time = masterData.calculationDateValue
+	entry.cost = helper.GetMoney(calcCostColumn, row)
+	entry.filename = masterData.fileName
+	AccRowEntry = entry
 End Function
 
 Public Sub WorkTypeNewRow(data as Object)
