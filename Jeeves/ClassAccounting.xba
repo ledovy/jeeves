@@ -58,6 +58,11 @@ Sub WriteCalculationToAccounting
 	Dim entryRow as Integer
 	entryRow = GetEntryRow(customerRow)
 	
+	&apos;TODO write customer-details
+	&apos;TODO  -&gt; clear old entries, if calc already exists in acc
+	&apos;TODO  -&gt; write entries for calc
+	&apos;TODO  -&gt; write total-entry
+	&apos;TODO create accRowEntry with ref to customer-details
 	WriteAccRow(AccRowEntry(calcHelper, calcTotalRow, masterData), entryRow)
     accHelper.SortRange(accTimeColumn, accCustomerColumn, customerRow, accCostColumn, entryRow+1)
 	accHelper.SetFormula(accCostColumn, lastRow, &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;)
