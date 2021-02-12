@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="StructWorkType" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;CONSTANTS
+&apos;Public Const typeMaxEntries = 100
+
+&apos;ATTRIBUTES	
+&apos;Public TypesSize, CollapsedSize, SeparateSize As Integer
+Public title As String
+Public grouped As Boolean
+Public row As Integer
+Public min As Date
+Public minText as String
+Public max As Date
+Public maxText as String
+
+Public helper as Object
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	title = &quot;&quot;
+	grouped = False
+	row = -1
+	max = 0
+	min = 0
+End Sub
+</script:module>

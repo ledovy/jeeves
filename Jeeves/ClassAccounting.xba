@@ -26,7 +26,7 @@ Public Sub Init(dataProvider as Object)
 	config = dataProvider.config
 	masterData = dataProvider.masterData
 	contactData = dataProvider.contactData
-	&apos;TODO rename calcTotalRow
+	
 	calcTotalRow = calcHelper.FindRow(calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
 End Sub
 
@@ -74,10 +74,10 @@ End Sub
 
 Private Function GetEntryRow(row as Integer)
 	Dim entryRow As Integer
-	entryRow = accHelper.FindRow(accFileColumn, row, masterData.fileName, False)
+	entryRow = accHelper.FindRow(accFileColumn, row, masterData.fileName, True)
 	If entryRow &lt; 0 Then
 		&apos;create new entry-row
-		entryRow = accHelper.FindRow(accTitleColumn, row, &quot;&quot;, False)+1
+		entryRow = accHelper.FindRow(accTitleColumn, row, &quot;&quot;, True)+1
 		accHelper.InsertRows(entryRow, 1)
 		lastRow = lastRow+1
 		msg = &quot;Eintrag zur Buchhaltung hinzugefügt&quot;
@@ -105,6 +105,6 @@ Private Sub WriteAccRow(entry as Object, row as Integer)
 	accHelper.SetText(accTitleColumn, row, entry.title)
 	accHelper.SetDate(accTimeColumn, row, entry.time)
 	accHelper.SetMoney(accCostColumn, row, entry.cost)
-	accHelper.SetText(accFileColumn, row, entry.fileName)
+	accHelper.SetText(accFileColumn, row-1, entry.fileName)
 End Sub
 </script:module>

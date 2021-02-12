@@ -6,18 +6,22 @@ Option ClassModule
 Option Explicit
 
 &apos;ATTRIBUTES
-Dim timeHelper, typeHelper, calcHelper, configHelper, accHelper as Object
+Dim timeHelper, typeHelper, calcHelper as Object
 Dim config, masterData, contactData, workTypes As Object
 Dim currentTargetRow As Integer
+Dim calcEntries(timeMaxEntries) as Object
+Dim calcEntriesSize as Integer
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
 	currentTargetRow = calcStartRow
+	calcEntriesSize = 0
 End Sub
 
 Public Sub Init(dataProvider as Object)
 	dataProvider.InitCalculationData()
 	timeHelper = dataProvider.timeHelper
+	typeHelper = dataProvider.typeHelper
 	calcHelper = dataProvider.calcHelper
 	
 	config = dataProvider.config
@@ -33,6 +37,7 @@ Public Sub CreateCalculation
 	ClearOldEntries()
 	ProcessEntries()
 	AddCollapsedEntries()
+	WriteEntries()
 	WriteSummary()
 	calcHelper.SaveDoc()
 End Sub
@@ -52,15 +57,17 @@ Sub ProcessEntries
 	Dim rowValue As String
 	rowValue = timeHelper.GetText(timeDateColumn, i)
 	Do While (&quot;&quot; &lt;&gt; rowValue) OR (i &lt; (timeFirstEntryRow+timeMaxEntries))
+		Dim entry as Object
+		entry = CalcRowEntry(timeHelper, i)
 		Dim typeValue, collapsedValue, sumValue As String
 		typeValue = timeHelper.GetText(timeTypeColumn, i)
 		If workTypes.IsCollapsed(typeValue) Then
 			sumValue = timeHelper.GetText(timeTimeColumn, i)
 		Else
-			sumValue = timeHelper.GetText(timeTimeRoundedColumn, i)
-			AddRow(CalcRowEntry(timeHelper, i))
+			sumValue = entry.time
+			AddRow(entry)
 		End If
-		workTypes.AddEffort(sumValue, typeValue)
+		workTypes.AddEffort(sumValue, typeValue, entry)
 		&apos; increment
 		i = i+1
 		rowValue = timeHelper.GetText(timeDateColumn, i)
@@ -71,6 +78,19 @@ Sub ProcessEntries
 End Sub
 
 Sub AddRow(entry As Object)
+	calcEntries(calcEntriesSize) = entry
+	calcEntriesSize = calcEntriesSize + 1
+End Sub
+
+Sub WriteEntries
+	Dim i as Integer
+	For i=0 To calcEntriesSize-1
+		InsertRow(calcEntries(i))
+	Next i
+	calcHelper.SortRange(calcDateColumn, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
+End Sub
+
+Sub InsertRow(entry As Object)
 	If (entry.datum &lt;&gt; &quot;&quot;) OR (entry.title &lt;&gt; &quot;&quot;) OR (entry.time &lt;&gt; 0) OR (entry.cost &lt;&gt; 0) Then
 		calcHelper.InsertRows(currentTargetRow, 1)
 		WriteRow(currentTargetRow, entry)
@@ -87,60 +107,29 @@ Sub WriteRow (rowIndex As Integer, entry as Object)
 		calcHelper.SetFormula(calcTimeColumn, rowIndex, &quot;=&quot;+timeValue+&quot;/(60*24)&quot;)
 		calcHelper.SetFormatTime(calcTimeColumn, rowIndex)
 		calcHelper.SetMoney(calcCostColumn, rowIndex, entry.cost)
-		&apos;calcHelper.SetFormatMoney(calcCostColumn, rowIndex)
 End Sub
 
 Sub AddCollapsedEntries
-	Dim i As Integer
-	For i = 0 To workTypes.TypesSize
+	Dim row As Integer
+	For row = 0 To workTypes.TypesSize-1
 		Dim typeValue As String
-		typeValue = workTypes.Types(i)
-		If workTypes.IsCollapsed(typeValue) Then
+		Dim t as Object
+		t = workTypes.WorkTypes(row)
+		typeValue = t.title
+		If t.grouped Then
 			Dim entry As Object
-			entry = workTypes.GetWorkEntry(typeValue)
-			entry.datum = GetRange(typeValue)
+			entry = CalcTypeEntry(typeHelper, row+typeFirstWorkTypesRow)
 			If entry.cost &lt;&gt; 0 Then
+				If t.min &lt;&gt; t.max Then
+					entry.datum = t.minText + &quot; - &quot; + t.maxText
+				Else
+					entry.datum = t.minText
+				End If
 				AddRow(entry)
 			End If
 		End If
-	Next i
-	calcHelper.SortRange(calcDateColumn, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
+	Next row
 End Sub
-
-Function GetRange(Optional category As String) As String
-	&apos;TODO ClassCursor (x/y, inc/dec, copy/create)
-	Dim currentX, currentY, firstX, firstY, lastX, lastY As Integer
-	currentX = timeDateColumn
-	currentY = timeFirstEntryRow
-	firstX = masterValueColumn
-	firstY = masterStartDateRow
-	lastX = masterValueColumn
-	lastY = masterStartDateRow
-	
-	Dim current As Date,first As Date, last As Date
-	current = timeHelper.GetDate(currentX, currentY)
-	Do While &quot;&quot; &lt;&gt; timeHelper.GetText(currentX, currentY)
-		If (IsMissing(category)) OR (category = timeHelper.GetText(timeTypeColumn, currentY)) Then
-			If (first = 0) OR (first &gt; current) Then
-				first = current
-				firstX = currentX
-				firstY = currentY
-			End If
-			If (last = 0) OR (last &lt; current) Then
-				last = current
-				lastX = currentX
-				lastY = currentY
-			End If
-		End If
-		currentY = currentY + 1
-		current = timeHelper.GetDate(currentX, currentY)
-	Loop
-	If first = last Then
-		GetRange = timeHelper.GetText(lastX, lastY)
-	Else
-		GetRange = timeHelper.GetText(firstX, firstY) + &quot; - &quot; + timeHelper.GetText(lastX, lastY)
-	End If
-End Function
 
 Sub WriteSummary
 	calcHelper.SetText(0, 0, masterData.customerName)

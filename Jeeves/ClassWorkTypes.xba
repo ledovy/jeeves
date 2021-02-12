@@ -10,17 +10,15 @@ Public Const typeMaxEntries = 100
 
 &apos;ATTRIBUTES	
 Public TypesSize, CollapsedSize, SeparateSize As Integer
-Public Types(typeMaxEntries) As String
-Public TypesCollapsed(typeMaxEntries) As Boolean
-Public TypesRow(typeMaxEntries) As Integer
+Public WorkTypes(typeMaxEntries) as Object
 
 Public helper as Object
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
-	&apos;TypesSize = 0
-	&apos;CollapsedSize = 0
-	&apos;SeparateSize = 0
+	TypesSize = 0
+	CollapsedSize = 0
+	SeparateSize = 0
 End Sub
 
 Public Sub Init(sheetHelper as Object)
@@ -33,7 +31,7 @@ Sub Reset
 	Dim i As Integer
 	For i = 1 To TypesSize
 		Dim row As Integer
-		row = TypesRow(i-1)
+		row = WorkTypes(i-1).row
 		helper.SetText(typeEffortColumn, row, 0)
 	Next i
 End Sub
@@ -55,15 +53,17 @@ Sub ReadTypes
 	Loop
 End Sub
 
-Private Sub AddType(workType As String, collapsed As Boolean, row As Integer)
-	Types(TypesSize) = workType
-	TypesCollapsed(TypesSize) = collapsed
-	If collapsed Then
+Private Sub AddType(title As String, grouped As Boolean, row As Integer)
+	Dim workType as new StructWorkType
+	workType.title = title
+	workType.grouped = grouped
+	workType.row = row
+	WorkTypes(TypesSize) = workType
+	If grouped Then
 		CollapsedSize = CollapsedSize + 1
 	Else
 		SeparateSize = SeparateSize + 1
 	End If
-	TypesRow(TypesSize) = row
 	TypesSize = TypesSize + 1
 End Sub
 
@@ -73,38 +73,46 @@ Public Function IsCollapsed(workType As String)
 	If i&lt;0 Then
 		IsCollapsed = 0
 	ELse
-		IsCollapsed = TypesCollapsed(i)
+		IsCollapsed = WorkTypes(i).grouped
 	End If
 End Function
 
 Private Function GetRow(workType As String) As Integer
 	Dim i As Integer 
-	For i = 0 To TypesSize
-		If Types(i) = workType Then
+	For i = 0 To TypesSize-1
+		Dim t as Object
+		t = WorkTypes(i)
+		If t.title = workType Then
 			GetRow = i
 			Exit Function
 		End If
 	Next i
-	Info(&quot;Unbekannte Kategorie: &apos;&quot;+workType+&quot;&apos;&quot;)
+	Warn(&quot;Unbekannte Kategorie: &apos;&quot;+workType+&quot;&apos;&quot;)
 	GetRow = -1
 End Function
 
-Public Sub AddEffort(effort As Integer, workType As String)
+Public Sub AddEffort(effort As Integer, workType As String, entry As Object)
 	Dim i As Integer
 	Dim start As Integer
 	start = GetRow(workType)
-	If start &gt;= 0 Then
+	If start &lt; 0 Then
+		Warn(&quot;Unbekannte Kategorie: &apos;&quot;+workType+&quot;&apos;&quot;)
+	Else
 		i = start+1
 		Dim v As Integer
 		v = helper.GetText(typeEffortColumn, i)
 		v = v + effort
 		helper.SetText(typeEffortColumn, i, v)
+		Dim t as Object
+		t = WorkTypes(start)
+		If (0 = t.min) OR (t.min &gt; entry.datum) Then
+			t.min = entry.datum
+			t.minText = entry.datum
+		End If
+		If (0 = t.max) OR (t.max &lt; entry.datum) Then
+			t.max = entry.datum
+			t.maxText = entry.datum
+		End If
 	End If
 End Sub
-
-Public Function GetWorkEntry(workType As String)
-	Dim row As Integer
-	row = GetRow(workType)+typeFirstWorkTypesRow
-	GetWorkEntry = CalcTypeEntry(helper, row)
-End Function
 </script:module>

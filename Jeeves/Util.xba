@@ -45,8 +45,7 @@ Public Function CalcRowEntry(helper as Object, row As Integer)
 End Function
 
 Public Function CalcTypeEntry(helper as Object, row As Integer)
-	Dim entry As Object
-	entry = New StructCalcEntry
+	Dim entry As New StructCalcEntry
 	entry.title = helper.GetText(typeTypeColumn, row)
 	entry.factor = helper.GetText(typeCostColumn, row) + &quot; / &quot; + helper.GetText(typeTimeColumn, row) + &quot; Min.&quot;
 	entry.time = helper.GetDate(typeMinutesRoundedColumn, row)
