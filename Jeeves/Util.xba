@@ -34,7 +34,8 @@ Public Function DocHelper(doc as Object, sheet as String) as Object
 End Function
 
 Public Function CalcRowEntry(helper as Object, row As Integer)
-	Dim entry As New StructCalcEntry
+	&apos;Dim entry As New StructCalcEntry
+	Dim entry As New CalcEntry
 	&apos;entry.Init(helper, row)
 	entry.datum = helper.GetText(timeDateColumn, row)
 	entry.factor = helper.GetText(timeFactorCostColumn, row) + &quot; / &quot; + helper.GetText(timeFactorTimeColumn, row) + &quot; Min.&quot;

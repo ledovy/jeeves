@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CalcReader" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CalcReader" script:language="StarBasic">REM  *****  BASIC  *****
 Option Compatible
 Option ClassModule
 Option Explicit
@@ -14,7 +14,7 @@ Dim model as Object
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
 	currentTargetRow = calcStartRow
-	model = new CalcEntry
+	model = new CalcModel
 End Sub
 
 Public Sub Init(dataProvider as Object)
@@ -38,15 +38,17 @@ Sub ReadEntries
 	Do While (&quot;&quot; &lt;&gt; rowValue) OR (i &lt; (timeFirstEntryRow+timeMaxEntries))
 		Dim entry as Object
 		entry = CalcRowEntry(timeHelper, i)
-		Dim typeValue, collapsedValue, sumValue As String
-		typeValue = timeHelper.GetText(timeTypeColumn, i)
-		If workTypes.IsCollapsed(typeValue) Then
-			sumValue = timeHelper.GetText(timeTimeColumn, i)
-		Else
-			sumValue = entry.time
-			model.AddEntry(entry)
+		If entry.HasValues() Then
+			Dim typeValue, collapsedValue, sumValue As String
+			typeValue = timeHelper.GetText(timeTypeColumn, i)
+			If workTypes.IsCollapsed(typeValue) Then
+				sumValue = timeHelper.GetText(timeTimeColumn, i)
+			Else
+				sumValue = entry.time
+				model.AddEntry(entry)
+			End If
+			workTypes.AddEffort(sumValue, typeValue, entry)
 		End If
-		workTypes.AddEffort(sumValue, typeValue, entry)
 		&apos; increment
 		i = i+1
 		rowValue = timeHelper.GetText(timeDateColumn, i)

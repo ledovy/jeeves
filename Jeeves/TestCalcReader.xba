@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestCalcReader" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+Private targetRow as Integer
+Private testsSucceeded as Integer
+Private failMessage as String
+Private failInfo as String
+Private helper as Object
+
+Public TestName as String
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	testsSucceeded = 0
+	failInfo = &quot;&quot;
+	failMessage = &quot;&quot;
+End Sub
+
+Public Sub Init(row as Integer)
+	targetRow = row
+	TestName = ReadTestName(targetRow)
+End Sub
+
+Private Sub Success
+	testsSucceeded = testsSucceeded + 1
+End Sub
+
+Private Sub Fail(info, msg as String)
+	failInfo = info
+	failMessage = msg
+End Sub
+
+Public Function HasFailed as Boolean
+	HasFailed = failInfo &lt;&gt; &quot;&quot; OR failMessage &lt;&gt; &quot;&quot;
+End Function
+
+Private Sub WriteResult
+	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
+End Sub
+
+Sub AssertText(info, expected, actual as String)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, expected+&quot; &lt;&gt; &quot;+actual)
+		End If
+	End If
+End Sub
+
+Sub AssertNumber(info as String, expected, actual as Integer)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, expected+&quot; &lt;&gt; &quot;+actual)
+		End If
+	End If
+End Sub
+
+Sub AssertDate(info as String, expected, actual as Integer)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, expected+&quot; &lt;&gt; &quot;+actual)
+		End If
+	End If
+End Sub
+
+Sub AssertMoney(info as String, expected, actual as Currency)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, &quot;&quot;+expected+&quot; &lt;&gt; &quot;+actual)
+		End If
+	End If
+End Sub
+
+&apos;Implement RunTests, but drop everything below this line
+
+Public Const testBasePath = &quot;/home/ledovy/git/jeeves/&quot;
+Public Const testDocAcme = testBasePath+&quot;integration-test/abrechnung-acme.ods&quot;
+Public Const testDocLedovy = testBasePath+&quot;integration-test/abrechnung-ledovy.ods&quot;
+Public Const testDocAccounting = testBasePath+&quot;integration-test/buchhaltung.ods&quot;
+
+Public reader as Object
+Public data As Object
+
+Sub RunTests(cellHelper as Object)
+	ReloadDataProvider(testDocLedovy)
+	
+	reader = new CalcReader
+	reader.Init(data)
+	reader.ReadEntries()
+	
+	AssertModel()
+	
+	WriteResult()
+End Sub
+
+Sub ReloadDataProvider(file as String)
+	data = new ClassDataProvider
+	data.InitTest(LoadDocument(file), file, testDocAccounting)
+End Sub
+
+Sub AssertModel
+	AssertNumber(&quot;nr of entries: &quot;+reader.model.entriesSize, 6, reader.model.entriesSize)
+	
+	AssertEntry(reader.model.GetEntry(0), &quot;24.01.2021&quot;, &quot;Coden&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, 675, 562.5)
+	AssertEntry(reader.model.GetEntry(1), &quot;11.01.2021&quot;, &quot;single default&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, 120, 100)
+	AssertEntry(reader.model.GetEntry(2), &quot;12.01.2021&quot;, &quot;single custom&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, 120, 120)
+	AssertEntry(reader.model.GetEntry(3), &quot;13.01.2021&quot;, &quot;single override&quot;, &quot;SFr. 70.00 / 60 Min.&quot;, 120, 140)
+	AssertEntry(reader.model.GetEntry(4), &quot;15.01.2021 - 17.01.2021&quot;, &quot;Facebook&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, 240, 240)
+	AssertEntry(reader.model.GetEntry(5), &quot;14.01.2021 - 16.01.2021&quot;, &quot;Standardschreiben&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, 240, 200)
+	
+	&apos;AssertNumber(&quot;nr of types: &quot;+reader.model.categoriesSize, 4, reader.model.categoriesSize)
+End Sub
+
+Sub AssertEntry(entry as Object, datum, title, factor As String, time As Date, cost As Currency)
+	AssertText(&quot;entry.datum&quot;, datum, entry.datum)
+	AssertText(&quot;entry.title&quot;, title, entry.title)
+	AssertText(&quot;entry.factor&quot;, factor, entry.factor)
+	AssertDate(&quot;entry.time&quot;, time, entry.time)
+	AssertMoney(&quot;entry.cost&quot;, cost, entry.cost)
+End Sub
+</script:module>

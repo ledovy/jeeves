@@ -24,4 +24,5 @@
  <library:element library:name="CalcReader"/>
  <library:element library:name="CalcEntry"/>
  <library:element library:name="CalcWriter"/>
+ <library:element library:name="TestCalcReader"/>
 </library:library>
