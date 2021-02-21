@@ -92,7 +92,7 @@ Sub ClearCalculation
 	&apos;BUTTON: Rechnung leeren
 	InitCalculation()
 	
-	calculation.ClearOldEntries()
+	calculation.ClearEntries()
 End Sub
 
 Sub InitCalculation

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CalcModel" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;ATTRIBUTES
+Dim TypesSize, GroupedSize As Integer
+Dim WorkTypes(typeMaxEntries) as Object
+Dim entries(timeMaxEntries) as Object
+Dim entriesSize as Integer
+Dim total As Integer
+
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	entriesSize = 0
+	total = 0
+End Sub
+
+Public Sub AddEntry(entry As Object)
+	entries(entriesSize) = entry
+	entriesSize = entriesSize + 1
+End Sub
+
+Public Sub AddWorkTypeEffort
+	&apos;TODO
+End Sub
+</script:module>

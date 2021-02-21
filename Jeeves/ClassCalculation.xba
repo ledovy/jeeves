@@ -9,13 +9,13 @@ Option Explicit
 Dim timeHelper, typeHelper, calcHelper as Object
 Dim config, masterData, contactData, workTypes As Object
 Dim currentTargetRow As Integer
-Dim calcEntries(timeMaxEntries) as Object
-Dim calcEntriesSize as Integer
+Dim entries(timeMaxEntries) as Object
+Dim entriesSize as Integer
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
 	currentTargetRow = calcStartRow
-	calcEntriesSize = 0
+	entriesSize = 0
 End Sub
 
 Public Sub Init(dataProvider as Object)
@@ -30,19 +30,19 @@ Public Sub Init(dataProvider as Object)
 	currentTargetRow = calcStartRow
 End Sub
 
+
 &apos;CALCULATION
 
 Public Sub CreateCalculation
 	ShowGreetings()
-	ClearOldEntries()
-	ProcessEntries()
-	AddCollapsedEntries()
+	ReadEntries()
+	ClearEntries()
 	WriteEntries()
 	WriteSummary()
 	calcHelper.SaveDoc()
 End Sub
 
-Public Sub ClearOldEntries
+Public Sub ClearEntries
 	Dim endRow, rows As Integer
 	endRow = calcHelper.FindRow(calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
 	rows = endRow-calcStartRow
@@ -51,7 +51,7 @@ Public Sub ClearOldEntries
 	End If
 End Sub
 
-Sub ProcessEntries
+Sub ReadEntries
 	Dim i As Integer
 	i = timeFirstEntryRow
 	Dim rowValue As String
@@ -72,41 +72,10 @@ Sub ProcessEntries
 		i = i+1
 		rowValue = timeHelper.GetText(timeDateColumn, i)
 	Loop
+	AddCollapsedEntries()
 	If (i &gt; (timeFirstEntryRow+timeMaxEntries)) Then
-		Info(&quot;Maximale Anzahl von &quot;+timeMaxEntries+&quot; Zeilen überschritten: &quot;+(i-timeFirstEntryRow))
+		Warn(&quot;Maximale Anzahl von &quot;+timeMaxEntries+&quot; Zeilen überschritten: &quot;+(i-timeFirstEntryRow))
 	End If
-End Sub
-
-Sub AddRow(entry As Object)
-	calcEntries(calcEntriesSize) = entry
-	calcEntriesSize = calcEntriesSize + 1
-End Sub
-
-Sub WriteEntries
-	Dim i as Integer
-	For i=0 To calcEntriesSize-1
-		InsertRow(calcEntries(i))
-	Next i
-	calcHelper.SortRange(calcDateColumn, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
-End Sub
-
-Sub InsertRow(entry As Object)
-	If (entry.datum &lt;&gt; &quot;&quot;) OR (entry.title &lt;&gt; &quot;&quot;) OR (entry.time &lt;&gt; 0) OR (entry.cost &lt;&gt; 0) Then
-		calcHelper.InsertRows(currentTargetRow, 1)
-		WriteRow(currentTargetRow, entry)
-		currentTargetRow = currentTargetRow + 1
-	End If
-End Sub
-
-Sub WriteRow (rowIndex As Integer, entry as Object)
-		calcHelper.SetText(calcDateColumn, rowIndex, entry.datum)
-		calcHelper.SetText(calcNameColumn, rowIndex, entry.title)
-		calcHelper.SetText(calcFactorColumn, rowIndex, entry.factor)
-		Dim timeValue as Integer
-		timeValue = entry.time
-		calcHelper.SetFormula(calcTimeColumn, rowIndex, &quot;=&quot;+timeValue+&quot;/(60*24)&quot;)
-		calcHelper.SetFormatTime(calcTimeColumn, rowIndex)
-		calcHelper.SetMoney(calcCostColumn, rowIndex, entry.cost)
 End Sub
 
 Sub AddCollapsedEntries
@@ -129,6 +98,38 @@ Sub AddCollapsedEntries
 			End If
 		End If
 	Next row
+End Sub
+
+Sub AddRow(entry As Object)
+	entries(entriesSize) = entry
+	entriesSize = entriesSize + 1
+End Sub
+
+Sub WriteEntries
+	Dim i as Integer
+	For i=0 To entriesSize-1
+		InsertRow(entries(i))
+	Next i
+	calcHelper.SortRange(calcDateColumn, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
+End Sub
+
+Sub InsertRow(entry As Object)
+	If (entry.datum &lt;&gt; &quot;&quot;) OR (entry.title &lt;&gt; &quot;&quot;) OR (entry.time &lt;&gt; 0) OR (entry.cost &lt;&gt; 0) Then
+		calcHelper.InsertRows(currentTargetRow, 1)
+		WriteRow(currentTargetRow, entry)
+		currentTargetRow = currentTargetRow + 1
+	End If
+End Sub
+
+Sub WriteRow (rowIndex As Integer, entry as Object)
+		calcHelper.SetText(calcDateColumn, rowIndex, entry.datum)
+		calcHelper.SetText(calcNameColumn, rowIndex, entry.title)
+		calcHelper.SetText(calcFactorColumn, rowIndex, entry.factor)
+		Dim timeValue as Integer
+		timeValue = entry.time
+		calcHelper.SetFormula(calcTimeColumn, rowIndex, &quot;=&quot;+timeValue+&quot;/(60*24)&quot;)
+		calcHelper.SetFormatTime(calcTimeColumn, rowIndex)
+		calcHelper.SetMoney(calcCostColumn, rowIndex, entry.cost)
 End Sub
 
 Sub WriteSummary

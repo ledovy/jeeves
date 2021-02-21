@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CalcReader" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;ATTRIBUTES
+Dim timeHelper, typeHelper as Object&apos;, calcHelper as Object
+Dim config, masterData, contactData, workTypes As Object
+Dim currentTargetRow As Integer
+Dim model as Object
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	currentTargetRow = calcStartRow
+	model = new CalcEntry
+End Sub
+
+Public Sub Init(dataProvider as Object)
+	dataProvider.InitCalculationData()
+	timeHelper = dataProvider.timeHelper
+	typeHelper = dataProvider.typeHelper
+	&apos;calcHelper = dataProvider.calcHelper
+	
+	config = dataProvider.config
+	masterData = dataProvider.masterData
+	workTypes = dataProvider.types
+	currentTargetRow = calcStartRow
+End Sub
+
+
+Sub ReadEntries
+	Dim i As Integer
+	i = timeFirstEntryRow
+	Dim rowValue As String
+	rowValue = timeHelper.GetText(timeDateColumn, i)
+	Do While (&quot;&quot; &lt;&gt; rowValue) OR (i &lt; (timeFirstEntryRow+timeMaxEntries))
+		Dim entry as Object
+		entry = CalcRowEntry(timeHelper, i)
+		Dim typeValue, collapsedValue, sumValue As String
+		typeValue = timeHelper.GetText(timeTypeColumn, i)
+		If workTypes.IsCollapsed(typeValue) Then
+			sumValue = timeHelper.GetText(timeTimeColumn, i)
+		Else
+			sumValue = entry.time
+			model.AddEntry(entry)
+		End If
+		workTypes.AddEffort(sumValue, typeValue, entry)
+		&apos; increment
+		i = i+1
+		rowValue = timeHelper.GetText(timeDateColumn, i)
+	Loop
+	AddCollapsedEntries()
+	If (i &gt; (timeFirstEntryRow+timeMaxEntries)) Then
+		Warn(&quot;Maximale Anzahl von &quot;+timeMaxEntries+&quot; Zeilen überschritten: &quot;+(i-timeFirstEntryRow))
+	End If
+End Sub
+
+Sub AddCollapsedEntries
+	Dim row As Integer
+	For row = 0 To workTypes.TypesSize-1
+		Dim typeValue As String
+		Dim t as Object
+		t = workTypes.WorkTypes(row)
+		typeValue = t.title
+		If t.grouped Then
+			Dim entry As Object
+			entry = CalcTypeEntry(typeHelper, row+typeFirstWorkTypesRow)
+			If entry.cost &lt;&gt; 0 Then
+				If t.min &lt;&gt; t.max Then
+					entry.datum = t.minText + &quot; - &quot; + t.maxText
+				Else
+					entry.datum = t.minText
+				End If
+				model.AddEntry(entry)
+			End If
+		End If
+	Next row
+End Sub
+
+
+</script:module>
