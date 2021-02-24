@@ -54,7 +54,7 @@ Sub ReadTypes
 End Sub
 
 Private Sub AddType(title As String, grouped As Boolean, row As Integer)
-	Dim workType as new StructWorkType
+	Dim workType as new Category
 	workType.title = title
 	workType.grouped = grouped
 	workType.row = row

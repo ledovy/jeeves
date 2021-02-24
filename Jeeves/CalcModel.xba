@@ -7,29 +7,96 @@ Option Explicit
 
 &apos;ATTRIBUTES
 Public CategoriesSize, GroupedSize As Integer
-Dim categories(typeMaxEntries) as Object
-Dim entries(timeMaxEntries) as Object
+Public Categories(typeMaxEntries) as Object
+Public Entries(timeMaxEntries) as Object
 Public EntriesSize as Integer
-Dim total As Integer
 
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
 	EntriesSize = 0
 	CategoriesSize = 0
-	total = 0
+	GroupedSize = 0
 End Sub
 
 Public Sub AddEntry(entry As Object)
-	entries(EntriesSize) = entry
+	Entries(EntriesSize) = entry
 	EntriesSize = EntriesSize + 1
 End Sub
 
-Public Function GetEntry(index as Integer)
-	GetEntry = entries(index)
+
+Public Sub AddCategory(category as Object)
+	Categories(CategoriesSize) = category
+	CategoriesSize = CategoriesSize + 1
+	if category.grouped then
+		GroupedSize = GroupedSize + 1
+	end if
+End Sub
+
+Public Sub AddEffort(effort As Integer, workType As String, entry As Object)
+	Dim t as Object
+	t = GetCategory(workType)
+	If IsEmpty(t) Then
+		Warn(&quot;Unbekannte Kategorie: &apos;&quot;+workType+&quot;&apos;&quot;)
+	Else
+		t.effort = t.effort + effort
+		t.cost = t.cost + entry.cost
+		If (0 = t.min) OR (t.min &gt; entry.datum) Then
+			t.min = entry.datum
+			t.minText = entry.datum
+		End If
+		If (0 = t.max) OR (t.max &lt; entry.datum) Then
+			t.max = entry.datum
+			t.maxText = entry.datum
+		End If
+	End If
+End Sub
+
+Public Function GetCategory(title as String)
+	Dim result as Object
+	Dim i as Integer
+	For i=0 To CategoriesSize-1
+		If title = Categories(i).title Then
+			result = Categories(i)
+		End If
+	Next i
+	GetCategory = result
 End Function
 
-Public Sub AddWorkTypeEffort
-	&apos;TODO
-End Sub
+Public Function CreateEntry(helper as Object, row As Integer)
+	Dim entry As New CalcEntry
+	entry.datum = helper.GetText(timeDateColumn, row)
+	entry.factor = helper.GetText(timeFactorCostColumn, row) + &quot; / &quot; + helper.GetText(timeFactorTimeColumn, row) + &quot; Min.&quot;
+	entry.time = helper.GetDate(timeTimeRoundedColumn, row)
+	entry.cost = helper.GetMoney(timeCostRoundedColumn, row)
+	entry.title = helper.GetText(timeNameColumn, row)
+	CreateEntry = entry
+End Function
+
+Public Function CreateCategoryEntry(cat as Object)&apos;(helper as Object, row As Integer)
+	Dim entry As New CalcEntry
+	entry.title = cat.title
+	Dim c as Integer
+	c = 100*cat.factorCost
+	entry.factor = &quot;SFr. &quot;+c/100 + &quot;.00 / &quot; + cat.factorEffort + &quot; Min.&quot;
+	entry.time = cat.effort
+	If cat.min &lt;&gt; cat.max Then
+		entry.datum = cat.minText + &quot; - &quot; + cat.maxText
+	Else
+		entry.datum = cat.minText
+	End If
+	entry.cost =  cat.cost
+	CreateCategoryEntry = entry
+End Function
+
+Public Function CreateCategory(helper as Object, row As Integer)
+	Dim cat as New Category
+	cat.title = helper.GetText(typeTypeColumn, row)
+	cat.grouped = helper.GetText(typeCollapsedColumn, row) = &quot;Ja&quot;
+	cat.row = row
+	cat.factorEffort = helper.GetNumber(typeTimeColumn, row)
+	cat.factorCost = helper.GetMoney(typeCostColumn, row)
+	CreateCategory = cat
+End Function
+
 </script:module>

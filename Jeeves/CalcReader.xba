@@ -29,6 +29,22 @@ Public Sub Init(dataProvider as Object)
 	currentTargetRow = calcStartRow
 End Sub
 
+Public Sub ReadCalculation
+	ReadTypes()
+	ReadEntries()
+End Sub
+
+Sub ReadTypes
+	Dim i As Integer
+	i = typeFirstWorkTypesRow
+	Do While typeHelper.HasText(typeTypeColumn, i)
+		Dim category As Object
+		category = model.CreateCategory(typeHelper, i)
+		model.AddCategory(category)
+		i = i+1
+	Loop
+End Sub
+
 
 Sub ReadEntries
 	Dim i As Integer
@@ -36,18 +52,20 @@ Sub ReadEntries
 	Dim rowValue As String
 	rowValue = timeHelper.GetText(timeDateColumn, i)
 	Do While (&quot;&quot; &lt;&gt; rowValue) OR (i &lt; (timeFirstEntryRow+timeMaxEntries))
-		Dim entry as Object
-		entry = CalcRowEntry(timeHelper, i)
+		Dim entry, category as Object
+		entry = model.CreateEntry(timeHelper, i)
 		If entry.HasValues() Then
-			Dim typeValue, collapsedValue, sumValue As String
+			Dim typeValue As String
+			Dim sumValue as Integer
 			typeValue = timeHelper.GetText(timeTypeColumn, i)
-			If workTypes.IsCollapsed(typeValue) Then
+			category = model.GetCategory(typeValue)
+			If category.grouped Then
 				sumValue = timeHelper.GetText(timeTimeColumn, i)
 			Else
 				sumValue = entry.time
 				model.AddEntry(entry)
 			End If
-			workTypes.AddEffort(sumValue, typeValue, entry)
+			model.AddEffort(sumValue, typeValue, entry)
 		End If
 		&apos; increment
 		i = i+1
@@ -61,14 +79,14 @@ End Sub
 
 Sub AddCollapsedEntries
 	Dim row As Integer
-	For row = 0 To workTypes.TypesSize-1
+	For row = 0 To model.CategoriesSize-1
 		Dim typeValue As String
 		Dim t as Object
-		t = workTypes.WorkTypes(row)
+		t = model.Categories(row)
 		typeValue = t.title
 		If t.grouped Then
 			Dim entry As Object
-			entry = CalcTypeEntry(typeHelper, row+typeFirstWorkTypesRow)
+			entry = model.CreateCategoryEntry(t)
 			If entry.cost &lt;&gt; 0 Then
 				If t.min &lt;&gt; t.max Then
 					entry.datum = t.minText + &quot; - &quot; + t.maxText

@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="StructWorkType" script:language="StarBasic">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Category" script:language="StarBasic">REM  *****  BASIC  *****
 Option Compatible
 Option ClassModule
 Option Explicit
 
-&apos;CONSTANTS
-&apos;Public Const typeMaxEntries = 100
-
 &apos;ATTRIBUTES	
-&apos;Public TypesSize, CollapsedSize, SeparateSize As Integer
 Public title As String
 Public grouped As Boolean
 Public row As Integer
@@ -17,8 +13,10 @@ Public min As Date
 Public minText as String
 Public max As Date
 Public maxText as String
-
-Public helper as Object
+Public effort as Integer
+Public factorEffort as Integer
+Public cost as Currency
+Public factorCost as Currency
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
@@ -26,6 +24,12 @@ Public Sub Class_Initialize
 	grouped = False
 	row = -1
 	max = 0
+	maxText = &quot;&quot;
 	min = 0
+	minText = &quot;&quot;
+	effort = 0
+	factorEffort = 0
+	cost = 0
+	factorCost = 0
 End Sub
 </script:module>

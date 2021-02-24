@@ -17,12 +17,11 @@
  <library:element library:name="ClassAccounting"/>
  <library:element library:name="Util"/>
  <library:element library:name="ClassDataProvider"/>
- <library:element library:name="StructCalcEntry"/>
+ <library:element library:name="TestCalcReader"/>
  <library:element library:name="StructAccEntry"/>
- <library:element library:name="StructWorkType"/>
+ <library:element library:name="CalcWriter"/>
  <library:element library:name="CalcModel"/>
  <library:element library:name="CalcReader"/>
  <library:element library:name="CalcEntry"/>
- <library:element library:name="CalcWriter"/>
- <library:element library:name="TestCalcReader"/>
+ <library:element library:name="Category"/>
 </library:library>

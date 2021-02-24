@@ -46,7 +46,7 @@ Sub AssertText(info, expected, actual as String)
 	If Not HasFailed Then
 		Success()
 		If expected &lt;&gt; actual Then
-			Fail(info, expected+&quot; &lt;&gt; &quot;+actual)
+			Fail(info, expected &amp; &quot; != &quot; &amp; actual)
 		End If
 	End If
 End Sub
@@ -55,7 +55,16 @@ Sub AssertNumber(info as String, expected, actual as Integer)
 	If Not HasFailed Then
 		Success()
 		If expected &lt;&gt; actual Then
-			Fail(info, expected+&quot; &lt;&gt; &quot;+actual)
+			Fail(info, expected &amp; &quot; != &quot; &amp; actual)
+		End If
+	End If
+End Sub
+
+Sub AssertBool(info as String, expected, actual as Boolean)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, expected &amp; &quot; != &quot; &amp; actual)
 		End If
 	End If
 End Sub
@@ -64,7 +73,7 @@ Sub AssertDate(info as String, expected, actual as Integer)
 	If Not HasFailed Then
 		Success()
 		If expected &lt;&gt; actual Then
-			Fail(info, expected+&quot; &lt;&gt; &quot;+actual)
+			Fail(info, expected &amp; &quot; != &quot; &amp; actual)
 		End If
 	End If
 End Sub
@@ -73,7 +82,7 @@ Sub AssertMoney(info as String, expected, actual as Currency)
 	If Not HasFailed Then
 		Success()
 		If expected &lt;&gt; actual Then
-			Fail(info, &quot;&quot;+expected+&quot; &lt;&gt; &quot;+actual)
+			Fail(info, &quot;&quot;+expected &amp; &quot; != &quot; &amp; actual)
 		End If
 	End If
 End Sub
@@ -93,7 +102,7 @@ Sub RunTests(cellHelper as Object)
 	
 	reader = new CalcReader
 	reader.Init(data)
-	reader.ReadEntries()
+	reader.ReadCalculation()
 	
 	AssertModel()
 	
@@ -106,23 +115,45 @@ Sub ReloadDataProvider(file as String)
 End Sub
 
 Sub AssertModel
-	AssertNumber(&quot;nr of entries: &quot;+reader.model.entriesSize, 6, reader.model.entriesSize)
+	Dim m as Object
+	m = reader.model
+	AssertNumber(&quot;nr of entries: &quot;+m.EntriesSize, 6, m.EntriesSize)
+	AssertNumber(&quot;nr of types: &quot;+m.CategoriesSize, 4, m.CategoriesSize)
+	AssertNumber(&quot;nr of grouped: &quot;+m.GroupedSize, 2, m.GroupedSize)
 	
-	AssertEntry(reader.model.GetEntry(0), &quot;24.01.2021&quot;, &quot;Coden&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, 675, 562.5)
-	AssertEntry(reader.model.GetEntry(1), &quot;11.01.2021&quot;, &quot;single default&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, 120, 100)
-	AssertEntry(reader.model.GetEntry(2), &quot;12.01.2021&quot;, &quot;single custom&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, 120, 120)
-	AssertEntry(reader.model.GetEntry(3), &quot;13.01.2021&quot;, &quot;single override&quot;, &quot;SFr. 70.00 / 60 Min.&quot;, 120, 140)
-	AssertEntry(reader.model.GetEntry(4), &quot;15.01.2021 - 17.01.2021&quot;, &quot;Facebook&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, 240, 240)
-	AssertEntry(reader.model.GetEntry(5), &quot;14.01.2021 - 16.01.2021&quot;, &quot;Standardschreiben&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, 240, 200)
+	AssertEntry(m.Entries(0), &quot;24.01.2021&quot;, &quot;Coden&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, 675, 562.5)
+	AssertEntry(m.Entries(1), &quot;11.01.2021&quot;, &quot;single default&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, 120, 100)
+	AssertEntry(m.Entries(2), &quot;12.01.2021&quot;, &quot;single custom&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, 120, 120)
+	AssertEntry(m.Entries(3), &quot;13.01.2021&quot;, &quot;single override&quot;, &quot;SFr. 70.00 / 60 Min.&quot;, 120, 140)
+	AssertEntry(m.Entries(4), &quot;15.01.2021 - 17.01.2021&quot;, &quot;Facebook&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, 240, 240)
+	AssertEntry(m.Entries(5), &quot;14.01.2021 - 16.01.2021&quot;, &quot;Standardschreiben&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, 240, 200)
 	
-	&apos;AssertNumber(&quot;nr of types: &quot;+reader.model.categoriesSize, 4, reader.model.categoriesSize)
+	AssertCategory(m.Categories(0), &quot;Inserat&quot;, False, &quot;12.01.2021&quot;, &quot;12.01.2021&quot;, 60, 60, 120, 120)
+	AssertCategory(m.Categories(1), &quot;Facebook&quot;, True, &quot;15.01.2021&quot;, &quot;17.01.2021&quot;, 60, 60, 240, 240)
+	AssertCategory(m.Categories(2), &quot;Standardschreiben&quot;, True, &quot;14.01.2021&quot;, &quot;16.01.2021&quot;, 60, 50, 240, 200)
+	AssertCategory(m.Categories(3), &quot;Varia&quot;, False, &quot;11.01.2021&quot;, &quot;24.01.2021&quot;, 60, 50, 915, 802.5)
+End Sub
+
+Sub AssertCategory(cat as Object, title as String, grouped as Boolean, min, max as String, factorEffort as Integer, factorCost as Currency, effort as Integer, cost as Currency)
+	If Not HasFailed Then
+		AssertText(&quot;cat[&quot;+title+&quot;].title&quot;, title, cat.title)
+		AssertBool(&quot;cat[&quot;+title+&quot;].grouped&quot;, grouped, cat.grouped)
+		AssertText(&quot;cat[&quot;+title+&quot;].min&quot;, min, cat.minText)
+		AssertText(&quot;cat[&quot;+title+&quot;].max&quot;, max, cat.maxText)
+		AssertNumber(&quot;cat[&quot;+title+&quot;].factorEffort&quot;, factorEffort, cat.factorEffort)
+		AssertMoney(&quot;cat[&quot;+title+&quot;].factorCost&quot;, factorCost, cat.factorCost)
+		AssertNumber(&quot;cat[&quot;+title+&quot;].effort&quot;, effort, cat.effort)
+		AssertMoney(&quot;cat[&quot;+title+&quot;].cost&quot;, cost, cat.cost)
+	End If
 End Sub
 
 Sub AssertEntry(entry as Object, datum, title, factor As String, time As Date, cost As Currency)
-	AssertText(&quot;entry.datum&quot;, datum, entry.datum)
-	AssertText(&quot;entry.title&quot;, title, entry.title)
-	AssertText(&quot;entry.factor&quot;, factor, entry.factor)
-	AssertDate(&quot;entry.time&quot;, time, entry.time)
-	AssertMoney(&quot;entry.cost&quot;, cost, entry.cost)
+	If Not HasFailed Then
+		AssertText(&quot;entry.datum&quot;, datum, entry.datum)
+		AssertText(&quot;entry.title&quot;, title, entry.title)
+		AssertText(&quot;entry.factor&quot;, factor, entry.factor)
+		AssertDate(&quot;entry.time&quot;, time, entry.time)
+		AssertMoney(&quot;entry.cost&quot;, cost, entry.cost)
+	End If
 End Sub
 </script:module>
