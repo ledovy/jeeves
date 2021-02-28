@@ -10,6 +10,7 @@ Public CategoriesSize, GroupedSize As Integer
 Public Categories(typeMaxEntries) as Object
 Public Entries(timeMaxEntries) as Object
 Public EntriesSize as Integer
+Public Data as Object
 
 
 &apos;CONSTRUCTOR
@@ -17,6 +18,7 @@ Public Sub Class_Initialize
 	EntriesSize = 0
 	CategoriesSize = 0
 	GroupedSize = 0
+	Data = new CalcData
 End Sub
 
 Public Sub AddEntry(entry As Object)
@@ -98,5 +100,20 @@ Public Function CreateCategory(helper as Object, row As Integer)
 	cat.factorCost = helper.GetMoney(typeCostColumn, row)
 	CreateCategory = cat
 End Function
+
+Public Function CreateData(helper as Object, file as String)
+	Dim data as new CalcData
+	data.customerName = helper.getText(masterValueColumn, masterCustomerNameRow)
+	data.customerCompany = helper.getText(masterValueColumn, masterCustomerCompanyRow)
+	data.customerEmail = helper.getText(masterValueColumn, masterCustomerEmailRow)
+	data.calculationTitle = helper.getText(masterValueColumn, masterCalculationTitleRow)
+	data.accountingTitle = helper.getText(masterValueColumn, masterAccountingTitleRow)
+	data.startDate = helper.getText(masterValueColumn, masterStartDateRow)
+	data.calculationDate = helper.getText(masterValueColumn, masterCalculationDateRow)
+	data.calculationDateValue = helper.GetDate(masterValueColumn, masterCalculationDateRow)
+	data.calculationYear = helper.getText(masterValueColumn, masterCalculationYearRow)
+	data.fileName = file
+	CreateData = data
+End Sub
 
 </script:module>

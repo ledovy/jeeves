@@ -90,15 +90,13 @@ End Sub
 &apos;Implement RunTests, but drop everything below this line
 
 Public Const testBasePath = &quot;/home/ledovy/git/jeeves/&quot;
-Public Const testDocAcme = testBasePath+&quot;integration-test/abrechnung-acme.ods&quot;
-Public Const testDocLedovy = testBasePath+&quot;integration-test/abrechnung-ledovy.ods&quot;
-Public Const testDocAccounting = testBasePath+&quot;integration-test/buchhaltung.ods&quot;
+Public Const testDoc = testBasePath+&quot;integration-test/abrechnung-calc.ods&quot;
 
 Public reader as Object
 Public data As Object
 
 Sub RunTests(cellHelper as Object)
-	ReloadDataProvider(testDocLedovy)
+	ReloadDataProvider(testDoc)
 	
 	reader = new CalcReader
 	reader.Init(data)
