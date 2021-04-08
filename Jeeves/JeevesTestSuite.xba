@@ -11,7 +11,8 @@ Public Const resultRowIntegrationTests 		= resultRowAllTests + resultRowHeight
 Public Const resultRowFindRowTests 		= resultRowAllTests + 2*resultRowHeight
 Public Const resultRowGetSetValueTests 	= resultRowAllTests + 3*resultRowHeight
 Public Const resultRowCalcReaderTests 	= resultRowAllTests + 4*resultRowHeight
-Public Const resultRowLastTests 		= resultRowAllTests + 4*resultRowHeight
+Public Const resultRowCalcWriterTests 	= resultRowAllTests + 5*resultRowHeight
+Public Const resultRowLastTests 		= resultRowAllTests + 5*resultRowHeight
 
 Private allTestsSucceeded, testsFailed as Integer
 Private failedInfo as String
@@ -28,6 +29,7 @@ Sub TestAll
 	TestFindRow()
 	TestGetSetValue()
 	TestCalcReader()
+	TestCalcWriter()
 	
 	WriteAllResult()
 End Sub
@@ -128,6 +130,21 @@ Sub ClearCalcReaderResults
 	Init()
 	Reset()
 	ClearTestResults(resultRowCalcReaderTests)
+End Sub
+
+&apos;TESTS: CalcWriter
+Sub TestCalcWriter
+	&apos;CalcWriter -&gt; Run
+	Init()
+	currentTest = New TestCalcWriter
+	RunCurrentTest(resultRowCalcWriterTests)
+End Sub
+
+Sub ClearCalcWriterResults
+	&apos;CalcWriter -&gt; Clear
+	Init()
+	Reset()
+	ClearTestResults(resultRowCalcWriterTests)
 End Sub
 
 &apos;METHODS

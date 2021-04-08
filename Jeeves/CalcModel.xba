@@ -112,8 +112,8 @@ Public Function CreateData(helper as Object, file as String)
 	data.calculationDate = helper.getText(masterValueColumn, masterCalculationDateRow)
 	data.calculationDateValue = helper.GetDate(masterValueColumn, masterCalculationDateRow)
 	data.calculationYear = helper.getText(masterValueColumn, masterCalculationYearRow)
-	data.fileName = file
+	data.fileName = helper.document.getLocation()&apos;file
 	CreateData = data
-End Sub
+End Function
 
 </script:module>

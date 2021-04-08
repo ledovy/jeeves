@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestCalcReader" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestCalcReader" script:language="StarBasic">REM  *****  BASIC  *****
 Option Compatible
 Option ClassModule
 Option Explicit
@@ -69,7 +69,7 @@ Sub AssertBool(info as String, expected, actual as Boolean)
 	End If
 End Sub
 
-Sub AssertDate(info as String, expected, actual as Integer)
+Sub AssertDate(info as String, expected, actual as Date)
 	If Not HasFailed Then
 		Success()
 		If expected &lt;&gt; actual Then
@@ -115,6 +115,20 @@ End Sub
 Sub AssertModel
 	Dim m as Object
 	m = reader.model
+	
+	Dim t as Date
+	t = Date()
+	AssertText(&quot;Data.customerName&quot;, &quot;Mikis Hofer&quot;, m.Data.customerName)
+	AssertText(&quot;Data.customerCompany&quot;, &quot;Ledovy Inc&quot;, m.Data.customerCompany)
+	AssertText(&quot;Data.customerEmail&quot;, &quot;mikis@ledovy.ch&quot;, m.Data.customerEmail)
+	AssertText(&quot;Data.calculationTitle&quot;, &quot;Jeeves&quot;, m.Data.calculationTitle)
+	AssertText(&quot;Data.accountingTitle&quot;, &quot;Coding&quot;, m.Data.accountingTitle)
+	AssertText(&quot;Data.startDate&quot;, &quot;06.01.2021&quot;, m.Data.startDate)
+	&apos;AssertText(&quot;Data.calculationDate&quot;, t, m.Data.calculationDate)
+	AssertDate(&quot;Data.calculationDateValue&quot;, t, m.Data.calculationDateValue)
+	AssertText(&quot;Data.calculationYear&quot;, &quot;&quot;+YEAR(t), m.Data.calculationYear)
+	AssertText(&quot;Data.fileName&quot;, &quot;file://&quot;+testDoc, m.Data.fileName)
+	
 	AssertNumber(&quot;nr of entries: &quot;+m.EntriesSize, 6, m.EntriesSize)
 	AssertNumber(&quot;nr of types: &quot;+m.CategoriesSize, 4, m.CategoriesSize)
 	AssertNumber(&quot;nr of grouped: &quot;+m.GroupedSize, 2, m.GroupedSize)

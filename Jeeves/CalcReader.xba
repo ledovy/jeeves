@@ -34,7 +34,7 @@ Public Sub ReadCalculation
 End Sub
 
 Sub ReadData
-	model.data = model.CreateData(timeHelper, &quot;filename?&quot;)
+	model.Data = model.CreateData(timeHelper, &quot;filename?&quot;)
 End Sub
 
 Sub ReadTypes

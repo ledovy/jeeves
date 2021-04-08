@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="CalcWriter" script:language="StarBasic">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
 
-Sub Main
-
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	
 End Sub
 </script:module>

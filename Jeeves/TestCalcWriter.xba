@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestCalcWriter" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+Private targetRow as Integer
+Private testsSucceeded as Integer
+Private failMessage as String
+Private failInfo as String
+Private helper as Object
+
+Public TestName as String
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	testsSucceeded = 0
+	failInfo = &quot;&quot;
+	failMessage = &quot;&quot;
+End Sub
+
+Public Sub Init(row as Integer)
+	targetRow = row
+	TestName = ReadTestName(targetRow)
+End Sub
+
+Private Sub Success
+	testsSucceeded = testsSucceeded + 1
+End Sub
+
+Private Sub Fail(info, msg as String)
+	failInfo = info
+	failMessage = msg
+End Sub
+
+Public Function HasFailed as Boolean
+	HasFailed = failInfo &lt;&gt; &quot;&quot; OR failMessage &lt;&gt; &quot;&quot;
+End Function
+
+Private Sub WriteResult
+	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
+End Sub
+
+Sub AssertText(info, expected, actual as String)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, expected &amp; &quot; != &quot; &amp; actual)
+		End If
+	End If
+End Sub
+
+Sub AssertNumber(info as String, expected, actual as Integer)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, expected &amp; &quot; != &quot; &amp; actual)
+		End If
+	End If
+End Sub
+
+Sub AssertBool(info as String, expected, actual as Boolean)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, expected &amp; &quot; != &quot; &amp; actual)
+		End If
+	End If
+End Sub
+
+Sub AssertDate(info as String, expected, actual as Date)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, expected &amp; &quot; != &quot; &amp; actual)
+		End If
+	End If
+End Sub
+
+Sub AssertMoney(info as String, expected, actual as Currency)
+	If Not HasFailed Then
+		Success()
+		If expected &lt;&gt; actual Then
+			Fail(info, &quot;&quot;+expected &amp; &quot; != &quot; &amp; actual)
+		End If
+	End If
+End Sub
+
+&apos;Implement RunTests, but drop everything below this line
+
+&apos;Public Const testBasePath = &quot;/home/ledovy/git/jeeves/&quot;
+&apos;Public Const testDoc = testBasePath+&quot;integration-test/abrechnung-calc.ods&quot;
+
+Public writer as Object
+
+Sub RunTests(cellHelper as Object)
+	
+	writer = new CalcWriter
+	&apos;reader.Init(data)
+	&apos;reader.ReadCalculation()
+	
+	&apos;AssertModel()
+	
+	WriteResult()
+End Sub
+</script:module>

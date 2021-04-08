@@ -25,4 +25,5 @@
  <library:element library:name="CalcEntry"/>
  <library:element library:name="Category"/>
  <library:element library:name="CalcData"/>
+ <library:element library:name="TestCalcWriter"/>
 </library:library>
