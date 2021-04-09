@@ -97,6 +97,7 @@ Public Sub LoadCalcHelper
 End Sub
 
 Public Sub LoadConfigHelper
+	&apos;TODO change source to cockpit
 	If Not IsEmpty(calcDoc) Then
 		configHelper = DocHelper(calcDoc, configSheetTitle)
 	Else

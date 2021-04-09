@@ -101,7 +101,7 @@ Public Function CreateCategory(helper as Object, row As Integer)
 	CreateCategory = cat
 End Function
 
-Public Sub CreateData(helper as Object)
+Public Sub ReadCalcData(helper as Object)
 	Data.customerName = helper.getText(masterValueColumn, masterCustomerNameRow)
 	Data.customerCompany = helper.getText(masterValueColumn, masterCustomerCompanyRow)
 	Data.customerEmail = helper.getText(masterValueColumn, masterCustomerEmailRow)
@@ -114,4 +114,11 @@ Public Sub CreateData(helper as Object)
 	Data.fileName = helper.document.getLocation()
 End Sub
 
+Public Sub ReadContactData(helper as Object)
+	contactFirstName = helper.getText(contactTitleRow, contactFirstNameRow)
+	contactLastName = helper.getText(contactTitleRow, contactLastNameRow)
+	contactAddress = helper.getText(contactTitleRow, contactAddressRow)
+	bankPc = helper.getText(bankTitleRow, bankPcRow)
+	bankIban = helper.getText(bankTitleRow, bankIbanRow)
+End Sub
 </script:module>

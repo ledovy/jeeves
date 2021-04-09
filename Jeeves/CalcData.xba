@@ -6,6 +6,7 @@ Option ClassModule
 Option Explicit
 
 &apos;ATTRIBUTES
+&apos;calculation-data
 Public customerName As String
 Public customerCompany As String
 Public customerEmail As String
@@ -16,6 +17,12 @@ Public calculationDate As String
 Public calculationDateValue As Date
 Public calculationYear As String
 Public fileName as String
+&apos;contact-data
+Public contactFirstName As String
+Public contactLastName As String
+Public contactAddress As String
+Public bankPc As String
+Public bankIban As String
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
@@ -29,5 +36,11 @@ Public Sub Class_Initialize
 	calculationDateValue = 0
 	calculationYear = &quot;&quot;
 	fileName = &quot;&quot;
+	
+	contactFirstName = &quot;&quot;
+	contactLastName = &quot;&quot;
+	contactAddress = &quot;&quot;
+	bankPc = &quot;&quot;
+	bankIban = &quot;&quot;
 End Sub
 </script:module>
