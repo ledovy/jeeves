@@ -101,19 +101,17 @@ Public Function CreateCategory(helper as Object, row As Integer)
 	CreateCategory = cat
 End Function
 
-Public Function CreateData(helper as Object, file as String)
-	Dim data as new CalcData
-	data.customerName = helper.getText(masterValueColumn, masterCustomerNameRow)
-	data.customerCompany = helper.getText(masterValueColumn, masterCustomerCompanyRow)
-	data.customerEmail = helper.getText(masterValueColumn, masterCustomerEmailRow)
-	data.calculationTitle = helper.getText(masterValueColumn, masterCalculationTitleRow)
-	data.accountingTitle = helper.getText(masterValueColumn, masterAccountingTitleRow)
-	data.startDate = helper.getText(masterValueColumn, masterStartDateRow)
-	data.calculationDate = helper.getText(masterValueColumn, masterCalculationDateRow)
-	data.calculationDateValue = helper.GetDate(masterValueColumn, masterCalculationDateRow)
-	data.calculationYear = helper.getText(masterValueColumn, masterCalculationYearRow)
-	data.fileName = helper.document.getLocation()&apos;file
-	CreateData = data
-End Function
+Public Sub CreateData(helper as Object)
+	Data.customerName = helper.getText(masterValueColumn, masterCustomerNameRow)
+	Data.customerCompany = helper.getText(masterValueColumn, masterCustomerCompanyRow)
+	Data.customerEmail = helper.getText(masterValueColumn, masterCustomerEmailRow)
+	Data.calculationTitle = helper.getText(masterValueColumn, masterCalculationTitleRow)
+	Data.accountingTitle = helper.getText(masterValueColumn, masterAccountingTitleRow)
+	Data.startDate = helper.getText(masterValueColumn, masterStartDateRow)
+	Data.calculationDate = helper.getText(masterValueColumn, masterCalculationDateRow)
+	Data.calculationDateValue = helper.GetDate(masterValueColumn, masterCalculationDateRow)
+	Data.calculationYear = helper.getText(masterValueColumn, masterCalculationYearRow)
+	Data.fileName = helper.document.getLocation()
+End Sub
 
 </script:module>

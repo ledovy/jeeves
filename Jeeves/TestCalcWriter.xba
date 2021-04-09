@@ -89,19 +89,89 @@ End Sub
 
 &apos;Implement RunTests, but drop everything below this line
 
-&apos;Public Const testBasePath = &quot;/home/ledovy/git/jeeves/&quot;
-&apos;Public Const testDoc = testBasePath+&quot;integration-test/abrechnung-calc.ods&quot;
+Public Const testBasePath = &quot;/home/ledovy/git/jeeves/&quot;
+Public Const testFile = &quot;abrechnung-calc.ods&quot;
+Public Const testOriginal = testBasePath+&quot;integration-test/vorlage/&quot;+testFile
+Public Const testDoc = testBasePath+&quot;integration-test/abrechnung-calc-writer.ods&quot;
 
-Public writer as Object
+Dim writer as Object
+Dim data As Object
+Dim model as Object
 
 Sub RunTests(cellHelper as Object)
+	PrepareTest()
+	
+	Dim reader as Object
+	reader = new CalcReader
+	reader.Init(data)
+	reader.ReadCalculation()
+	model = reader.model
 	
 	writer = new CalcWriter
-	&apos;reader.Init(data)
-	&apos;reader.ReadCalculation()
+	writer.Init(data)
+	writer.WriteCalculation(model)
 	
-	&apos;AssertModel()
+	AssertCalcSheet()
 	
 	WriteResult()
+	data.CloseDocs()
+End Sub
+
+Sub PrepareTest
+	If FileExists(testDoc) Then 
+		Kill(testDoc)
+	End If
+	FileCopy(testOriginal, testDoc)
+	ReloadDataProvider(testDoc)
+End Sub
+
+Sub ReloadDataProvider(file as String)
+	data = new ClassDataProvider
+	data.InitTest(LoadDocument(file), file, &quot;&quot;)&apos;testDocAccounting)
+End Sub
+
+Sub AssertCalcSheet
+	AssertCell(&quot;customerName&quot;, &quot;Mikis Hofer&quot;, 0, 0)
+	AssertCell(&quot;companyName&quot;, &quot;Ledovy Inc&quot;, 0, 1)
+	AssertCell(&quot;customerMail&quot;, &quot;mikis@ledovy.ch&quot;, 0, 2)
+	
+	AssertRange(&quot;calcTitle&quot;, &quot;Ledovy Inc | Abrechnung Jeeves&quot;, &quot;A6&quot;)
+	&apos;AssertRange(&quot;calcDatum&quot;, &quot;Datum: &quot; + DATE(), &quot;A7&quot;)
+	
+	AssertRow(0, &quot;11.01.2021&quot;, &quot;single default&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;02:00&quot;, &quot;SFr. 100.00&quot;)
+	AssertRow(1, &quot;12.01.2021&quot;, &quot;single custom&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, &quot;02:00&quot;, &quot;SFr. 120.00&quot;)
+	AssertRow(2, &quot;13.01.2021&quot;, &quot;single override&quot;, &quot;SFr. 70.00 / 60 Min.&quot;, &quot;02:00&quot;, &quot;SFr. 140.00&quot;)
+	AssertRow(3, &quot;14.01.2021 - 16.01.2021&quot;, &quot;Standardschreiben&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;04:00&quot;, &quot;SFr. 200.00&quot;)
+	AssertRow(4, &quot;15.01.2021 - 17.01.2021&quot;, &quot;Facebook&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, &quot;04:00&quot;, &quot;SFr. 240.00&quot;)
+	AssertRow(5, &quot;24.01.2021&quot;, &quot;Coden&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;11:15&quot;, &quot;SFr. 562.50&quot;)
+	
+	AssertCell(&quot;total&quot;, &quot;SFr. 1&apos;362.50&quot;, 4, calcStartRow+6)
+	
+	&apos;AssertCell(&quot;contactPC&quot;, &quot;90-123456-7&quot;, calcStartRow+6+calcBankPcOffset, 1)
+	&apos;AssertCell(&quot;contactIBAN&quot;, &quot;CH6500000000901234567&quot;, calcStartRow+6+calcBankIbanOffset, 1)
+	&apos;AssertCell(&quot;contactName&quot;, &quot;Mia Muster; Musterstrasse 12, 3400 Musterlingen&quot;, calcStartRow+6+calcBankAddressOffset, 1)
+	&apos;AssertCell(&quot;contactGreeting&quot;, &quot;Mia&quot;, calcStartRow+6+calcFirstNameOffset, 1)
+End Sub
+
+Sub AssertRow(i as Integer, datum, title, factor, time, cost as String)
+	Dim row as Integer
+	row = calcStartRow+i
+	AssertCell(&quot;entry &quot;+row+&quot;:datum&quot;, datum, 0, row)
+	AssertCell(&quot;entry &quot;+row+&quot;:title&quot;, title, 1, row)
+	AssertCell(&quot;entry &quot;+row+&quot;:factor&quot;, factor, 2, row)
+	AssertCell(&quot;entry &quot;+row+&quot;:time&quot;, time, 3, row)
+	AssertCell(&quot;entry &quot;+row+&quot;:cost&quot;, cost, 4, row)
+End Sub
+
+Sub AssertCell(info, expected as String, column, row as Integer)
+	Dim actual as String
+	actual = data.calcHelper.GetText(column, row)
+	assertText(info, expected, actual)
+End Sub
+
+Sub AssertRange(info, expected, range as String)
+	Dim actual as String
+	actual = data.calcHelper.GetRangeText(range)
+	assertText(info, expected, actual)
 End Sub
 </script:module>

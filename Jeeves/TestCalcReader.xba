@@ -90,13 +90,15 @@ End Sub
 &apos;Implement RunTests, but drop everything below this line
 
 Public Const testBasePath = &quot;/home/ledovy/git/jeeves/&quot;
-Public Const testDoc = testBasePath+&quot;integration-test/abrechnung-calc.ods&quot;
+Public Const testFile = &quot;abrechnung-calc.ods&quot;
+Public Const testOriginal = testBasePath+&quot;integration-test/vorlage/&quot;+testFile
+Public Const testDoc = testBasePath+&quot;integration-test/abrechnung-calc-reader.ods&quot;
 
 Public reader as Object
 Public data As Object
 
 Sub RunTests(cellHelper as Object)
-	ReloadDataProvider(testDoc)
+	PrepareTest()
 	
 	reader = new CalcReader
 	reader.Init(data)
@@ -105,11 +107,20 @@ Sub RunTests(cellHelper as Object)
 	AssertModel()
 	
 	WriteResult()
+	data.CloseDocs()
+End Sub
+
+Sub PrepareTest
+	If FileExists(testDoc) Then 
+		Kill(testDoc)
+	End If
+	FileCopy(testOriginal, testDoc)
+	ReloadDataProvider(testDoc)
 End Sub
 
 Sub ReloadDataProvider(file as String)
 	data = new ClassDataProvider
-	data.InitTest(LoadDocument(file), file, testDocAccounting)
+	data.InitTest(LoadDocument(file), file, &quot;&quot;)&apos;testDocAccounting)
 End Sub
 
 Sub AssertModel

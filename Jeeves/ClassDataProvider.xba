@@ -56,6 +56,22 @@ Public Sub InitCalculationData
 	LoadConfiguration()
 End Sub
 
+Public Sub CloseDocs
+	CloseHelper(timeHelper)
+	CloseHelper(typeHelper)
+	CloseHelper(calcHelper)
+	CloseHelper(configHelper)
+	CloseHelper(contactHelper)
+	CloseHelper(accHelper)
+	CloseHelper(accCustomerHelper)
+End Sub
+
+Public Sub CloseHelper(helper as Object)
+	If Not IsNull(helper) Then
+		helper.CloseDoc()
+	End If
+End Sub
+
 Public Sub LoadTimeHelper
 	If Not IsEmpty(calcDoc) Then
 		timeHelper = DocHelper(calcDoc, timeSheetTitle)

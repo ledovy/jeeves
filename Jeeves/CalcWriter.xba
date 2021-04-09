@@ -5,8 +5,84 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
+
+Dim calcHelper as Object
+Dim config as Object
+Dim model as Object
+Dim currentTargetRow As Integer
+
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
-	
+	currentTargetRow = calcStartRow
+End Sub
+
+Public Sub Init(dataProvider as Object)
+	&apos;dataProvider.LoadCalcHelper()
+	dataProvider.InitCalculationData()
+	calcHelper = dataProvider.calcHelper
+	config = dataProvider.config
+End Sub
+
+Public Sub WriteCalculation(m as Object)
+	model = m
+	ClearEntries()
+	WriteEntries()
+	WriteSummary()
+	calcHelper.SaveDoc()
+End Sub
+
+Public Sub ClearEntries
+	Dim endRow, rows As Integer
+	endRow = calcHelper.FindRow(calcFactorColumn, calcStartRow, &quot;Total: &quot;, True)
+	rows = endRow-calcStartRow
+	If rows &gt; 0 Then
+		calcHelper.RemoveRows(calcStartRow, rows)
+	End If
+End Sub
+
+Sub WriteEntries
+	Dim i as Integer
+	For i=0 To model.EntriesSize-1
+		InsertRow(model.Entries(i))
+	Next i
+	calcHelper.SortRange(calcDateColumn, calcDateColumn, calcStartRow, calcCostColumn, currentTargetRow)
+End Sub
+
+Sub InsertRow(entry As Object)
+	If (entry.datum &lt;&gt; &quot;&quot;) OR (entry.title &lt;&gt; &quot;&quot;) OR (entry.time &lt;&gt; 0) OR (entry.cost &lt;&gt; 0) Then
+		calcHelper.InsertRows(currentTargetRow, 1)
+		WriteRow(currentTargetRow, entry)
+		currentTargetRow = currentTargetRow + 1
+	End If
+End Sub
+
+Sub WriteRow (rowIndex As Integer, entry as Object)
+		calcHelper.SetText(calcDateColumn, rowIndex, entry.datum)
+		calcHelper.SetText(calcNameColumn, rowIndex, entry.title)
+		calcHelper.SetText(calcFactorColumn, rowIndex, entry.factor)
+		Dim timeValue as Integer
+		timeValue = entry.time
+		calcHelper.SetFormula(calcTimeColumn, rowIndex, &quot;=&quot;+timeValue+&quot;/(60*24)&quot;)
+		calcHelper.SetFormatTime(calcTimeColumn, rowIndex)
+		calcHelper.SetMoney(calcCostColumn, rowIndex, entry.cost)
+End Sub
+
+Sub WriteSummary
+	calcHelper.SetText(0, 0, model.Data.customerName)
+	calcHelper.SetText(0, 1, model.Data.customerCompany)
+	calcHelper.SetText(0, 2, model.Data.customerEmail)
+	&apos;header
+	calcHelper.SetRangeText(&quot;A6&quot;, model.Data.customerCompany + &quot; | Abrechnung &quot; + model.Data.calculationTitle)
+	calcHelper.SetRangeText(&quot;A7&quot;, &quot;Datum: &quot; + model.Data.calculationDate)
+	&apos;time sum
+	If config.ShowTimeSum Then
+		calcHelper.SetFormula(calcTimeColumn, currentTargetRow, &quot;=SUM(D&quot;+(calcStartRow+1)+&quot;:D&quot;+(currentTargetRow)+&quot;)&quot;)
+		calcHelper.SetFormatTime(calcTimeColumn, currentTargetRow)
+	End If
+	&apos;cost sum
+	If config.ShowCostSum Then
+		calcHelper.SetFormula(calcCostColumn, currentTargetRow, &quot;=SUM(E&quot;+(calcStartRow+1)+&quot;:E&quot;+(currentTargetRow)+&quot;)&quot;)
+		calcHelper.SetFormatMoney(calcCostColumn, currentTargetRow)
+	End If
 End Sub
 </script:module>

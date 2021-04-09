@@ -8,12 +8,12 @@ Option Explicit
 &apos;ATTRIBUTES
 Dim timeHelper, typeHelper as Object&apos;, calcHelper as Object
 Dim config, masterData, contactData As Object
-Dim currentTargetRow As Integer
+&apos;Dim currentTargetRow As Integer
 Dim model as Object
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
-	currentTargetRow = calcStartRow
+&apos;	currentTargetRow = calcStartRow
 	model = new CalcModel
 End Sub
 
@@ -24,7 +24,7 @@ Public Sub Init(dataProvider as Object)
 	
 	config = dataProvider.config
 	masterData = dataProvider.masterData
-	currentTargetRow = calcStartRow
+&apos;	currentTargetRow = calcStartRow
 End Sub
 
 Public Sub ReadCalculation
@@ -34,7 +34,7 @@ Public Sub ReadCalculation
 End Sub
 
 Sub ReadData
-	model.Data = model.CreateData(timeHelper, &quot;filename?&quot;)
+	model.CreateData(timeHelper)
 End Sub
 
 Sub ReadTypes
