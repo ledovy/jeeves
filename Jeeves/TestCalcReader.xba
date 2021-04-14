@@ -111,16 +111,13 @@ Sub RunTests(cellHelper as Object)
 End Sub
 
 Sub PrepareTest
-	If FileExists(testDoc) Then 
-		Kill(testDoc)
-	End If
-	FileCopy(testOriginal, testDoc)
+	PrepareTestFile(testOriginal, testDoc)
 	ReloadDataProvider(testDoc)
 End Sub
 
 Sub ReloadDataProvider(file as String)
 	data = new ClassDataProvider
-	data.InitTest(LoadDocument(file), file, &quot;&quot;)&apos;testDocAccounting)
+	data.InitTest(LoadDocument(file), file, &quot;&quot;)
 End Sub
 
 Sub AssertModel

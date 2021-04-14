@@ -42,12 +42,22 @@ Private Sub WriteResult
 	WriteTestResult(targetRow, testsSucceeded, failInfo, failMessage)
 End Sub
 
+Public Const testPathBase = &quot;/home/ledovy/git/jeeves/&quot;
+Public Const testPathTemplate = &quot;integration-test/vorlage/&quot;
+Public Const testPathTarget = &quot;integration-test/&quot;
 &apos;Implement RunTests, but drop everything below this line
 
-Public Const testBasePath = &quot;/home/ledovy/git/jeeves/&quot;
-Public Const testDocAcme = testBasePath+&quot;integration-test/abrechnung-acme.ods&quot;
-Public Const testDocLedovy = testBasePath+&quot;integration-test/abrechnung-ledovy.ods&quot;
-Public Const testDocAccounting = testBasePath+&quot;integration-test/buchhaltung.ods&quot;
+Public Const docAcme = &quot;abrechnung-acme.ods&quot;
+Public Const docLedovy = &quot;abrechnung-ledovy.ods&quot;
+Public Const docAcc = &quot;buchhaltung.ods&quot;
+
+Public Const templateAcme = testPathBase+testPathTemplate+docAcme
+Public Const templateLedovy = testPathBase+testPathTemplate+docLedovy
+Public Const templateAcc = testPathBase+testPathTemplate+docAcc
+
+Public Const testDocAcme = testPathBase+testPathTarget+docAcme
+Public Const testDocLedovy = testPathBase+testPathTarget+docLedovy
+Public Const testDocAccounting = testPathBase+testPathTarget+docAcc
 
 Public calculation as Object
 Public accounting as Object
@@ -57,6 +67,9 @@ Dim calcTotalRow as Integer
 Sub RunTests(cellHelper as Object)
 	helper = cellHelper
 	
+	PrepareTestFile(templateAcme, testDocAcme)
+	PrepareTestFile(templateLedovy, testDocLedovy)
+	PrepareTestFile(templateAcc, testDocAccounting)
 	ReloadDataProvider(testDocLedovy)
 	InitTestCalculation()
 	If Not HasFailed Then

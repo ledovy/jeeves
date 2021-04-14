@@ -87,12 +87,14 @@ Sub AssertMoney(info as String, expected, actual as Currency)
 	End If
 End Sub
 
+Public Const testPathBase = &quot;/home/ledovy/git/jeeves/&quot;
+Public Const testPathTemplate = &quot;integration-test/vorlage/&quot;
+Public Const testPathTarget = &quot;integration-test/&quot;
 &apos;Implement RunTests, but drop everything below this line
 
-Public Const testBasePath = &quot;/home/ledovy/git/jeeves/&quot;
 Public Const testFile = &quot;abrechnung-calc.ods&quot;
-Public Const testOriginal = testBasePath+&quot;integration-test/vorlage/&quot;+testFile
-Public Const testDoc = testBasePath+&quot;integration-test/abrechnung-calc-writer.ods&quot;
+Public Const testOriginal = testPathBase+testPathTemplate+testFile
+Public Const testDoc = testPathBase+testPathTarget+&quot;abrechnung-calc-writer.ods&quot;
 
 Dim writer as Object
 Dim data As Object
@@ -118,10 +120,7 @@ Sub RunTests(cellHelper as Object)
 End Sub
 
 Sub PrepareTest
-	If FileExists(testDoc) Then 
-		Kill(testDoc)
-	End If
-	FileCopy(testOriginal, testDoc)
+	PrepareTestFile(testOriginal, testDoc)
 	ReloadDataProvider(testDoc)
 End Sub
 

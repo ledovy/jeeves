@@ -98,6 +98,13 @@ Public Function LoadDocument(path as String)
     LoadDocument = StarDesktop.loadComponentFromURL(ConvertToURL(path), &quot;_blank&quot;, 0, properties())
 End Function
 
+Public Sub PrepareTestFile(template, target as String)
+	If FileExists(target) Then 
+		Kill(target)
+	End If
+	FileCopy(template, target)
+End Sub
+
 Public Sub ShowGreetings
 	Dim t as Date
 	t = Now()
