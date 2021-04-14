@@ -87,12 +87,14 @@ Sub AssertMoney(info as String, expected, actual as Currency)
 	End If
 End Sub
 
+Public Const testPathBase = &quot;/home/ledovy/git/jeeves/&quot;
+Public Const testPathTemplate = &quot;test/templates/&quot;
+Public Const testPathTarget = &quot;test/results/&quot;
 &apos;Implement RunTests, but drop everything below this line
 
-Public Const testBasePath = &quot;/home/ledovy/git/jeeves/&quot;
 Public Const testFile = &quot;abrechnung-calc.ods&quot;
-Public Const testOriginal = testBasePath+&quot;integration-test/vorlage/&quot;+testFile
-Public Const testDoc = testBasePath+&quot;integration-test/abrechnung-calc-reader.ods&quot;
+Public Const testOriginal = testPathBase+testPathTemplate+testFile
+Public Const testDoc = testPathBase+testPathTarget+&quot;abrechnung-calc-reader.ods&quot;
 
 Public reader as Object
 Public data As Object

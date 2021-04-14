@@ -43,8 +43,8 @@ Private Sub WriteResult
 End Sub
 
 Public Const testPathBase = &quot;/home/ledovy/git/jeeves/&quot;
-Public Const testPathTemplate = &quot;integration-test/vorlage/&quot;
-Public Const testPathTarget = &quot;integration-test/&quot;
+Public Const testPathTemplate = &quot;test/templates/&quot;
+Public Const testPathTarget = &quot;test/results/&quot;
 &apos;Implement RunTests, but drop everything below this line
 
 Public Const docAcme = &quot;abrechnung-acme.ods&quot;
