@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="JeevesData" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;CONSTANTS
+
+&apos;ATTRIBUTES
+Public calcPath as String
+Public calcDoc as Object
+
+Public cockpitPath as String
+Public cockpitDoc as Object
+
+Public accPath as String
+Public accDoc as Object
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	
+End Sub
+
+&apos;abrechnung.ods
+Public Sub OpenCalcFile(file as Object)
+	If Not IsEmpty(file) Then
+		calcDoc = file
+		calcPath = file.getLocation()
+	Else
+		Info(&quot;no calcDoc: &quot;+file)
+	End If
+End Sub
+
+Public Sub CloseCalcFile
+	CloseFile(calcDoc)
+End Sub
+
+Public Sub OpenCalcPath(path as String)
+	calcDoc = LoadDocument(path)
+	calcPath = path
+End Sub
+
+&apos;sheets
+Public Function GetTimeHelper as Object
+	If Not IsEmpty(calcDoc) Then
+		GetTimeHelper = DocHelper(calcDoc, timeSheetTitle)
+	Else
+		Info(&quot;no calcDoc: &quot;+calcPath)
+	End If
+End Function
+
+Public Function GetTypeHelper as Object
+	If Not IsEmpty(calcDoc) Then
+		GetTypeHelper = DocHelper(calcDoc, typeSheetTitle)
+	Else
+		Info(&quot;no calcDoc: &quot;+calcPath)
+	End If
+End Function
+
+Public Function GetCalcHelper as Object
+	If Not IsEmpty(calcDoc) Then
+		GetCalcHelper = DocHelper(calcDoc, calcSheetTitle)
+	Else
+		Info(&quot;no calcDoc: &quot;+calcPath)
+	End If
+End Function
+
+Public Function GetConfigHelper as Object
+	If Not IsEmpty(cockpitDoc) Then
+		GetConfigHelper = DocHelper(cockpitDoc, configSheetTitle)
+	Else
+		Info(&quot;no cockpitDoc: &quot;+cockpitPath)
+	End If
+End Function
+
+Public Function GetContactHelper as Object
+	If Not IsEmpty(cockpitDoc) Then
+		GetContactHelper = DocHelper(cockpitDoc, contactSheetTitle)
+	Else
+		Info(&quot;no cockpitDoc: &quot;+cockpitPath)
+	End If
+End Function
+
+Public Function GetConfig as Object
+	Dim config as New ClassConfig
+	config.Init(GetConfigHelper())
+	GetConfig = config
+End Function
+
+&apos;jeeves-cockpit.ods
+Public Sub OpenCockpitFile(file as Object)
+	If Not IsEmpty(file) Then
+		cockpitDoc = file
+		cockpitPath = file.getLocation()
+	Else
+		Info(&quot;no cockpitDoc: &quot;+file)
+	End If
+End Sub
+
+Public Sub CloseCockpitFile
+	CloseFile(cockpitDoc)
+End Sub
+
+Public Sub OpenCockpitPath(path as String)
+	cockpitDoc = LoadDocument(path)
+	cockpitPath = path
+End Sub
+
+&apos;buchhaltung.ods
+Public Sub OpenAccFile(file as Object)
+	If Not IsEmpty(file) Then
+		accDoc = file
+		accPath = file.getLocation()
+	Else
+		Info(&quot;no accDoc: &quot;+file)
+	End If
+End Sub
+
+Public Sub CloseAccFile
+	CloseFile(accDoc)
+End Sub
+
+Public Sub OpenAccPath(path as String)
+	accDoc = LoadDocument(path)
+	accPath = path
+End Sub
+
+Public Sub CloseDocs
+	CloseCalcFile()
+	CloseCockpitFile()
+	CloseAccFile()
+End Sub
+
+Private Sub CloseFile(file as Object)
+	If Not IsNull(file) Then
+		file.Close(True)
+	End If
+End Sub
+</script:module>

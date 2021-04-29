@@ -91,7 +91,7 @@ Sub TestFindRow
 	&apos;FindRow -&gt; Run
 	Init()
 	
-	currentTest = New TestFindRow
+	currentTest = New CellHelperTestFindRow
 	RunCurrentTest(resultRowFindRowTests)
 End Sub
 
@@ -106,7 +106,7 @@ End Sub
 Sub TestGetSetValue
 	&apos;GetSetValue -&gt; Run
 	Init()
-	currentTest = New TestGetSetValue
+	currentTest = New CellHelperTestGetSetValue
 	RunCurrentTest(resultRowGetSetValueTests)
 End Sub
 
@@ -121,7 +121,7 @@ End Sub
 Sub TestCalcReader
 	&apos;CalcReader -&gt; Run
 	Init()
-	currentTest = New TestCalcReader
+	currentTest = New CalcReaderTest
 	RunCurrentTest(resultRowCalcReaderTests)
 End Sub
 
@@ -136,7 +136,7 @@ End Sub
 Sub TestCalcWriter
 	&apos;CalcWriter -&gt; Run
 	Init()
-	currentTest = New TestCalcWriter
+	currentTest = New CalcWriterTest
 	RunCurrentTest(resultRowCalcWriterTests)
 End Sub
 

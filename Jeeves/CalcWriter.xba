@@ -17,10 +17,8 @@ Public Sub Class_Initialize
 End Sub
 
 Public Sub Init(dataProvider as Object)
-	&apos;dataProvider.LoadCalcHelper()
-	dataProvider.InitCalculationData()
-	calcHelper = dataProvider.calcHelper
-	config = dataProvider.config
+	calcHelper = dataProvider.GetCalcHelper()
+	config = dataProvider.GetConfig()
 End Sub
 
 Public Sub WriteCalculation(m as Object)
@@ -28,6 +26,7 @@ Public Sub WriteCalculation(m as Object)
 	ClearEntries()
 	WriteEntries()
 	WriteSummary()
+	WriteCalculationContact()
 	calcHelper.SaveDoc()
 End Sub
 
@@ -84,5 +83,13 @@ Sub WriteSummary
 		calcHelper.SetFormula(calcCostColumn, currentTargetRow, &quot;=SUM(E&quot;+(calcStartRow+1)+&quot;:E&quot;+(currentTargetRow)+&quot;)&quot;)
 		calcHelper.SetFormatMoney(calcCostColumn, currentTargetRow)
 	End If
+End Sub
+
+Sub WriteCalculationContact
+	calcHelper.SetRangeText(&quot;A5&quot;,  model.Data.contactFirstName+&quot; &quot;+model.Data.contactLastName)
+	calcHelper.SetText(calcContactInfoColumn, currentTargetRow+calcBankPcOffset, &quot;PC: &quot;+model.Data.bankPc)
+	calcHelper.SetText(calcContactInfoColumn, currentTargetRow+calcBankIbanOffset, &quot;IBAN: &quot;+model.Data.bankIban)
+	calcHelper.SetText(calcContactInfoColumn, currentTargetRow+calcBankAddressOffset, &quot;Kontoinhaberin: &quot;+model.Data.contactFirstName+&quot; &quot;+model.Data.contactLastName+&quot;; &quot;+model.Data.contactAddress)
+	calcHelper.SetText(calcContactInfoColumn, currentTargetRow+calcFirstNameOffset, model.Data.contactFirstName)
 End Sub
 </script:module>

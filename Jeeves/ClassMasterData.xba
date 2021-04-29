@@ -5,6 +5,8 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
+&apos;deprecated: use CalcData
+
 &apos;ATTRIBUTES
 Private helper as Object
 Public customerName As String

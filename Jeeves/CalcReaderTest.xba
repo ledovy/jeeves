@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestCalcReader" script:language="StarBasic">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CalcReaderTest" script:language="StarBasic">REM  *****  BASIC  *****
 Option Compatible
 Option ClassModule
 Option Explicit
@@ -95,6 +95,7 @@ Public Const testPathTarget = &quot;test/results/&quot;
 Public Const testFile = &quot;abrechnung-calc.ods&quot;
 Public Const testOriginal = testPathBase+testPathTemplate+testFile
 Public Const testDoc = testPathBase+testPathTarget+&quot;abrechnung-calc-reader.ods&quot;
+Public Const testCockpit = testPathBase+testPathTemplate+&quot;jeeves-cockpit.ods&quot;
 
 Public reader as Object
 Public data As Object
@@ -118,8 +119,9 @@ Sub PrepareTest
 End Sub
 
 Sub ReloadDataProvider(file as String)
-	data = new ClassDataProvider
-	data.InitTest(LoadDocument(file), file, &quot;&quot;)
+	data = new JeevesData
+	data.OpenCalcPath(testDoc)
+	data.OpenCockpitPath(testCockpit)
 End Sub
 
 Sub AssertModel

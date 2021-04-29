@@ -6,8 +6,9 @@ Option ClassModule
 Option Explicit
 
 &apos;ATTRIBUTES
-Dim timeHelper, typeHelper as Object
-Dim config, masterData, contactData As Object
+Dim timeHelper as Object
+Dim typeHelper as Object
+Dim contactHelper as Object
 Dim model as Object
 
 &apos;CONSTRUCTOR
@@ -16,12 +17,9 @@ Public Sub Class_Initialize
 End Sub
 
 Public Sub Init(dataProvider as Object)
-	dataProvider.InitCalculationData()
-	timeHelper = dataProvider.timeHelper
-	typeHelper = dataProvider.typeHelper
-	
-	config = dataProvider.config
-	masterData = dataProvider.masterData
+	timeHelper = dataProvider.GetTimeHelper()
+	typeHelper = dataProvider.GetTypeHelper()
+	contactHelper = dataProvider.GetContactHelper()
 End Sub
 
 Public Sub ReadCalculation
@@ -32,6 +30,7 @@ End Sub
 
 Sub ReadData
 	model.ReadCalcData(timeHelper)
+	model.ReadContactData(contactHelper)
 End Sub
 
 Sub ReadTypes

@@ -8,6 +8,7 @@ Public dataProvider As Object
 
 
 Sub ReloadDataProvider
+	&apos;TODO: replace ClassDataProvider with JeevesData
 	dataProvider = new ClassDataProvider
 	dataProvider.Init(ThisComponent)
 End Sub
@@ -97,6 +98,7 @@ End Sub
 
 Sub InitCalculation
 	ReloadDataProvider()
+	&apos;TODO: use CalcReader/-Writer
 	calculation = new ClassCalculation
 	calculation.Init(dataProvider)
 End Sub
@@ -110,6 +112,7 @@ End Sub
 
 Sub InitAccounting
 	ReloadDataProvider()
+	&apos;TODO: create new AccWriter
 	accounting = new ClassAccounting
 	accounting.Init(dataProvider)
 End Sub

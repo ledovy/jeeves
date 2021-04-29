@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ClassCellHelper" script:language="StarBasic">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CellHelper" script:language="StarBasic">REM  *****  BASIC  *****
 Option Compatible
 Option ClassModule
 Option Explicit
@@ -188,6 +188,7 @@ Public Sub SortRange(sortColumn, startColumn, startRow, endColumn, endRow as Int
 End Sub
 
 Public Sub CloseDoc
+	&apos;deprecated: maybe other helpers are still open
     document.Close(True)
 End Sub
 

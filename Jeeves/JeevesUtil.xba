@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Util" script:language="StarBasic">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="JeevesUtil" script:language="StarBasic">REM  *****  BASIC  *****
 
 Public Sub Main
 	Info(&quot;Jeeves v2.1.1-SNAPSHOT&quot;)
@@ -28,7 +28,7 @@ Public Function SheetHelper(sheet as String) as Object
 End Function
 
 Public Function DocHelper(doc as Object, sheet as String) as Object
-	Dim h as new ClassCellHelper
+	Dim h as new CellHelper
 	h.Init(doc, sheet)
 	DocHelper = h
 End Function

@@ -75,7 +75,7 @@ Public Function CreateEntry(helper as Object, row As Integer)
 	CreateEntry = entry
 End Function
 
-Public Function CreateCategoryEntry(cat as Object)&apos;(helper as Object, row As Integer)
+Public Function CreateCategoryEntry(cat as Object)
 	Dim entry As New CalcEntry
 	entry.title = cat.title
 	Dim c as Integer
@@ -115,10 +115,10 @@ Public Sub ReadCalcData(helper as Object)
 End Sub
 
 Public Sub ReadContactData(helper as Object)
-	contactFirstName = helper.getText(contactTitleRow, contactFirstNameRow)
-	contactLastName = helper.getText(contactTitleRow, contactLastNameRow)
-	contactAddress = helper.getText(contactTitleRow, contactAddressRow)
-	bankPc = helper.getText(bankTitleRow, bankPcRow)
-	bankIban = helper.getText(bankTitleRow, bankIbanRow)
+	Data.contactFirstName = helper.getText(contactValueColumn, contactFirstNameRow)
+	Data.contactLastName = helper.getText(contactValueColumn, contactLastNameRow)
+	Data.contactAddress = helper.getText(contactValueColumn, contactAddressRow)
+	Data.bankPc = helper.getText(contactValueColumn, contactBankPcRow)
+	Data.bankIban = helper.getText(contactValueColumn, contactBankIbanRow)
 End Sub
 </script:module>

@@ -83,7 +83,17 @@ Public Const configDefaultFactorCostRow = 5
 Public Const configDefaultFactorTimeRow = 6
 
 
-Public Const accSheetTitle = &quot;Kontaktdaten&quot;
+Public Const contactSheetTitle = &quot;Kontaktdaten&quot;
+
+Public Const contactCaptionColumn = 0
+Public Const contactValueColumn = 1
+Public Const contactTitleRow = 0
+Public Const contactFirstNameRow = 1
+Public Const contactLastNameRow = 2
+Public Const contactAddressRow = 3
+Public Const contactBankTitleRow = 4
+Public Const contactBankPcRow = 5
+Public Const contactBankIbanRow = 6
 
 Public Const accCustomerColumn = 0
 Public Const accTitleColumn = 1

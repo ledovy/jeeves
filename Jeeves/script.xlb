@@ -9,15 +9,15 @@
  <library:element library:name="ClassTimeReset"/>
  <library:element library:name="JeevesApp"/>
  <library:element library:name="ClassContact"/>
- <library:element library:name="TestFindRow"/>
+ <library:element library:name="CalcWriterTest"/>
  <library:element library:name="DocInfo"/>
- <library:element library:name="TestGetSetValue"/>
- <library:element library:name="ClassCellHelper"/>
+ <library:element library:name="CellHelper"/>
+ <library:element library:name="CellHelperTestFindRow"/>
  <library:element library:name="ClassCalculation"/>
  <library:element library:name="ClassAccounting"/>
- <library:element library:name="Util"/>
+ <library:element library:name="JeevesData"/>
  <library:element library:name="ClassDataProvider"/>
- <library:element library:name="TestCalcReader"/>
+ <library:element library:name="CalcReaderTest"/>
  <library:element library:name="StructAccEntry"/>
  <library:element library:name="CalcWriter"/>
  <library:element library:name="CalcModel"/>
@@ -25,5 +25,6 @@
  <library:element library:name="CalcEntry"/>
  <library:element library:name="Category"/>
  <library:element library:name="CalcData"/>
- <library:element library:name="TestCalcWriter"/>
+ <library:element library:name="CellHelperTestGetSetValue"/>
+ <library:element library:name="JeevesUtil"/>
 </library:library>

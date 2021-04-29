@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TestCalcWriter" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CalcWriterTest" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
 Option Compatible
 Option ClassModule
 Option Explicit
@@ -95,9 +95,11 @@ Public Const testPathTarget = &quot;test/results/&quot;
 Public Const testFile = &quot;abrechnung-calc.ods&quot;
 Public Const testOriginal = testPathBase+testPathTemplate+testFile
 Public Const testDoc = testPathBase+testPathTarget+&quot;abrechnung-calc-writer.ods&quot;
+Public Const testCockpit = testPathBase+testPathTemplate+&quot;jeeves-cockpit.ods&quot;
 
 Dim writer as Object
 Dim data As Object
+Dim helper as Object
 Dim model as Object
 
 Sub RunTests(cellHelper as Object)
@@ -121,12 +123,14 @@ End Sub
 
 Sub PrepareTest
 	PrepareTestFile(testOriginal, testDoc)
-	ReloadDataProvider(testDoc)
+	ReloadDataProvider
 End Sub
 
-Sub ReloadDataProvider(file as String)
-	data = new ClassDataProvider
-	data.InitTest(LoadDocument(file), file, &quot;&quot;)&apos;testDocAccounting)
+Sub ReloadDataProvider
+	data = new JeevesData
+	data.OpenCalcPath(testDoc)
+	helper = data.getCalcHelper()
+	data.OpenCockpitPath(testCockpit)
 End Sub
 
 Sub AssertCalcSheet
@@ -146,10 +150,10 @@ Sub AssertCalcSheet
 	
 	AssertCell(&quot;total&quot;, &quot;SFr. 1&apos;362.50&quot;, 4, calcStartRow+6)
 	
-	&apos;AssertCell(&quot;contactPC&quot;, &quot;90-123456-7&quot;, calcStartRow+6+calcBankPcOffset, 1)
-	&apos;AssertCell(&quot;contactIBAN&quot;, &quot;CH6500000000901234567&quot;, calcStartRow+6+calcBankIbanOffset, 1)
-	&apos;AssertCell(&quot;contactName&quot;, &quot;Mia Muster; Musterstrasse 12, 3400 Musterlingen&quot;, calcStartRow+6+calcBankAddressOffset, 1)
-	&apos;AssertCell(&quot;contactGreeting&quot;, &quot;Mia&quot;, calcStartRow+6+calcFirstNameOffset, 1)
+	AssertCell(&quot;contactPC&quot;, &quot;PC: 90-123456-7&quot;, 0, calcStartRow+6+calcBankPcOffset)
+	AssertCell(&quot;contactIBAN&quot;, &quot;IBAN: CH6500000000901234567&quot;, 0, calcStartRow+6+calcBankIbanOffset)
+	AssertCell(&quot;contactName&quot;, &quot;Kontoinhaberin: Mia Muster; Musterstrasse 12, 3400 Musterlingen&quot;, 0, calcStartRow+6+calcBankAddressOffset)
+	AssertCell(&quot;contactGreeting&quot;, &quot;Mia&quot;, 0, calcStartRow+6+calcFirstNameOffset)
 End Sub
 
 Sub AssertRow(i as Integer, datum, title, factor, time, cost as String)
@@ -164,13 +168,13 @@ End Sub
 
 Sub AssertCell(info, expected as String, column, row as Integer)
 	Dim actual as String
-	actual = data.calcHelper.GetText(column, row)
+	actual = helper.GetText(column, row)
 	assertText(info, expected, actual)
 End Sub
 
 Sub AssertRange(info, expected, range as String)
 	Dim actual as String
-	actual = data.calcHelper.GetRangeText(range)
+	actual = helper.GetRangeText(range)
 	assertText(info, expected, actual)
 End Sub
 </script:module>

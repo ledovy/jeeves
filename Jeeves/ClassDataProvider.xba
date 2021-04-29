@@ -39,8 +39,8 @@ Public Sub Init(doc as Object)
 	accPath = config.PathAccounting
 End Sub
 
-Public Sub InitTest(doc as Object, calcFile, accFile as String)
-	calcDoc = doc
+Public Sub InitTest(calcFile, accFile as String)
+	calcDoc = LoadDocument(calcFile)
 	calcPath = calcFile
 	accPath = accFile
 End Sub

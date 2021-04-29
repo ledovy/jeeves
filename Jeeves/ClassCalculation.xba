@@ -5,6 +5,8 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
+&apos;deprecated: use CalcReader/-Writer
+
 &apos;ATTRIBUTES
 Dim timeHelper, typeHelper, calcHelper as Object
 Dim config, masterData, contactData, workTypes As Object
@@ -29,7 +31,6 @@ Public Sub Init(dataProvider as Object)
 	workTypes = dataProvider.types
 	currentTargetRow = calcStartRow
 End Sub
-
 
 &apos;CALCULATION
 

@@ -5,6 +5,8 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
+&apos;deprecated: use AccWriter
+
 &apos;CONSTANTS
 
 &apos;ATTRIBUTES
@@ -34,17 +36,17 @@ End Sub
 &apos;ACCOUNTING
 
 Public Sub UpdateAccounting
-	WriteCalculationContact()
+	&apos;WriteCalculationContact()
 	WriteCalculationToAccounting()
 End Sub
 
-Sub WriteCalculationContact
-	calcHelper.SetRangeText(&quot;A5&quot;,  contactData.contactFirstName+&quot; &quot;+contactData.contactLastName)
-	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcBankPcOffset, &quot;PC: &quot;+contactData.bankPc)
-	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcBankIbanOffset, &quot;IBAN: &quot;+contactData.bankIban)
-	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcBankAddressOffset, &quot;Kontoinhaberin: &quot;+contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot;; &quot;+contactData.contactAddress)
-	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcFirstNameOffset, contactData.contactFirstName)
-End Sub
+&apos;Sub WriteCalculationContact
+&apos;	calcHelper.SetRangeText(&quot;A5&quot;,  contactData.contactFirstName+&quot; &quot;+contactData.contactLastName)
+&apos;	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcBankPcOffset, &quot;PC: &quot;+contactData.bankPc)
+&apos;	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcBankIbanOffset, &quot;IBAN: &quot;+contactData.bankIban)
+&apos;	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcBankAddressOffset, &quot;Kontoinhaberin: &quot;+contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot;; &quot;+contactData.contactAddress)
+&apos;	calcHelper.SetText(calcContactInfoColumn, calcTotalRow+calcFirstNameOffset, contactData.contactFirstName)
+&apos;End Sub
 
 Dim lastRow As Integer
 Dim msg as String

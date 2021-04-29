@@ -5,16 +5,18 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
+&apos;deprecated: use CalcData
+
 &apos;CONSTANTS
-Public Const captionColumn = 0
-Public Const valueColumn = 1
-Public Const contactTitleRow = 0
-Public Const contactFirstNameRow = 1
-Public Const contactLastNameRow = 2
-Public Const contactAddressRow = 3
-Public Const bankTitleRow = 4
-Public Const bankPcRow = 5
-Public Const bankIbanRow = 6
+&apos;Public Const captionColumn = 0
+&apos;Public Const valueColumn = 1
+&apos;Public Const contactTitleRow = 0
+&apos;Public Const contactFirstNameRow = 1
+&apos;Public Const contactLastNameRow = 2
+&apos;Public Const contactAddressRow = 3
+&apos;Public Const bankTitleRow = 4
+&apos;Public Const bankPcRow = 5
+&apos;Public Const bankIbanRow = 6
 
 &apos;ATTRIBUTES
 Public contactFirstName As String
