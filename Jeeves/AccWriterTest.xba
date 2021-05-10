@@ -104,22 +104,47 @@ Public Const testPathTemplate = &quot;test/templates/&quot;
 Public Const testPathTarget = &quot;test/results/&quot;
 &apos;Implement RunTests, but drop everything below this line
 
-Public Const testFileCalc = &quot;abrechnung-ledovy.ods&quot;
-Public Const testOriginalCalc = testPathBase+testPathTemplate+testFileCalc
-Public Const testDocCalc = testPathBase+testPathTarget+&quot;abrechnung-acc-writer.ods&quot;
-Public Const testFileAcc = &quot;buchhaltung.ods&quot;
-Public Const testOriginalAcc = testPathBase+testPathTemplate+testFileAcc
-Public Const testDocAcc = testPathBase+testPathTarget+&quot;buchhaltung-acc-writer.ods&quot;
+Public Const acmeOriginal = testPathBase+testPathTemplate+&quot;abrechnung-acme.ods&quot;
+Public Const acmeDoc = testPathBase+testPathTarget+&quot;abrechnung-acc-acme.ods&quot;
+
+Public Const ledovyOriginal = testPathBase+testPathTemplate+&quot;abrechnung-ledovy.ods&quot;
+Public Const ledovyOriginal2 = testPathBase+testPathTemplate+&quot;abrechnung-ledovy2.ods&quot;
+Public Const ledovyDoc = testPathBase+testPathTarget+&quot;abrechnung-acc-ledovy.ods&quot;
+
+Public Const accOriginal = testPathBase+testPathTemplate+&quot;buchhaltung.ods&quot;
+Public Const accDoc = testPathBase+testPathTarget+&quot;buchhaltung-acc-writer.ods&quot;
+
 Public Const testCockpit = testPathBase+testPathTemplate+&quot;jeeves-cockpit.ods&quot;
 
 Dim writer as Object
 Dim data As Object
 Dim accHelper as Object
 Dim model as Object
+Dim today as String
 
 Sub RunTests(cellHelper as Object)
 	PrepareTest()
 	
+	AssertAccSheet()
+	
+	WriteResult()
+	data.CloseDocs()
+End Sub
+
+Sub PrepareTest
+	PrepareTestFile(acmeOriginal, acmeDoc)
+	PrepareTestFile(ledovyOriginal, ledovyDoc)
+	PrepareTestFile(accOriginal, accDoc)
+	ReloadDataProvider
+End Sub
+
+Sub ReloadDataProvider
+	data = new JeevesData
+	data.OpenCockpitPath(testCockpit)
+	data.OpenAccPath(accDoc)
+End Sub
+
+Sub ProcessAcc
 	Dim reader as Object
 	reader = new CalcReader
 	reader.Init(data)
@@ -129,33 +154,38 @@ Sub RunTests(cellHelper as Object)
 	writer = new AccWriter
 	writer.Init(data)
 	writer.WriteAccounting(model)
-	
-	AssertAccSheet()
-	
-	WriteResult()
-	data.CloseDocs()
-End Sub
-
-Sub PrepareTest
-	PrepareTestFile(testOriginalCalc, testDocCalc)
-	PrepareTestFile(testOriginalAcc, testDocAcc)
-	ReloadDataProvider
-End Sub
-
-Sub ReloadDataProvider
-	data = new JeevesData
-	data.OpenCalcPath(testDocCalc)
-	data.OpenAccPath(testDocAcc)
-	data.OpenCockpitPath(testCockpit)
 End Sub
 
 Sub AssertAccSheet
+	data.OpenCalcPath(ledovyDoc)
+	ProcessAcc()
+	
+	data.OpenCalcPath(acmeDoc)
+	ProcessAcc()
+	
 	accHelper = data.getAccHelper(&quot;2021&quot;)
 	
 	AssertRange(accHelper, &quot;Acc-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
-	AssertCell(accHelper, &quot;Acc-Customer&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
-	AssertAccRow(6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+testDocCalc)
+	AssertCell(accHelper, &quot;Acc-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc)
 	AssertAccRow(7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 8)
+	AssertAccRow(9, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
+	AssertAccRow(10, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc-Total&quot;, &quot;SFr. 2&apos;308.33&quot;, accCostColumn, 12)
+	
+	PrepareTestFile(ledovyOriginal2, ledovyDoc)
+	data.OpenCalcPath(ledovyDoc)
+	ProcessAcc()
+	
+	AssertRange(accHelper, &quot;Acc-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
+	AssertCell(accHelper, &quot;Acc-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;562.50&quot;, &quot;file://&quot;+ledovyDoc)
+	AssertAccRow(7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 8)
+	AssertAccRow(9, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
+	AssertAccRow(10, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc-Total&quot;, &quot;SFr. 2&apos;508.33&quot;, accCostColumn, 12)
 End Sub
 
 Sub AssertAccRow(row as Integer, title, calc, cost, file as String)
