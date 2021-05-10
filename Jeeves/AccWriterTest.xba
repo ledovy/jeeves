@@ -110,6 +110,7 @@ Public Const acmeDoc = testPathBase+testPathTarget+&quot;abrechnung-acc-acme.ods
 Public Const ledovyOriginal = testPathBase+testPathTemplate+&quot;abrechnung-ledovy.ods&quot;
 Public Const ledovyOriginal2 = testPathBase+testPathTemplate+&quot;abrechnung-ledovy2.ods&quot;
 Public Const ledovyDoc = testPathBase+testPathTarget+&quot;abrechnung-acc-ledovy.ods&quot;
+Public Const ledovyDoc2 = testPathBase+testPathTarget+&quot;abrechnung-acc-ledovy2.ods&quot;
 
 Public Const accOriginal = testPathBase+testPathTemplate+&quot;buchhaltung.ods&quot;
 Public Const accDoc = testPathBase+testPathTarget+&quot;buchhaltung-acc-writer.ods&quot;
@@ -119,6 +120,8 @@ Public Const testCockpit = testPathBase+testPathTemplate+&quot;jeeves-cockpit.od
 Dim writer as Object
 Dim data As Object
 Dim accHelper as Object
+Dim acmeHelper as Object
+Dim ledovyHelper as Object
 Dim model as Object
 Dim today as String
 
@@ -159,39 +162,73 @@ End Sub
 Sub AssertAccSheet
 	data.OpenCalcPath(ledovyDoc)
 	ProcessAcc()
+	accHelper = data.getAccHelper(&quot;2021&quot;)
+	&apos;acmeHelper = data.getAccHelper(&quot;ACME 2021&quot;)
+	&apos;ledovyHelper = data.getAccHelper(&quot;Ledovy Inc 2021&quot;)
+		
+	AssertRange(accHelper, &quot;Acc0-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
+	AssertCell(accHelper, &quot;Acc0-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(accHelper, 6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc)
+	AssertAccRow(accHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertAccRow(accHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc0-Total&quot;, &quot;Total&quot;, accCustomerColumn, 9)
+	AssertCell(accHelper, &quot;Acc0-Total&quot;, &quot;SFr. 1&apos;362.50&quot;, accCostColumn, 9)
+		
+	&apos;AssertRange(ledovyHelper, &quot;Acc0a-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen Ledovy Inc 2021&quot;, &quot;A1&quot;)
+	&apos;AssertCell(ledovyHelper, &quot;Acc0a-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	&apos;AssertAccRow(ledovyHelper, 6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc)
+	&apos;AssertAccRow(ledovyHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	&apos;AssertAccRow(ledovyHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	&apos;AssertCell(ledovyHelper, &quot;Acc0a-Total&quot;, &quot;Total&quot;, accCustomerColumn, 9)
+	&apos;AssertCell(ledovyHelper, &quot;Acc0a-Total&quot;, &quot;SFr. 1&apos;362.50&quot;, accCostColumn, 9)
 	
 	data.OpenCalcPath(acmeDoc)
 	ProcessAcc()
-	
-	accHelper = data.getAccHelper(&quot;2021&quot;)
-	
-	AssertRange(accHelper, &quot;Acc-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
-	AssertCell(accHelper, &quot;Acc-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
-	AssertAccRow(6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc)
-	AssertAccRow(7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-	AssertCell(accHelper, &quot;Acc-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 8)
-	AssertAccRow(9, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
-	AssertAccRow(10, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-	AssertCell(accHelper, &quot;Acc-Total&quot;, &quot;SFr. 2&apos;308.33&quot;, accCostColumn, 12)
+		
+	AssertRange(accHelper, &quot;Acc1-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
+	AssertCell(accHelper, &quot;Acc1-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(accHelper, 6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc)
+	AssertAccRow(accHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc1-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 8)
+	AssertAccRow(accHelper, 9, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
+	AssertAccRow(accHelper, 10, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc1-Total&quot;, &quot;Total&quot;, accCustomerColumn, 12)
+	AssertCell(accHelper, &quot;Acc1-Total&quot;, &quot;SFr. 2&apos;308.33&quot;, accCostColumn, 12)
 	
 	PrepareTestFile(ledovyOriginal2, ledovyDoc)
 	data.OpenCalcPath(ledovyDoc)
 	ProcessAcc()
 	
-	AssertRange(accHelper, &quot;Acc-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
-	AssertCell(accHelper, &quot;Acc-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
-	AssertAccRow(6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;562.50&quot;, &quot;file://&quot;+ledovyDoc)
-	AssertAccRow(7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-	AssertCell(accHelper, &quot;Acc-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 8)
-	AssertAccRow(9, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
-	AssertAccRow(10, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-	AssertCell(accHelper, &quot;Acc-Total&quot;, &quot;SFr. 2&apos;508.33&quot;, accCostColumn, 12)
+	AssertRange(accHelper, &quot;Acc2-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
+	AssertCell(accHelper, &quot;Acc2-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(accHelper, 6, &quot;Coding2&quot;, DATE(), &quot;SFr. 1&apos;562.50&quot;, &quot;file://&quot;+ledovyDoc)
+	AssertAccRow(accHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc2-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 8)
+	AssertAccRow(accHelper, 9, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
+	AssertAccRow(accHelper, 10, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc2-Total&quot;, &quot;Total&quot;, accCustomerColumn, 12)
+	AssertCell(accHelper, &quot;Acc2-Total&quot;, &quot;SFr. 2&apos;508.33&quot;, accCostColumn, 12)
+	
+	PrepareTestFile(ledovyOriginal, ledovyDoc2)
+	data.OpenCalcPath(ledovyDoc2)
+	ProcessAcc()
+	
+	AssertRange(accHelper, &quot;Acc2-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
+	AssertCell(accHelper, &quot;Acc2-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(accHelper, 6, &quot;Coding2&quot;, DATE(), &quot;SFr. 1&apos;562.50&quot;, &quot;file://&quot;+ledovyDoc)
+	AssertAccRow(accHelper, 7, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc2)
+	AssertAccRow(accHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc2-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 9)
+	AssertAccRow(accHelper, 10, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
+	AssertAccRow(accHelper, 11, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(accHelper, &quot;Acc2-Total&quot;, &quot;Total&quot;, accCustomerColumn, 13)
+	AssertCell(accHelper, &quot;Acc2-Total&quot;, &quot;SFr. 3&apos;870.83&quot;, accCostColumn, 13)
 End Sub
 
-Sub AssertAccRow(row as Integer, title, calc, cost, file as String)
-	AssertCell(accHelper, &quot;AccRow-title&quot;, title, accTitleColumn, row)
-	&apos;AssertCell(accHelper, &quot;AccRow-time&quot;, time, accTimeColumn, row)
-	AssertCell(accHelper, &quot;AccRow-cost&quot;, cost, accCostColumn, row)
-	AssertCell(accHelper, &quot;AccRow-file&quot;, file, accFileColumn, row)
+Sub AssertAccRow(helper as Object, row as Integer, title, calc, cost, file as String)
+	AssertCell(helper, &quot;AccRow&quot;+row+&quot;-title&quot;, title, accTitleColumn, row)
+	&apos;AssertCell(helper, &quot;AccRow&quot;+row+&quot;-time&quot;, time, accTimeColumn, row)
+	AssertCell(helper, &quot;AccRow&quot;+row+&quot;-cost&quot;, cost, accCostColumn, row)
+	AssertCell(helper, &quot;AccRow&quot;+row+&quot;-file&quot;, file, accFileColumn, row)
 End Sub
 </script:module>
