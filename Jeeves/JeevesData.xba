@@ -145,18 +145,6 @@ Public Function GetAccHelper(sheetName as String) as Object
 	End If
 End Function
 
-Public Sub LoadAccHelper
-	Dim sheetName as String
-	sheetName = masterData.calculationYear
-    If accDoc.Sheets.hasByName(sheetName) Then
-		accHelper = DocHelper(accDoc, sheetName)
-	Else
-		accDoc.Sheets.copyByName(templateSheetName, sheetName, 0)
-		accHelper = DocHelper(accDoc, sheetName)
-		accHelper.SetRangeText(&quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
-	End If
-End Sub
-
 Public Sub CloseDocs
 	CloseCalcFile()
 	CloseCockpitFile()

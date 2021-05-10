@@ -55,6 +55,7 @@ Public Function CalcTypeEntry(helper as Object, row As Integer)
 End Function
 
 Public Function AccRowEntry(helper as Object, row as Integer, masterData as Object)
+&apos;DEPRECATED
 	Dim entry As Object
 	entry = New StructAccEntry
 	entry.title = masterData.accountingTitle

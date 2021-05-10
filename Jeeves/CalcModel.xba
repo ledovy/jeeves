@@ -10,15 +10,19 @@ Public CategoriesSize, GroupedSize As Integer
 Public Categories(typeMaxEntries) as Object
 Public Entries(timeMaxEntries) as Object
 Public EntriesSize as Integer
+Public EntrySum as Currency
 Public Data as Object
+Public Accounting as Object
 
 
 &apos;CONSTRUCTOR
 Public Sub Class_Initialize
 	EntriesSize = 0
+	EntrySum = 0
 	CategoriesSize = 0
 	GroupedSize = 0
 	Data = new CalcData
+	Accounting = new AccEntry
 End Sub
 
 Public Sub AddEntry(entry As Object)
@@ -52,6 +56,7 @@ Public Sub AddEffort(effort As Integer, workType As String, entry As Object)
 			t.maxText = entry.datum
 		End If
 	End If
+	Accounting.cost = Accounting.cost + entry.cost
 End Sub
 
 Public Function GetCategory(title as String)
@@ -112,6 +117,12 @@ Public Sub ReadCalcData(helper as Object)
 	Data.calculationDateValue = helper.GetDate(masterValueColumn, masterCalculationDateRow)
 	Data.calculationYear = helper.getText(masterValueColumn, masterCalculationYearRow)
 	Data.fileName = helper.document.getLocation()
+	
+	Accounting.customer = Data.customerCompany
+	Accounting.title = Data.accountingTitle
+	Accounting.time = Data.calculationDateValue
+&apos;	cost = helper.GetMoney(calcCostColumn, row)
+	Accounting.filename = Data.fileName
 End Sub
 
 Public Sub ReadContactData(helper as Object)

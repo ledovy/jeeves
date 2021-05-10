@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="AccEntry" script:language="StarBasic">REM  *****  BASIC  *****
+Option Compatible
+Option ClassModule
+Option Explicit
+
+&apos;ATTRIBUTES
+Public customer as String
+Public title as String
+Public time as Date
+Public cost as Currency
+Public filename as String
+
+
+&apos;CONSTRUCTOR
+Public Sub Class_Initialize
+	customer = &quot;&quot;
+	title = &quot;&quot;
+	filename = &quot;&quot;
+	time = 0
+	cost = 0
+End Sub
+
+&apos;Public Sub Init(helper as Object, row as Integer, masterData as Object)
+&apos;	title = masterData.accountingTitle
+&apos;	time = masterData.calculationDateValue
+&apos;	cost = helper.GetMoney(calcCostColumn, row)
+&apos;	filename = masterData.fileName
+&apos;End Sub
+</script:module>

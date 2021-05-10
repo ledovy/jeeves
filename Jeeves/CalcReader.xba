@@ -26,6 +26,7 @@ Public Sub ReadCalculation
 	ReadData()
 	ReadTypes()
 	ReadEntries()
+	&apos;model.ReadAccounting()
 End Sub
 
 Sub ReadData

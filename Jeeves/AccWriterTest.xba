@@ -104,7 +104,7 @@ Public Const testPathTemplate = &quot;test/templates/&quot;
 Public Const testPathTarget = &quot;test/results/&quot;
 &apos;Implement RunTests, but drop everything below this line
 
-Public Const testFileCalc = &quot;abrechnung-calc.ods&quot;
+Public Const testFileCalc = &quot;abrechnung-ledovy.ods&quot;
 Public Const testOriginalCalc = testPathBase+testPathTemplate+testFileCalc
 Public Const testDocCalc = testPathBase+testPathTarget+&quot;abrechnung-acc-writer.ods&quot;
 Public Const testFileAcc = &quot;buchhaltung.ods&quot;
@@ -150,13 +150,18 @@ Sub ReloadDataProvider
 End Sub
 
 Sub AssertAccSheet
-	accHelper = data.getAccHelper(&quot;Jahresübersicht 2021&quot;)
+	accHelper = data.getAccHelper(&quot;2021&quot;)
 	
-	AssertCell(accHelper, &quot;Acc-Customer&quot;, &quot;Ledovy Inc&quot;, 0, 4)
-	&apos;AssertAccRow(5, &quot;job&quot;, &quot;rechnung&quot;, &quot;betrag&quot;)
+	AssertRange(accHelper, &quot;Acc-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
+	AssertCell(accHelper, &quot;Acc-Customer&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+testDocCalc)
+	AssertAccRow(7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
 End Sub
 
-Sub AssertAccRow(row as Integer, title, calc, money as String)
-
+Sub AssertAccRow(row as Integer, title, calc, cost, file as String)
+	AssertCell(accHelper, &quot;AccRow-title&quot;, title, accTitleColumn, row)
+	&apos;AssertCell(accHelper, &quot;AccRow-time&quot;, time, accTimeColumn, row)
+	AssertCell(accHelper, &quot;AccRow-cost&quot;, cost, accCostColumn, row)
+	AssertCell(accHelper, &quot;AccRow-file&quot;, file, accFileColumn, row)
 End Sub
 </script:module>
