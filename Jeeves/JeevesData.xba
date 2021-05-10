@@ -126,6 +126,37 @@ Public Sub OpenAccPath(path as String)
 	accPath = path
 End Sub
 
+Public Function GetAccHelper(sheetName as String) as Object
+	Dim helper as Object
+	If Not IsEmpty(accDoc) Then
+		If accDoc.Sheets.hasByName(sheetName) Then
+			helper = DocHelper(accDoc, sheetName)
+		Else
+			Dim model as New CalcModel
+			model.ReadContactData(GetContactHelper())
+			accDoc.Sheets.copyByName(templateSheetName, sheetName, 0)
+			helper = DocHelper(accDoc, sheetName)
+			helper.SetRangeText(&quot;A1&quot;, model.Data.contactFirstName+&quot; &quot;+model.Data.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
+			helper.SaveDoc()
+		End If
+		GetAccHelper = helper
+	Else
+		Info(&quot;no accDoc: &quot;+accPath)
+	End If
+End Function
+
+Public Sub LoadAccHelper
+	Dim sheetName as String
+	sheetName = masterData.calculationYear
+    If accDoc.Sheets.hasByName(sheetName) Then
+		accHelper = DocHelper(accDoc, sheetName)
+	Else
+		accDoc.Sheets.copyByName(templateSheetName, sheetName, 0)
+		accHelper = DocHelper(accDoc, sheetName)
+		accHelper.SetRangeText(&quot;A1&quot;, contactData.contactFirstName+&quot; &quot;+contactData.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
+	End If
+End Sub
+
 Public Sub CloseDocs
 	CloseCalcFile()
 	CloseCockpitFile()

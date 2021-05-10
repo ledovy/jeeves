@@ -12,7 +12,8 @@ Public Const resultRowFindRowTests 		= resultRowAllTests + 2*resultRowHeight
 Public Const resultRowGetSetValueTests 	= resultRowAllTests + 3*resultRowHeight
 Public Const resultRowCalcReaderTests 	= resultRowAllTests + 4*resultRowHeight
 Public Const resultRowCalcWriterTests 	= resultRowAllTests + 5*resultRowHeight
-Public Const resultRowLastTests 		= resultRowAllTests + 5*resultRowHeight
+Public Const resultRowAccWriterTests 	= resultRowAllTests + 6*resultRowHeight
+Public Const resultRowLastTests 		= resultRowAllTests + 6*resultRowHeight
 
 Private allTestsSucceeded, testsFailed as Integer
 Private failedInfo as String
@@ -30,6 +31,7 @@ Sub TestAll
 	TestGetSetValue()
 	TestCalcReader()
 	TestCalcWriter()
+	TestAccWriter()
 	
 	WriteAllResult()
 End Sub
@@ -145,6 +147,21 @@ Sub ClearCalcWriterResults
 	Init()
 	Reset()
 	ClearTestResults(resultRowCalcWriterTests)
+End Sub
+
+&apos;TESTS: AccWriter
+Sub TestAccWriter
+	&apos;AccWriter -&gt; Run
+	Init()
+	currentTest = New AccWriterTest
+	RunCurrentTest(resultRowAccWriterTests)
+End Sub
+
+Sub ClearAccWriterResults
+	&apos;AccWriter -&gt; Clear
+	Init()
+	Reset()
+	ClearTestResults(resultRowAccWriterTests)
 End Sub
 
 &apos;METHODS

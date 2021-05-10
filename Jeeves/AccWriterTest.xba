@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CalcWriterTest" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="AccWriterTest" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
 Option Compatible
 Option ClassModule
 Option Explicit
@@ -104,14 +104,17 @@ Public Const testPathTemplate = &quot;test/templates/&quot;
 Public Const testPathTarget = &quot;test/results/&quot;
 &apos;Implement RunTests, but drop everything below this line
 
-Public Const testFile = &quot;abrechnung-calc.ods&quot;
-Public Const testOriginal = testPathBase+testPathTemplate+testFile
-Public Const testDoc = testPathBase+testPathTarget+&quot;abrechnung-calc-writer.ods&quot;
+Public Const testFileCalc = &quot;abrechnung-calc.ods&quot;
+Public Const testOriginalCalc = testPathBase+testPathTemplate+testFileCalc
+Public Const testDocCalc = testPathBase+testPathTarget+&quot;abrechnung-acc-writer.ods&quot;
+Public Const testFileAcc = &quot;buchhaltung.ods&quot;
+Public Const testOriginalAcc = testPathBase+testPathTemplate+testFileAcc
+Public Const testDocAcc = testPathBase+testPathTarget+&quot;buchhaltung-acc-writer.ods&quot;
 Public Const testCockpit = testPathBase+testPathTemplate+&quot;jeeves-cockpit.ods&quot;
 
 Dim writer as Object
 Dim data As Object
-Dim calcHelper as Object
+Dim accHelper as Object
 Dim model as Object
 
 Sub RunTests(cellHelper as Object)
@@ -123,58 +126,37 @@ Sub RunTests(cellHelper as Object)
 	reader.ReadCalculation()
 	model = reader.model
 	
-	writer = new CalcWriter
+	writer = new AccWriter
 	writer.Init(data)
-	writer.WriteCalculation(model)
+	writer.WriteAccounting(model)
 	
-	AssertCalcSheet()
+	AssertAccSheet()
 	
 	WriteResult()
 	data.CloseDocs()
 End Sub
 
 Sub PrepareTest
-	PrepareTestFile(testOriginal, testDoc)
+	PrepareTestFile(testOriginalCalc, testDocCalc)
+	PrepareTestFile(testOriginalAcc, testDocAcc)
 	ReloadDataProvider
 End Sub
 
 Sub ReloadDataProvider
 	data = new JeevesData
-	data.OpenCalcPath(testDoc)
-	calcHelper = data.getCalcHelper()
+	data.OpenCalcPath(testDocCalc)
+	data.OpenAccPath(testDocAcc)
 	data.OpenCockpitPath(testCockpit)
 End Sub
 
-Sub AssertCalcSheet
-	AssertCell(calcHelper, &quot;customerName&quot;, &quot;Mikis Hofer&quot;, 0, 0)
-	AssertCell(calcHelper, &quot;companyName&quot;, &quot;Ledovy Inc&quot;, 0, 1)
-	AssertCell(calcHelper, &quot;customerMail&quot;, &quot;mikis@ledovy.ch&quot;, 0, 2)
+Sub AssertAccSheet
+	accHelper = data.getAccHelper(&quot;Jahresübersicht 2021&quot;)
 	
-	AssertRange(calcHelper, &quot;calcTitle&quot;, &quot;Ledovy Inc | Abrechnung Jeeves&quot;, &quot;A6&quot;)
-	&apos;AssertRange(calcHelper, &quot;calcDatum&quot;, &quot;Datum: &quot; + DATE(), &quot;A7&quot;)
-	
-	AssertRow(0, &quot;11.01.2021&quot;, &quot;single default&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;02:00&quot;, &quot;SFr. 100.00&quot;)
-	AssertRow(1, &quot;12.01.2021&quot;, &quot;single custom&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, &quot;02:00&quot;, &quot;SFr. 120.00&quot;)
-	AssertRow(2, &quot;13.01.2021&quot;, &quot;single override&quot;, &quot;SFr. 70.00 / 60 Min.&quot;, &quot;02:00&quot;, &quot;SFr. 140.00&quot;)
-	AssertRow(3, &quot;14.01.2021 - 16.01.2021&quot;, &quot;Standardschreiben&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;04:00&quot;, &quot;SFr. 200.00&quot;)
-	AssertRow(4, &quot;15.01.2021 - 17.01.2021&quot;, &quot;Facebook&quot;, &quot;SFr. 60.00 / 60 Min.&quot;, &quot;04:00&quot;, &quot;SFr. 240.00&quot;)
-	AssertRow(5, &quot;24.01.2021&quot;, &quot;Coden&quot;, &quot;SFr. 50.00 / 60 Min.&quot;, &quot;11:15&quot;, &quot;SFr. 562.50&quot;)
-	
-	AssertCell(calcHelper, &quot;total&quot;, &quot;SFr. 1&apos;362.50&quot;, 4, calcStartRow+6)
-	
-	AssertCell(calcHelper, &quot;contactPC&quot;, &quot;PC: 90-123456-7&quot;, 0, calcStartRow+6+calcBankPcOffset)
-	AssertCell(calcHelper, &quot;contactIBAN&quot;, &quot;IBAN: CH6500000000901234567&quot;, 0, calcStartRow+6+calcBankIbanOffset)
-	AssertCell(calcHelper, &quot;contactName&quot;, &quot;Kontoinhaberin: Mia Muster; Musterstrasse 12, 3400 Musterlingen&quot;, 0, calcStartRow+6+calcBankAddressOffset)
-	AssertCell(calcHelper, &quot;contactGreeting&quot;, &quot;Mia&quot;, 0, calcStartRow+6+calcFirstNameOffset)
+	AssertCell(accHelper, &quot;Acc-Customer&quot;, &quot;Ledovy Inc&quot;, 0, 4)
+	&apos;AssertAccRow(5, &quot;job&quot;, &quot;rechnung&quot;, &quot;betrag&quot;)
 End Sub
 
-Sub AssertRow(i as Integer, datum, title, factor, time, cost as String)
-	Dim row as Integer
-	row = calcStartRow+i
-	AssertCell(calcHelper, &quot;entry &quot;+row+&quot;:datum&quot;, datum, 0, row)
-	AssertCell(calcHelper, &quot;entry &quot;+row+&quot;:title&quot;, title, 1, row)
-	AssertCell(calcHelper, &quot;entry &quot;+row+&quot;:factor&quot;, factor, 2, row)
-	AssertCell(calcHelper, &quot;entry &quot;+row+&quot;:time&quot;, time, 3, row)
-	AssertCell(calcHelper, &quot;entry &quot;+row+&quot;:cost&quot;, cost, 4, row)
+Sub AssertAccRow(row as Integer, title, calc, money as String)
+
 End Sub
 </script:module>

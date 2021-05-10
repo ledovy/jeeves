@@ -27,4 +27,6 @@
  <library:element library:name="CalcData"/>
  <library:element library:name="CellHelperTestGetSetValue"/>
  <library:element library:name="JeevesUtil"/>
+ <library:element library:name="AccWriter"/>
+ <library:element library:name="AccWriterTest"/>
 </library:library>
