@@ -160,32 +160,34 @@ Sub ProcessAcc
 End Sub
 
 Sub AssertAccSheet
+	&apos;step 1: add calculation ledovy inc
 	data.OpenCalcPath(ledovyDoc)
 	ProcessAcc()
+	
 	accHelper = data.getAccHelper(&quot;2021&quot;)
-	&apos;acmeHelper = data.getAccHelper(&quot;ACME 2021&quot;)
-	&apos;ledovyHelper = data.getAccHelper(&quot;Ledovy Inc 2021&quot;)
-		
-	AssertRange(accHelper, &quot;Acc0-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
+	AssertCell(accHelper, &quot;Acc0-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, 0, 0)
 	AssertCell(accHelper, &quot;Acc0-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
 	AssertAccRow(accHelper, 6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc)
 	AssertAccRow(accHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
 	AssertAccRow(accHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
 	AssertCell(accHelper, &quot;Acc0-Total&quot;, &quot;Total&quot;, accCustomerColumn, 9)
 	AssertCell(accHelper, &quot;Acc0-Total&quot;, &quot;SFr. 1&apos;362.50&quot;, accCostColumn, 9)
-		
-	&apos;AssertRange(ledovyHelper, &quot;Acc0a-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen Ledovy Inc 2021&quot;, &quot;A1&quot;)
-	&apos;AssertCell(ledovyHelper, &quot;Acc0a-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
-	&apos;AssertAccRow(ledovyHelper, 6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc)
-	&apos;AssertAccRow(ledovyHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-	&apos;AssertAccRow(ledovyHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-	&apos;AssertCell(ledovyHelper, &quot;Acc0a-Total&quot;, &quot;Total&quot;, accCustomerColumn, 9)
-	&apos;AssertCell(ledovyHelper, &quot;Acc0a-Total&quot;, &quot;SFr. 1&apos;362.50&quot;, accCostColumn, 9)
 	
+	ledovyHelper = data.getAccHelper(&quot;Ledovy Inc 2021&quot;)
+	AssertCell(ledovyHelper, &quot;Acc0a-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen Ledovy Inc 2021&quot;, 0, 0)
+	AssertCell(ledovyHelper, &quot;Acc0a-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(ledovyHelper, 6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc)
+	AssertAccRow(ledovyHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertAccRow(ledovyHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(ledovyHelper, &quot;Acc0a-Total&quot;, &quot;Total&quot;, accCustomerColumn, 9)
+	AssertCell(ledovyHelper, &quot;Acc0a-Total&quot;, &quot;SFr. 1&apos;362.50&quot;, accCostColumn, 9)
+	
+	&apos;step 2: add calculation acme
 	data.OpenCalcPath(acmeDoc)
 	ProcessAcc()
+	acmeHelper = data.getAccHelper(&quot;ACME 2021&quot;)
 		
-	AssertRange(accHelper, &quot;Acc1-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
+	AssertCell(accHelper, &quot;Acc1-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, 0, 0)
 	AssertCell(accHelper, &quot;Acc1-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
 	AssertAccRow(accHelper, 6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc)
 	AssertAccRow(accHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
@@ -194,12 +196,29 @@ Sub AssertAccSheet
 	AssertAccRow(accHelper, 10, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
 	AssertCell(accHelper, &quot;Acc1-Total&quot;, &quot;Total&quot;, accCustomerColumn, 12)
 	AssertCell(accHelper, &quot;Acc1-Total&quot;, &quot;SFr. 2&apos;308.33&quot;, accCostColumn, 12)
+		
+	AssertCell(ledovyHelper, &quot;Acc1a-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen Ledovy Inc 2021&quot;, 0, 0)
+	AssertCell(ledovyHelper, &quot;Acc1a-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(ledovyHelper, 6, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc)
+	AssertAccRow(ledovyHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertAccRow(ledovyHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(ledovyHelper, &quot;Acc1a-Total&quot;, &quot;Total&quot;, accCustomerColumn, 9)
+	AssertCell(ledovyHelper, &quot;Acc1a-Total&quot;, &quot;SFr. 1&apos;362.50&quot;, accCostColumn, 9)
+		
+	AssertCell(acmeHelper, &quot;Acc1b-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen ACME 2021&quot;, 0, 0)
+	AssertCell(acmeHelper, &quot;Acc1b-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 5)
+	AssertAccRow(acmeHelper, 6, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
+	AssertAccRow(acmeHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertAccRow(acmeHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(acmeHelper, &quot;Acc1b-Total&quot;, &quot;Total&quot;, accCustomerColumn, 9)
+	AssertCell(acmeHelper, &quot;Acc1b-Total&quot;, &quot;SFr. 945.83&quot;, accCostColumn, 9)
 	
+	&apos;step 3: update calculation ledovy inc
 	PrepareTestFile(ledovyOriginal2, ledovyDoc)
 	data.OpenCalcPath(ledovyDoc)
 	ProcessAcc()
 	
-	AssertRange(accHelper, &quot;Acc2-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
+	AssertCell(accHelper, &quot;Acc2-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, 0, 0)
 	AssertCell(accHelper, &quot;Acc2-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
 	AssertAccRow(accHelper, 6, &quot;Coding2&quot;, DATE(), &quot;SFr. 1&apos;562.50&quot;, &quot;file://&quot;+ledovyDoc)
 	AssertAccRow(accHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
@@ -208,21 +227,55 @@ Sub AssertAccSheet
 	AssertAccRow(accHelper, 10, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
 	AssertCell(accHelper, &quot;Acc2-Total&quot;, &quot;Total&quot;, accCustomerColumn, 12)
 	AssertCell(accHelper, &quot;Acc2-Total&quot;, &quot;SFr. 2&apos;508.33&quot;, accCostColumn, 12)
+		
+	AssertCell(ledovyHelper, &quot;Acc2a-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen Ledovy Inc 2021&quot;, 0, 0)
+	AssertCell(ledovyHelper, &quot;Acc2a-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(ledovyHelper, 6, &quot;Coding2&quot;, DATE(), &quot;SFr. 1&apos;562.50&quot;, &quot;file://&quot;+ledovyDoc)
+	AssertAccRow(ledovyHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertAccRow(ledovyHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(ledovyHelper, &quot;Acc2a-Total&quot;, &quot;Total&quot;, accCustomerColumn, 9)
+	AssertCell(ledovyHelper, &quot;Acc2a-Total&quot;, &quot;SFr. 1&apos;562.50&quot;, accCostColumn, 9)
+		
+	AssertCell(acmeHelper, &quot;Acc2b-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen ACME 2021&quot;, 0, 0)
+	AssertCell(acmeHelper, &quot;Acc2b-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 5)
+	AssertAccRow(acmeHelper, 6, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
+	AssertAccRow(acmeHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertAccRow(acmeHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(acmeHelper, &quot;Acc2b-Total&quot;, &quot;Total&quot;, accCustomerColumn, 9)
+	AssertCell(acmeHelper, &quot;Acc2b-Total&quot;, &quot;SFr. 945.83&quot;, accCostColumn, 9)
 	
+	&apos;step 4: add second calculation ledovy inc
 	PrepareTestFile(ledovyOriginal, ledovyDoc2)
 	data.OpenCalcPath(ledovyDoc2)
 	ProcessAcc()
 	
-	AssertRange(accHelper, &quot;Acc2-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, &quot;A1&quot;)
-	AssertCell(accHelper, &quot;Acc2-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertCell(accHelper, &quot;Acc3-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen 2021&quot;, 0, 0)
+	AssertCell(accHelper, &quot;Acc3-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
 	AssertAccRow(accHelper, 6, &quot;Coding2&quot;, DATE(), &quot;SFr. 1&apos;562.50&quot;, &quot;file://&quot;+ledovyDoc)
 	AssertAccRow(accHelper, 7, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc2)
 	AssertAccRow(accHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-	AssertCell(accHelper, &quot;Acc2-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 9)
+	AssertCell(accHelper, &quot;Acc3-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 9)
 	AssertAccRow(accHelper, 10, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
 	AssertAccRow(accHelper, 11, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-	AssertCell(accHelper, &quot;Acc2-Total&quot;, &quot;Total&quot;, accCustomerColumn, 13)
-	AssertCell(accHelper, &quot;Acc2-Total&quot;, &quot;SFr. 3&apos;870.83&quot;, accCostColumn, 13)
+	AssertCell(accHelper, &quot;Acc3-Total&quot;, &quot;Total&quot;, accCustomerColumn, 13)
+	AssertCell(accHelper, &quot;Acc3-Total&quot;, &quot;SFr. 3&apos;870.83&quot;, accCostColumn, 13)
+		
+	AssertCell(ledovyHelper, &quot;Acc3a-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen Ledovy Inc 2021&quot;, 0, 0)
+	AssertCell(ledovyHelper, &quot;Acc3a-Ledovy&quot;, &quot;Ledovy Inc&quot;, accCustomerColumn, 5)
+	AssertAccRow(ledovyHelper, 6, &quot;Coding2&quot;, DATE(), &quot;SFr. 1&apos;562.50&quot;, &quot;file://&quot;+ledovyDoc)
+	AssertAccRow(ledovyHelper, 7, &quot;Coding&quot;, DATE(), &quot;SFr. 1&apos;362.50&quot;, &quot;file://&quot;+ledovyDoc2)
+	AssertAccRow(ledovyHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertAccRow(ledovyHelper, 9, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(ledovyHelper, &quot;Acc3a-Total&quot;, &quot;Total&quot;, accCustomerColumn, 10)
+	AssertCell(ledovyHelper, &quot;Acc3a-Total&quot;, &quot;SFr. 2&apos;925.00&quot;, accCostColumn, 10)
+		
+	AssertCell(acmeHelper, &quot;Acc3b-Header&quot;, &quot;Mia Muster – Auflistung Abrechnungen ACME 2021&quot;, 0, 0)
+	AssertCell(acmeHelper, &quot;Acc3b-ACME&quot;, &quot;ACME&quot;, accCustomerColumn, 5)
+	AssertAccRow(acmeHelper, 6, &quot;Lieferung Rüebli&quot;, DATE(), &quot;SFr. 945.83&quot;, &quot;file://&quot;+acmeDoc)
+	AssertAccRow(acmeHelper, 7, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertAccRow(acmeHelper, 8, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+	AssertCell(acmeHelper, &quot;Acc3b-Total&quot;, &quot;Total&quot;, accCustomerColumn, 9)
+	AssertCell(acmeHelper, &quot;Acc3b-Total&quot;, &quot;SFr. 945.83&quot;, accCostColumn, 9)
 End Sub
 
 Sub AssertAccRow(helper as Object, row as Integer, title, calc, cost, file as String)

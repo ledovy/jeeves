@@ -126,23 +126,21 @@ Public Sub OpenAccPath(path as String)
 	accPath = path
 End Sub
 
-Public Function GetAccHelper(sheetName as String) as Object
+Public Function HasAccSheet(sheetName as String) as Boolean
+	HasAccSheet = accDoc.Sheets.hasByName(sheetName)
+End Function
+
+Public Function CreateAccSheet(sheetName as String, position as Integer, model as Object) as Object
+	accDoc.Sheets.copyByName(templateSheetName, sheetName, position)
 	Dim helper as Object
-	If Not IsEmpty(accDoc) Then
-		If accDoc.Sheets.hasByName(sheetName) Then
-			helper = DocHelper(accDoc, sheetName)
-		Else
-			Dim model as New CalcModel
-			model.ReadContactData(GetContactHelper())
-			accDoc.Sheets.copyByName(templateSheetName, sheetName, 0)
-			helper = DocHelper(accDoc, sheetName)
-			helper.SetRangeText(&quot;A1&quot;, model.Data.contactFirstName+&quot; &quot;+model.Data.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
-			helper.SaveDoc()
-		End If
-		GetAccHelper = helper
-	Else
-		Info(&quot;no accDoc: &quot;+accPath)
-	End If
+	helper = DocHelper(accDoc, sheetName)
+	helper.SetRangeText(&quot;A1&quot;, model.Data.contactFirstName+&quot; &quot;+model.Data.contactLastName+&quot; – Auflistung Abrechnungen &quot;+sheetName)
+	helper.SaveDoc()
+	CreateAccSheet = helper
+End Function
+
+Public Function GetAccHelper(sheetName as String) as Object
+	GetAccHelper = DocHelper(accDoc, sheetName)
 End Function
 
 Public Sub CloseDocs

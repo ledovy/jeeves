@@ -5,7 +5,7 @@ Option Compatible
 Option ClassModule
 Option Explicit
 
-Dim accHelper as Object
+&apos;Dim accHelper as Object
 &apos;Dim customerHelper as Object
 Dim provider as Object
 Dim model as Object
@@ -23,38 +23,51 @@ End Sub
 Dim lastRow As Integer
 Dim msg as String
 
-Public Sub WriteAccounting(m as Object)
-	model = m
-	accHelper = provider.GetAccHelper(model.Data.calculationYear)
-	lastRow = accHelper.FindRow(accCustomerColumn, accStartRow, &quot;Total&quot;, True)
+Public Sub WriteAccounting(dataModel as Object)
+	model = dataModel
+	Dim yearHelper, customerHelper as Object
+	Dim yearName, customerName as String
+
+	yearName = model.Data.calculationYear
+	If provider.HasAccSheet(yearName) Then
+		yearHelper = provider.GetAccHelper(yearName)
+	Else
+		yearHelper = provider.CreateAccSheet(yearName, 0, model)
+	End If
+	WriteAccountingSheet(yearHelper)
+
+	customerName = model.Data.customerCompany+&quot; &quot;+model.Data.calculationYear
+	If provider.HasAccSheet(customerName) Then
+		customerHelper = provider.GetAccHelper(customerName)
+	Else
+		customerHelper = provider.CreateAccSheet(customerName, 1, model)
+	End If
+	WriteAccountingSheet(customerHelper)
+End Sub
+
+Public Sub WriteAccountingSheet(helper as Object)
+	lastRow = helper.FindRow(accCustomerColumn, accStartRow, &quot;Total&quot;, True)
 	
 	Dim customerRow as Integer
-	customerRow = GetCustomerRow(model.Data.customerCompany)+1
+	customerRow = GetCustomerRow(helper, model.Data.customerCompany)+1
 	
 	Dim entryRow as Integer
-	entryRow = GetEntryRow(customerRow)
+	entryRow = GetEntryRow(helper, customerRow)
 	
-	&apos;TODO write customer-details
-	&apos;TODO  -&gt; clear old entries, if calc already exists in acc
-	&apos;TODO  -&gt; write entries for calc
-	&apos;TODO  -&gt; write total-entry
-	&apos;TODO create accRowEntry with ref to customer-details
-	WriteAccRow(model.Accounting, entryRow)
-	&apos;WriteAccRow(AccRowEntry(calcHelper, calcTotalRow, model.Data.fileName), entryRow)
-    accHelper.SortRange(accTimeColumn, accCustomerColumn, customerRow, accCostColumn, entryRow+1)
-	accHelper.SetFormula(accCostColumn, lastRow, &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;)
-	accHelper.SaveDoc()
-	&apos;accHelper.CloseDoc()
+	WriteAccRow(helper, model.Accounting, entryRow)
+	helper.SortRange(accTimeColumn, accCustomerColumn, customerRow, accCostColumn, entryRow+1)
+	helper.SetFormula(accCostColumn, lastRow, &quot;=SUM(D&quot;+(accStartRow+1)+&quot;:D&quot;+(lastRow)+&quot;)&quot;)
+	helper.SaveDoc()
 	Info(msg)
 End Sub
 
-Private Function GetEntryRow(row as Integer)
+Private Function GetEntryRow(helper as Object, row as Integer)
 	Dim entryRow As Integer
-	entryRow = accHelper.FindRow(accFileColumn, row, model.Data.fileName, True)
+	entryRow = helper.FindRow(accFileColumn, row, model.Data.fileName, True)
 	If entryRow &lt; 0 Then
 		&apos;create new entry-row
-		entryRow = accHelper.FindRow(accTitleColumn, row, &quot;&quot;, True)+1
-		accHelper.InsertRows(entryRow, 1)
+		entryRow = helper.FindRow(accTitleColumn, row, &quot;&quot;, True)+1
+		helper.InsertRows(entryRow, 1)
 		lastRow = lastRow+1
 		msg = &quot;Eintrag zur Buchhaltung hinzugefügt&quot;
 	Else
@@ -63,24 +76,24 @@ Private Function GetEntryRow(row as Integer)
 	GetEntryRow = entryRow
 End Function
 
-Private Function GetCustomerRow(company as String)
+Private Function GetCustomerRow(helper as Object, company as String)
 	Dim row as Integer
-	row = accHelper.FindRow(accCustomerColumn, accStartRow, company, True)
+	row = helper.FindRow(accCustomerColumn, accStartRow, company, True)
 	If row &lt; 0 Then
 	&apos;if customer does not exist, create a new title
 		row = lastRow-1
-		accHelper.InsertRows(row-1, accCustomerSpacing)
-		accHelper.SetText(accCustomerColumn, row, company)
+		helper.InsertRows(row-1, accCustomerSpacing)
+		helper.SetText(accCustomerColumn, row, company)
 		lastRow = lastRow+accCustomerSpacing
 	End If
 	GetCustomerRow = row
 End Function
 
-Private Sub WriteAccRow(entry as Object, row as Integer)
+Private Sub WriteAccRow(helper as Object, entry as Object, row as Integer)
 	&apos;write entry for calculation
-	accHelper.SetText(accTitleColumn, row, entry.title)
-	accHelper.SetDate(accTimeColumn, row, entry.time)
-	accHelper.SetMoney(accCostColumn, row, entry.cost)
-	accHelper.SetText(accFileColumn, row-1, entry.fileName)	&apos;why is the row shifted???
+	helper.SetText(accTitleColumn, row, entry.title)
+	helper.SetDate(accTimeColumn, row, entry.time)
+	helper.SetMoney(accCostColumn, row, entry.cost)
+	helper.SetText(accFileColumn, row-1, entry.fileName)	&apos;why is the row shifted???
 End Sub
 </script:module>
