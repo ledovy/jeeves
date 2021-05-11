@@ -2,6 +2,111 @@
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="JeevesUtil" script:language="StarBasic">REM  *****  BASIC  *****
 
+Public Const templateSheetName = &quot;Vorlage&quot;
+
+Public Const timeSheetTitle = &quot;Zeiterfassung&quot;
+
+Public Const timeDateColumn = 0
+Public Const timeTimeColumn = 1
+Public Const timeTypeColumn = 2
+Public Const timeNameColumn = 3
+Public Const timeMaxTimeColumn = 4
+Public Const timeMaxCostColumn = 5
+Public Const timeFactorCostColumn = 6
+Public Const timeFactorTimeColumn  = 7
+Public Const timeCollapsedColumn = 8
+Public Const timeCostColumn = 9
+Public Const timeTimeRoundedColumn = 10
+Public Const timeTimeFormattedColumn = 11
+Public Const timeCostRoundedColumn = 12
+Public Const timeCostFactorColumn = 13
+Public Const timeFirstEntryRow = 12
+
+Public Const timeMaxEntries = 300
+
+Public Const masterCaptionColumn = 0
+Public Const masterValueColumn = 1
+Public Const masterCustomerTitleRow = 0
+Public Const masterCustomerNameRow = 1
+Public Const masterCustomerCompanyRow = 2
+Public Const masterCustomerEmailRow = 3
+Public Const masterCalculationTitleRow = 4
+Public Const masterAccountingTitleRow = 5
+Public Const masterStartDateRow = 6
+Public Const masterCalculationDateRow = 7
+Public Const masterCalculationYearRow = 8
+
+
+Public Const typeSheetTitle = &quot;Arbeitstypen&quot;
+
+Public Const typeTypeColumn = 0
+Public Const typeCollapsedColumn = 1
+Public Const typeCollapsedMinutesColumn = 2
+
+Public Const typeCostColumn = 3&apos;6
+Public Const typeTimeColumn = 4&apos;7
+Public Const typeCostPerMinutesColumn = 5&apos;8
+
+Public Const typeEffortColumn = 6&apos;3
+
+Public Const typeMinutesRoundedColumn = 7&apos;4
+Public Const typeMinutesFormattedColumn = 8&apos;5
+
+Public Const typeCostsFormattedColumn = 9
+
+Public Const typeFirstWorkTypesRow = 1
+
+
+Public Const calcSheetTitle = &quot;Abrechnung&quot;
+
+Public Const calcDateColumn = 0
+Public Const calcNameColumn = 1
+Public Const calcFactorColumn = 2
+Public Const calcTimeColumn = 3
+Public Const calcCostColumn = 4
+Public Const calcStartRow = 8
+
+Public Const calcContactInfoColumn = 0
+Public Const calcBankPcOffset = 3
+Public Const calcBankIbanOffset = 4
+Public Const calcBankAddressOffset = 5
+Public Const calcFirstNameOffset = 8
+
+
+Public Const configSheetTitle = &quot;Konfiguration&quot;
+
+Public Const configCaptionColumn = 0
+Public Const configValueColumn = 1
+Public Const configShowTimeSumRow = 1
+Public Const configShowCostSumRow = 2
+Public Const configPathAccountingRow = 3
+Public Const configJeevesVersionRow = 4
+Public Const configDefaultFactorCostRow = 5
+Public Const configDefaultFactorTimeRow = 6
+
+
+Public Const contactSheetTitle = &quot;Kontaktdaten&quot;
+
+Public Const contactCaptionColumn = 0
+Public Const contactValueColumn = 1
+Public Const contactTitleRow = 0
+Public Const contactFirstNameRow = 1
+Public Const contactLastNameRow = 2
+Public Const contactAddressRow = 3
+Public Const contactBankTitleRow = 4
+Public Const contactBankPcRow = 5
+Public Const contactBankIbanRow = 6
+
+Public Const accCustomerColumn = 0
+Public Const accTitleColumn = 1
+Public Const accTimeColumn = 2
+Public Const accCostColumn = 3
+Public Const accFileColumn = 4
+Public Const accStartRow = 3
+
+Public Const accCustomerSpacing = 2
+
+
 Public Sub Main
 	Info(&quot;Jeeves v2.1.1-SNAPSHOT&quot;)
 End Sub

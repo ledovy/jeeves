@@ -10,7 +10,7 @@
  <library:element library:name="JeevesApp"/>
  <library:element library:name="ClassContact"/>
  <library:element library:name="CalcWriterTest"/>
- <library:element library:name="DocInfo"/>
+ <library:element library:name="AccEntry"/>
  <library:element library:name="CellHelper"/>
  <library:element library:name="CellHelperTestFindRow"/>
  <library:element library:name="ClassCalculation"/>
@@ -28,5 +28,4 @@
  <library:element library:name="CellHelperTestGetSetValue"/>
  <library:element library:name="JeevesUtil"/>
  <library:element library:name="AccWriter"/>
- <library:element library:name="AccEntry"/>
 </library:library>

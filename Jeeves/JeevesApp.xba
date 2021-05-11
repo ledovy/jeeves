@@ -5,12 +5,23 @@
 Public calculation as Object
 Public accounting as Object
 Public dataProvider As Object
+&apos;Public data As Object
+&apos;Dim model as Object
+&apos;Dim reader as Object
+&apos;Dim calcWriter as Object
+&apos;Dim accWriter as Object
 
 
 Sub ReloadDataProvider
 	&apos;TODO: replace ClassDataProvider with JeevesData
 	dataProvider = new ClassDataProvider
 	dataProvider.Init(ThisComponent)
+	&apos;data = new JeevesData
+	&apos;data.OpenCalcSheet()
+	&apos;reader = new CalcReader
+	&apos;reader.Init(data)
+	&apos;calcWriter = new CalcWriter
+	&apos;calcWriter.Init(data)
 End Sub
 
 &apos; timeSheet: Zeiterfassung
@@ -85,34 +96,41 @@ End Sub
 Sub RunCalculation
 	&apos;BUTTON: Rechnung aktualisieren
 	InitCalculation()
-	
+		
+	&apos;TODO: use CalcWriter
 	calculation.CreateCalculation()
+	&apos;calcWriter.WriteCalculation(model)
 End Sub
 
 Sub ClearCalculation
 	&apos;BUTTON: Rechnung leeren
 	InitCalculation()
 	
+	&apos;TODO: use CalcWriter
 	calculation.ClearEntries()
+	&apos;calcWriter.ClearEntries()
 End Sub
 
 Sub InitCalculation
 	ReloadDataProvider()
-	&apos;TODO: use CalcReader/-Writer
+	&apos;TODO: use CalcReader
 	calculation = new ClassCalculation
 	calculation.Init(dataProvider)
+	&apos;model = reader.ReadCalculation()
 End Sub
 
 Sub RunAccounting
 	&apos;Buchhaltung aktualisieren
 	InitAccounting()
 	
+	&apos;TODO: use AccWriter
 	accounting.UpdateAccounting()
 End Sub
 
 Sub InitAccounting
 	ReloadDataProvider()
-	&apos;TODO: create new AccWriter
+	
+	&apos;TODO: use CalcReader
 	accounting = new ClassAccounting
 	accounting.Init(dataProvider)
 End Sub
